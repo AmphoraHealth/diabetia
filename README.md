@@ -1,2 +1,2 @@
-# diabetia
+# DiabetIA
 diabetia related exploration
