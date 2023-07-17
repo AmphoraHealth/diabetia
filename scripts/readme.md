@@ -1,1 +1,1 @@
-here we will store all the plots related to a graph
+here we will store all the scripts related to a graph
