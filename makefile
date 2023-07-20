@@ -1,3 +1,6 @@
+create_env:
+	bash run_enviroment.sh
+
 download: data/hk_database.csv
 	@echo "Downloaded hk_database.csv"
 
