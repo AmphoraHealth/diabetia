@@ -8,19 +8,19 @@
 Input:
   - data/diabetia.csv
 Output:
-  - data/fold_selection-{complication}.json
+  - data/fold_selection-{diagnostic}.json
 Additional outputs:
   - None
 """
 
-# get complication from command line
-import sys
-COMPLICATION = sys.argv[1]
-if not COMPLICATION in ['E112','E113','E114','E115']:
-    raise ValueError('given complication must be one of E112, E113, E114, E115')
+# get complication from command line ------------------------------------------
+from conf.global_constants import DIAGNOSTIC
 
-# Constants
+# Constants -------------------------------------------------------------------
 IN_PATH = 'data/diabetia.csv'
-OUT_PATH = f"data/fold_selection-{COMPLICATION}.json"
+OUT_PATH = f"data/fold_selection-{DIAGNOSTIC}.json"
 
-# Import libraries
+# Import libraries ------------------------------------------------------------
+
+# Code: fold selection --------------------------------------------------------
+# general code to make stratified folds given the selected diagnostic
