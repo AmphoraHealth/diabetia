@@ -12,9 +12,9 @@ Additional outputs:
 """
 
 # Constants
-IN_PATH = '../data/hk_database.csv'
-OUT_PATH = '../data/hk_database_cleaned.csv'
-CONFIG_PATH = '../conf/engineering_conf.json'
+IN_PATH = './data/hk_database.csv'
+OUT_PATH = './data/hk_database_cleaned.csv'
+CONFIG_PATH = './conf/engineering_conf.json'
 
 # Import libraries
 import pandas as pd
@@ -23,11 +23,68 @@ import re
 import os
 import logging
 import json
+import sys
 from sklearn import preprocessing
+from alive_progress import alive_bar
 
 #..Default configurations
 logging_format = '%(asctime)s|%(name)s|%(levelname)s: %(message)s'
 logging.basicConfig(level=logging.INFO, format=logging_format, datefmt='%d-%m-%y %H:%M:%S')
+
+#############################################################################
+# Auxiliar functions
+#############################################################################
+
+def snakeCase(string:str) -> str:
+    """
+    Function to change a string into snake case
+    """
+    string = str(string)
+    replaces = {
+        'á':'a',
+        'é':'e',
+        'í':'i',
+        'ó':'o',
+        'ú':'u',
+        'ñ':'n',
+        ' ':'_',
+        ',':'',
+        '.':'',
+        '[':'',
+        ']':''
+    }
+    
+    string = string.split()
+    string = [s.strip().lower() for s in string]
+    string = '_'.join(string)
+        
+    for k,v in replaces.items():
+        string = string.replace(k,v)
+    
+    return string
+
+def labelDxEncoder(obj:list[int,int]) -> int:
+    """
+    Function to transform binary prediction into labels in order to indetify cases:
+    - [0,0] = 0
+    - [0,1] = 1
+    - [1,1] = 2
+    - [1,0] = error
+    """
+    try:
+        if obj == [0,0]:
+            return 0
+        elif obj == [0,1]:
+            return 1
+        elif obj == [1,1]:
+            return 2
+        else:
+            return np.nan
+    except:
+        return np.nan
+
+
+ #############################################################################   
 
 class DataEngineering:
     
@@ -38,17 +95,49 @@ class DataEngineering:
       ):
         self.in_path:str = IN_PATH
         self.config_path:str = CONFIG_PATH
-        self.data:pd.dataFrame = pd.DataFrame()
+        self.data:pd.DataFrame = pd.DataFrame()
         self.config:dict = json.load(open(f'{self.config_path}', 'r'))
+
+
+    def mainTransform(self) -> pd.DataFrame:
+        """
+        Function to run all transformations.
+        """
+        try:
+            #..Transformations starts
+            self.readFile()
+            self.cleanHeaders()
+            self.dropCols()
+            self.categoricalCols()
+            self.ordinalCols()
+            self.updateDiagnosis()
+
+            logging.info('Transformations done')
+            return self.data
+        except Exception as e:
+            return logging.warning(f'Transformations failed. {e}')
     
 
-    def readFile(self):
+    def readFile(self,rows:int = None):
         try:
+            self.data = pd.read_csv(f'{self.in_path}', low_memory=False, nrows=rows)
             return logging.info('File read')
         except Exception as e:
             return logging.warning(f'File was not read. {e}')
           
-    
+
+    def cleanHeaders(self):
+        """
+        function to clean headers and json file
+        """    
+        try:
+            #..updating names in file
+            self.data.columns = [snakeCase(str(column)) for column in self.data.columns]
+            return logging.info('Headers converted into snakeCase')
+        except Exception as e:
+            logging.warning(f'{self.cleanHeaders.__name__} failed. {e}')
+
+
     def dropCols(self):
         """
         Function to drop next columns:
@@ -57,7 +146,24 @@ class DataEngineering:
         - all columns that are counts
         """   
         try:
-            return logging.info(f'{0} columns dropped')
+            #..Drop unncessesary columns by json file
+            dropUnnecessaryCols:list[str] = self.config['config']['columnsToDrop']['unnecessaryCols']
+            self.data.drop(columns=dropUnnecessaryCols, inplace=True)
+
+            #..Drop empty columns
+            dropEmptyCols:list[str] = self.data.columns[self.data.isnull().all()]
+            self.data.drop(columns=dropEmptyCols, inplace=True)
+
+            #..Drop counts
+            dropCountColumns:list[str] = [n for n in self.data.columns if bool(re.match('^.*count$',n)) == True]
+            self.data.drop(columns=dropCountColumns, inplace=True)
+
+            columnsDropped:int = len(dropUnnecessaryCols)\
+                +len(dropEmptyCols)\
+                +len(dropCountColumns)
+            
+            return logging.info(f'{columnsDropped} columns dropped')
+        
         except Exception as e:
             return logging.warning(f'Columns were not dropped. {e}')
         
@@ -69,9 +175,38 @@ class DataEngineering:
         labels with LabelEnconder from sklearn.
         """
         try:
+            #..Get categorical cols from json config and encoder from sklearn
+            categoricalCols:list[str] = self.config['config']['categorical_cols']
+            encoder:object = preprocessing.LabelEncoder()
+            
+            #..Loop all columns in config
+            for col in self.config['config']['categorical_cols']:
+                self.data[col] = encoder.fit_transform(self.data[col])
+                
             return logging.info('Categorical cols transformed')
+        
         except Exception as e:
             return logging.warning(f'{self.categoricalCols.__name__} failed. {e}')
+        
+
+    def ordinalCols(self):
+        """
+        Function to clean ordinal columns. It is required to write in engineering_conf
+        the columns which are consider as ordinal. 
+        """
+        try:
+            #..Get ordinal cols from json config file
+            ordinalCols:list[str] = self.config['config']['ordinal_cols']
+
+            #..Loop all columns in config
+            for column in ordinalCols:
+                self.data[column] = \
+                    pd.to_datetime(self.data[column], errors='coerce')\
+                    .apply(lambda x: x.toordinal() if pd.isnull(x) == False else x)
+                
+            return logging.info('Ordinal cols transformed')
+        except Exception as e:
+            return logging.warning(f'{self.ordinalCols.__name__} failed. {e}') 
     
 
     def updateDiagnosis(self): 
@@ -85,27 +220,24 @@ class DataEngineering:
         3. [1,1] = 2
         """  
         try:
-            return logging.info(f'{0} columns dropped')
-        except Exception as e:
-            return logging.warning(f'Columns were not dropped. {e}')
-        
+            #..Get diagnosis columns from json config file
+            dxCols:dict[str:str] = self.config['config']['diagnosis']
 
-    def transform(self) -> pd.DataFrame:
-        """
-        Function to run all transformations.
-        """
-        try:
-            logging.info('Transformations done')
-            return self.data
+            #..Loop through dxCols dictionary to clean each dx
+            with alive_bar(len(dxCols.keys()), title='### Y Values in transformation') as bar:
+                for cie, name in dxCols.items():
+                    self.data[cie] = self.data.apply(lambda x: labelDxEncoder(x[[name,cie]].to_list()), axis=1)
+                    bar()
+            return logging.info(f'Y Values transformed into labels')
         except Exception as e:
-            return logging.warning(f'Transformations failed. {e}')
-    
+            return logging.warning(f'Y Values were not transformed. {e}')
+        
 
     def __str__(self):
         return 'Data engineering transformations'
 
 
-def run() -> pd.DataFrame:
+def runDataEngineering() -> pd.DataFrame:
     """
     Function to run all data engineering process
     """
@@ -117,7 +249,7 @@ def run() -> pd.DataFrame:
       )
 
       # Run transformations
-      data = data_engineering.transform()
+      data = data_engineering.mainTransform()
 
       # Save file
       data.to_csv(f'{OUT_PATH}', index=False, encoding='UTF-8')
@@ -125,10 +257,10 @@ def run() -> pd.DataFrame:
       return logging.info(f'File saved on {OUT_PATH}')
     
     except Exception as e:
-        return logging.warning(f'{run.__name__} process failed. {e}')
+        return logging.warning(f'{runDataEngineering.__name__} process failed. {e}')
 
 
 if __name__ == '__main__':
     logging.info(f'{"="*30}DATA ENGINEERING STARTS')
-    run()
+    runDataEngineering()
     logging.info(f'{"="*30}DATA ENGINEERING FINISHED')
