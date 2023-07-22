@@ -1,0 +1,37 @@
+{
+    "config":{
+        "diagnosis":{
+            "e112":"diabetes_mellitus_tipo_2_con_complicaciones_renales",
+            "e113":"diabetes_mellitus_tipo_2_con_complicaciones_oftalmicas",
+            "e114":"diabetes_mellitus_tipo_2_con_complicaciones_neurologicas",
+            "e115":"diabetes_mellitus_tipo_2_con_complicaciones_circulatorias_perifericas"
+        },
+        "columnsToDrop":{
+            "unnecessaryCols":[
+                "cx_curp",
+                "first_cx",
+                "last_cx",
+                "count_cx_w",
+                "years_cx",
+                "window",
+                "x_start",
+                "x_end",
+                "y_start",
+                "y_end",
+                "e11",
+                "e110",
+                "e111",
+                "e116",
+                "e117",
+                "e118",
+                "e119"
+            ]
+        },
+        "ordinal_cols":[
+            "df_nacimiento"
+        ],
+        "categorical_cols":[
+            "cs_sexo"
+        ]
+    }
+}
