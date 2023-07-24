@@ -1,8 +1,13 @@
-create_env:
-	bash run_enviroment.sh
+# short names:
+create_env: .venv/bin/activate
+
+diabetia: data/diabetia.csv
 
 download: data/hk_database.csv
-	@echo "Downloaded hk_database.csv"
+
+# initial setup
+.venv/bin/activate: bash/run_enviroment.sh requirements.txt
+	bash bash/run_enviroment.sh
 
 data/hk_database.csv:
 	cd data && make hk_database.csv
