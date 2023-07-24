@@ -40,7 +40,15 @@ fi
   source .venv/bin/activate
   pip install --upgrade pip
   pip install -r  requirements.txt
+  errors=$?
   deactivate
+
+  # exit if requirements installation failed
+  if [ $errors -ne 0 ];
+  then
+    echo ">>> requirements installation failed"
+    exit 1
+  fi
 
 # succesful exit
 echo '>>> .venv created'
