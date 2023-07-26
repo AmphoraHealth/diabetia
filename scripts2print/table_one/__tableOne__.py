@@ -5,7 +5,6 @@ import sys
 import os
 import matplotlib.pyplot as plt
 import seaborn as sns
-import pyinputplus as pyp
 import json
 from tableone import TableOne
 from math import floor,ceil
@@ -16,7 +15,10 @@ import warnings
 warnings.filterwarnings('ignore')
 
 
+# add code constants
 CONFIG = json.load(open(f'{os.path.dirname(__file__)}/config.json','r'))
+IN_PATH = f"{os.getcwd()}/data/diabetia.csv"
+OUT_PATH = f"{os.getcwd()}/data/table_one"
 
 class TableConstruction:
 
@@ -29,9 +31,9 @@ class TableConstruction:
 
         self.localPath:str = os.path.dirname(__file__)
         self.config = json.load(open(f'{self.localPath}/config.json','r'))
-        self.dataPath = f"{self.config['PATHS']['outPath']}/{dataPath}"
-        self.outPath = f"{self.config['PATHS']['outPath']}/{outPath}"
-        self.pt:pd.DataFrame = pd.read_excel(f"{self.dataPath}/{fileName}")
+        self.dataPath = dataPath
+        self.outPath = outPath
+        self.pt:pd.DataFrame = pd.read_csv(fileName)
         self.cols:dict = self.config['COLUMNS']
 
 
@@ -255,23 +257,24 @@ class TableConstruction:
 
 
 def run():
+    # get the final path
+    userInputDataFolder = "/".join(IN_PATH.split("/")[:-1])
+    userInputFile = IN_PATH
+    userInputOutFolder = OUT_PATH
 
-    while True:
-        userInputDataFolder:str = input('DATA FOLDER NAME: ')
-        userInputOutFolder:str = input('FOLER NAME TO SAVE RESULTS: ')
-        if os.path.exists(f'{CONFIG["PATHS"]["outPath"]}/{userInputDataFolder}'):
-            filesMenu:list[str] = os.listdir(f'{CONFIG["PATHS"]["outPath"]}/{userInputDataFolder}')
-            break
-        else:
-            os.system('clear')
-            print(f'WARNING: "{userInputDataFolder}" does not exists. Write a valid folder.')
+    # confirm the path existance
+    if not os.path.exists(userInputDataFolder):
+        print(f"Path {userInputDataFolder} does not exist!")
+        raise Exception(f"Path {userInputDataFolder} does not exist!")
+    if not os.path.exists(userInputFile):
+        print(f"File {userInputFile} does not exist!")
+        raise Exception(f"File {userInputFile} does not exist!")
+    if not os.path.exists(userInputOutFolder):
+        os.system(f"mkdir {userInputOutFolder}")
 
+    # preprocesing
 
-    userInputFile:str = pyp.inputMenu(
-        filesMenu,numbered=True,  
-        prompt='SELECT FILE\nFiles in folder:\n'
-        )
-
+    # run the table one construction
     tblOne = TableConstruction(
         fileName=userInputFile,
         dataPath=userInputDataFolder,
