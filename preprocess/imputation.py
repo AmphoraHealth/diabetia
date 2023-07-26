@@ -11,8 +11,8 @@ Additional outputs:
 """
 
 # Constants
-IN_PATH = '../data/hk_database_cleaned.csv'
-OUT_PATH = '../data/diabetia.csv'
+IN_PATH = 'data/hk_database_cleaned.csv'
+OUT_PATH = 'data/diabetia.csv'
 
 # Import libraries
 import pandas as pd
