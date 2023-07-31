@@ -63,27 +63,6 @@ def snakeCase(string:str) -> str:
     
     return string
 
-def labelDxEncoder(obj:list[int,int]) -> int:
-    """
-    Function to transform binary prediction into labels in order to indetify cases:
-    - [0,0] = 0
-    - [0,1] = 1
-    - [1,1] = 2
-    - [1,0] = error
-    """
-    try:
-        if obj == [0,0]:
-            return 0
-        elif obj == [0,1]:
-            return 1
-        elif obj == [1,1]:
-            return 2
-        else:
-            return np.nan
-    except:
-        return np.nan
-
-
  #############################################################################   
 
 class DataEngineering:
@@ -107,10 +86,12 @@ class DataEngineering:
             #..Transformations starts
             self.readFile()
             self.cleanHeaders()
-            self.dropCols()
+            self.createAgeDx()
+            self.createYearSinceDx()
             self.categoricalCols()
             self.ordinalCols()
             self.updateDiagnosis()
+            self.dropCols()
 
             logging.info('Transformations done')
             return self.data
@@ -144,6 +125,7 @@ class DataEngineering:
         - unnecesary columns or informative
         - empty columns
         - all columns that are counts
+        - drop std (pending)
         """   
         try:
             #..Drop unncessesary columns by json file
@@ -226,12 +208,44 @@ class DataEngineering:
             #..Loop through dxCols dictionary to clean each dx
             with alive_bar(len(dxCols.keys()), title='### Y Values in transformation') as bar:
                 for cie, name in dxCols.items():
-                    self.data[cie] = self.data.apply(lambda x: labelDxEncoder(x[[name,cie]].to_list()), axis=1)
+                    self.data.loc[(self.data[(self.data[name] == 0) & (self.data[cie]==0)]).index,cie] = 0
+                    self.data.loc[(self.data[(self.data[name] == 0) & (self.data[cie]==1)]).index,cie] = 1
+                    self.data.loc[(self.data[(self.data[name] == 1) & (self.data[cie]==1)]).index,cie] = 2
                     bar()
             return logging.info(f'Y Values transformed into labels')
         except Exception as e:
             return logging.warning(f'Y Values were not transformed. {e}')
         
+    
+    def createYearSinceDx(self):
+        """
+        Function to update anio_dx for year since T2D diagnosis
+        """
+        try:
+            yearsSinceDx = pd.to_datetime(self.data['x_start']).dt.year
+            self.data.insert(3,'years_since_dx', yearsSinceDx)
+            self.data['years_since_dx'] = self.data.apply(lambda x: x['years_since_dx']-x['anio_dx'] if x['anio_dx'] > 0  else 0,axis=1)
+            self.data.loc[(self.data[self.data['years_since_dx']<0]).index,'years_since_dx'] = 0
+            return logging.info('Year since Dx updated')
+        except Exception as e:
+            return logging.warning(f'{self.createYearSinceDx.__name__} failed. {e}')
+        
+    
+    def createAgeDx(self):
+        """
+        Function to calculate age at T2D diagnosis
+        """
+        try:
+            aux = self.data[['id','df_nacimiento','anio_dx']].sort_values(by=['id','df_nacimiento'], ascending = True)
+            aux = aux[aux['anio_dx'].isnull()==False]
+            aux = aux.drop_duplicates(subset='id', keep = 'first')
+            aux['df_nacimiento'] = pd.to_datetime(aux['df_nacimiento']).dt.year
+            aux['age_diag'] = aux['anio_dx'] - aux['df_nacimiento']
+            aux_ages:dict = dict(zip(aux['id'],aux['age_diag']))
+            self.data.insert(4,'age_diag', self.data['id'].apply(lambda x: aux_ages.get(x,np.nan)))
+            return logging.info('Age at Dx created')
+        except Exception as e:
+            return logging.warning(f'{self.createAgeDx.__name__} failed. {e}')
 
     def __str__(self):
         return 'Data engineering transformations'
