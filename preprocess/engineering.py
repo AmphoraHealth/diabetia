@@ -115,7 +115,7 @@ class DataEngineering:
             #..Transformations starts
             self.readFile()
             self.cleanHeaders()
-            #self.createAgeDx()
+            self.createAgeDx()
             self.createYearSinceDx()
             self.categoricalCols()
             self.ordinalCols()
@@ -259,6 +259,26 @@ class DataEngineering:
             return logging.info('Year since Dx updated')
         except Exception as e:
             return logging.warning(f'{self.createYearSinceDx.__name__} failed. {e}')
+        
+    
+    def createAgeDx(self):
+        """
+        Function to calculate age at T2D diagnosis
+        """
+        try:
+            aux = self.data[['id','df_nacimiento','anio_dx']].sort_values(by=['id','df_nacimiento'], ascending = True)
+            aux = aux[aux['anio_dx'].isnull()==False]
+            aux = aux.drop_duplicates(subset='id', keep = 'first')
+            aux['df_nacimiento'] = pd.to_datetime(aux['df_nacimiento']).dt.year
+            aux['age_diag'] = aux['anio_dx'] - aux['df_nacimiento']
+            aux_ages:dict = dict(zip(aux['id'],aux['age_diag']))
+            self.data.insert(4,'age_diag', self.data['id'].apply(lambda x: aux_ages.get(x,np.nan)))
+            return logging.info('Age at Dx created')
+        except Exception as e:
+            return logging.warning(f'{self.createAgeDx.__name__} failed. {e}')
+
+    def __str__(self):
+        return 'Data engineering transformations'
 
 
 def runDataEngineering() -> pd.DataFrame:
