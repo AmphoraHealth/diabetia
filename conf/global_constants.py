@@ -1,45 +1,66 @@
+""" global_constants.py
+    This code is to receive the arguments from the command line and check them.
+    The arguments follow the next order:
+      - diagnostic: E112, E113, E114, E115
+      - origin: diabetia (unprocessed), discretized
+      - test_fold: 0, 1, 2, 3, 4
+      - balancing_method: unbalanced, undersampling, oversampling, midsampling
+      - normalization_method: zscore, power_transform
+      - feature_selection_method: xi2, relieff, probabilistic, mutual_info
+      - machine_learning_method: logistic, dt, bernoulli, gaussian
+"""
+
 # Import libraries
 import sys
 
 # constants
-DIAGNOSTIC = ['E112','E113','E114','E115']
-METHODS = ['xi2','relieff']
+DIAGNOSTICS = ['E112','E113','E114','E115']
+ORIGINS = ['diabetia','discretized']
 FOLDS = range(5)
-MODELS = ['logistic','dt','bernoulli','gaussian']
+BALANCING_METHODS = ['unbalanced','undersampling','oversampling','midsampling']
+NORMALIZATION_METHODS = ['zscore','power_transform']
+FS_METHODS = ['xi2','relieff','probabilistic','mutual_info']
+ML_MODELS = ['logistic','dt','bernoulli','gaussian']
 
 # default values
-DIAGNOSTIC = 'E112'
-SELECTION_METHOD = 'xi2'
-TEST_FOLD = 0
-MODEL = 'logistic'
+DIAGNOSTIC = DIAGNOSTICS[0]
+ORIGIN = ORIGINS[0]
+TEST_FOLD = FOLDS[0]
+BALANCING_METHOD = BALANCING_METHODS[0]
+NORMALIZATION_METHOD = NORMALIZATION_METHODS[0]
+FEATURE_SELECTION_METHOD = FS_METHODS[0]
+MACHINE_LEARNING_MODEL = ML_MODELS[0]
 
 # get values from command line
 if len(sys.argv) == 1:
   # default values if no argument is given
-  print("\n  missing argument, using default values")
+  print("\n  missing arguments, using default values")
 else:
   # get values from command line
   try:
     args = sys.argv[1].split('-')
-    if len(args) >= 1:
-      DIAGNOSTIC = args[0]
-    if len(args) >= 2:
-      SELECTION_METHOD = args[1]
-    if len(args) >= 3:
-      TEST_FOLD = int(args[2])
-    if len(args) >= 4:
-      MODEL = args[3]
+    DIAGNOSTIC = args[0]
+    ORIGIN = args[1]
+    TEST_FOLD = int(args[2])
+    BALANCING_METHOD = args[3]
+    NORMALIZATION_METHOD = args[4]
+    FEATURE_SELECTION_METHOD = args[5]
+    MACHINE_LEARNING_MODEL = args[6]
   except:
-    err_l1 = 'given argument must be in the form of {complication}-{method}-{test_fold}-{model}'
-    err_l2 = '  not all arguments are required, but they must be in the given order'
-    raise ValueError(f"{err_l1}\n{err_l2}")
+    pass
   
 # check values
-if not DIAGNOSTIC in DIAGNOSTIC:
+if not DIAGNOSTIC in DIAGNOSTICS:
   raise ValueError(f"given complication must be one of {', '.join(DIAGNOSTIC)}")
-if not SELECTION_METHOD in METHODS:
-  raise ValueError(f"given method must be one of {', '.join(METHODS)}")
-if not TEST_FOLD in range(5):
-  raise ValueError(f"given test fold must be an integer between 0 and {max(FOLDS)}")
-if not MODEL in MODELS:
-  raise ValueError(f"given model must be one of {', '.join(MODELS)}")
+if not ORIGIN in ORIGINS:
+  raise ValueError(f"given origin must be one of {', '.join(ORIGIN)}")
+if not TEST_FOLD in FOLDS:
+  raise ValueError(f"given test fold must be one of {', '.join(TEST_FOLD)}")
+if not BALANCING_METHOD in BALANCING_METHODS:
+  raise ValueError(f"given balancing method must be one of {', '.join(BALANCING_METHOD)}")
+if not NORMALIZATION_METHOD in NORMALIZATION_METHODS:
+  raise ValueError(f"given normalization method must be one of {', '.join(NORMALIZATION_METHOD)}")
+if not FEATURE_SELECTION_METHOD in FS_METHODS:
+  raise ValueError(f"given feature selection method must be one of {', '.join(FS_METHODS)}")
+if not MACHINE_LEARNING_MODEL in ML_MODELS:
+  raise ValueError(f"given machine learning model must be one of {', '.join(ML_MODELS)}")
