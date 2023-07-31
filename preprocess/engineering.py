@@ -63,35 +63,6 @@ def snakeCase(string:str) -> str:
     
     return string
 
-def labelDxEncoder(obj:list[int,int]) -> int:
-    """
-    Function to transform binary prediction into labels in order to indetify cases:
-    - [0,0] = 0
-    - [0,1] = 1
-    - [1,1] = 2
-
-    TD2  -- Com
-    [0,0]  [0,0] = 0
-    [0,1]  [0,0] = 1
-    [0,1]  [0,1] = 2
-    [1,1]  [0,0] = 3
-    [1,1]  [0,1] = 4
-    [1,1]  [1,1] = 5
-     
-    """
-    try:
-        if obj == [0,0]:
-            return 0
-        elif obj == [0,1]:
-            return 1
-        elif obj == [1,1]:
-            return 2
-        else:
-            return np.nan
-    except:
-        return np.nan
-
-
  #############################################################################   
 
 class DataEngineering:
@@ -237,7 +208,6 @@ class DataEngineering:
             #..Loop through dxCols dictionary to clean each dx
             with alive_bar(len(dxCols.keys()), title='### Y Values in transformation') as bar:
                 for cie, name in dxCols.items():
-                    #self.data[cie] = self.data.apply(lambda x: labelDxEncoder(x[[name,cie]].to_list()), axis=1)
                     self.data.loc[(self.data[(self.data[name] == 0) & (self.data[cie]==0)]).index,cie] = 0
                     self.data.loc[(self.data[(self.data[name] == 0) & (self.data[cie]==1)]).index,cie] = 1
                     self.data.loc[(self.data[(self.data[name] == 1) & (self.data[cie]==1)]).index,cie] = 2
