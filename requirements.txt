@@ -4,3 +4,5 @@ scikit_learn==1.0.2
 alive_progress==3.0.1
 matplotlib==3.7.2
 seaborn==0.11.2
+tableone==0.7.10
+openpyxl==3.1.2
