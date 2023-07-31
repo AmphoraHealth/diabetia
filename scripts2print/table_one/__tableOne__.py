@@ -10,6 +10,14 @@ from tableone import TableOne
 from math import floor,ceil
 from scipy.stats import chi2
 from itertools import combinations
+import aux_preprocess as aux_pre
+from time import time
+
+# get the root path of the project
+ROOT_PATH = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(ROOT_PATH)
+# import libraries from the root path
+from libs import logging
 
 import warnings
 warnings.filterwarnings('ignore')
@@ -103,11 +111,21 @@ class TableConstruction:
         """
         Process to read summarized file of diabetes registers and build table one
         """
-        columns = [n for n in self.pt.columns if n not in self.cols['colsCancer']+self.cols['colsInfo']]
+        columns = [n for n in self.pt.columns if n not in self.cols['colsCancer']+self.cols['colsInfo']+["e112","e113","e114","e115"]]
         age_columns = ['age_diag','age_index']
 
+        # perform data transformation and cleaning
+        self.pt = aux_pre.preprocess(self.pt, window=1, reduced_sample=True)
 
-        #....Table one groupby condition (OVERALL, HTN_WH_T2D, T2D_WH_HTN, TD2_W_HTN, NONE)
+        # columns cleaning
+        columns = [col for col in columns if col not in age_columns]
+        columns = [col for col in columns if not any([ col.endswith(f'_{s}') for s in ["min","max","mean","sum","std","median"] ])]
+        columns = [col for col in columns if not col in ["albumina","bacterias","bilirrubina_acetona","cilindros","eritrocitos","glucosa","hemoglobina","leucocitos","otros"]]
+        columns = [col for col in columns if not col in ["Unnamed: 0","id","age_at_wx"]]
+        columns = [col for col in columns if col.startswith("diabetes")]
+
+        #....Table one groupby condition (OVERALL, HTN_WO_T2D, T2D_WO_HTN, TD2_W_HTN, NONE)
+        logging.info(f"Starting table one construction by condition")
         pt_1 = TableOne(
                 data = self.pt, 
                 categorical = columns , 
@@ -121,6 +139,7 @@ class TableConstruction:
         )
 
         #....Table one for W_T2D
+        logging.info(f"Starting table one construction by T2D")
         pt_2 = TableOne(
                 data = self.pt, 
                 categorical = columns , 
@@ -139,6 +158,7 @@ class TableConstruction:
         Both files are concatenated in order to have all groups together
         """
 
+        logging.info(f"Concatenating tables")
         if not os.path.exists(self.outPath):
             os.system(f'mkdir {self.outPath}')
 
@@ -153,11 +173,11 @@ class TableConstruction:
         pt_ov.drop(pt_ov.iloc[0:1,:].index,inplace=True)
         pt_ov.set_index(['Variables','Levels'],inplace=True)
 
-        #..Process to W_T2D and WH_T2D
+        #..Process to W_T2D and WO_T2D
         pt_diab = pd.read_csv(f'{self.outPath}/W_T2D.csv',low_memory=True)
         pt_diab.columns = ['Variables','Levels']+[n for n in list(pt_diab.iloc[0:1,:].values[0]) if str(n) != 'nan']
         pt_diab.drop(columns=['Missing','Overall'],inplace=True)
-        pt_diab.rename(columns = {'0':'WH_T2D','1':'W_T2D'},inplace=True)
+        pt_diab.rename(columns = {'0':'WO_T2D','1':'W_T2D'},inplace=True)
 
         pt_diab = pt_diab[pt_diab['Levels']!='0']
         pt_diab.drop(pt_diab.iloc[0:1,:].index,inplace=True)
@@ -178,19 +198,22 @@ class TableConstruction:
 
         age_1 = pd.concat([
         self.pt[['age_index']].agg([np.mean,np.median,np.std,'count']).round(2).rename(columns={'age_index':'Overall'}),
-        self.pt.groupby('condition')['age_index'].agg([np.mean,np.median,np.std,'count']).round(2).T.rename(columns={'T2D':'T2D_WH_HTN'}),
-        self.pt.groupby('T2D')['age_index'].agg([np.mean,np.median,np.std,'count']).round(2).T.rename(columns={0:'WH_T2D',1:'W_T2D'})
-        ],axis=1)[['Overall','W_T2D','T2D_WH_HTN','T2D_W_HTN','WH_T2D']]
+        self.pt.groupby('condition')['age_index'].agg([np.mean,np.median,np.std,'count']).round(2).T.rename(columns={'T2D':'T2D_WO_HTN'}),
+        self.pt.groupby('T2D')['age_index'].agg([np.mean,np.median,np.std,'count']).round(2).T.rename(columns={0:'WO_T2D',1:'W_T2D'})
+        ],axis=1)[['Overall','W_T2D','T2D_WO_HTN','T2D_W_HTN','WO_T2D']]
 
         age_1 = age_1.set_index([['Age at index']*4,list(age_1.index)])
         age_1 = age_1.rename_axis(['Variables','Levels'])
 
+        # Temporal change:
+        self.pt['age_diag'] = self.pt['age_at_wx']
+
         #..Age at diagnosis
         age_2 = pd.concat([
             self.pt[['age_diag']].agg([np.mean,np.median,np.std,'count']).round(2).rename(columns={'age_diag':'Overall'}),
-            self.pt.groupby('condition')['age_diag'].agg([np.mean,np.median,np.std,'count']).round(2).T.rename(columns={'T2D':'T2D_WH_HTN'}),
-            self.pt.groupby('T2D')['age_diag'].agg([np.mean,np.median,np.std,'count']).round(2).T.rename(columns={0:'WH_T2D',1:'W_T2D'})
-        ],axis=1)[['Overall','W_T2D','T2D_WH_HTN','T2D_W_HTN','WH_T2D']]
+            self.pt.groupby('condition')['age_diag'].agg([np.mean,np.median,np.std,'count']).round(2).T.rename(columns={'T2D':'T2D_WO_HTN'}),
+            self.pt.groupby('T2D')['age_diag'].agg([np.mean,np.median,np.std,'count']).round(2).T.rename(columns={0:'WO_T2D',1:'W_T2D'})
+        ],axis=1)[['Overall','W_T2D','T2D_WO_HTN','T2D_W_HTN','WO_T2D']]
 
         age_2 = age_2.set_index([['Age at Dx']*4,list(age_2.index)])
         age_2 = age_2.rename_axis(['Variables','Levels'])
@@ -202,7 +225,7 @@ class TableConstruction:
         ptOne = pd.concat([age,pt_all],axis=0)
 
         #..Order
-        colsOrder = ['Overall','W_T2D','T2D_WH_HTN','T2D_W_HTN','WH_T2D']
+        colsOrder = ['Overall','W_T2D','T2D_WO_HTN','T2D_W_HTN','WO_T2D']
         ptOne = ptOne[colsOrder]
 
         #..splitting
@@ -210,7 +233,7 @@ class TableConstruction:
             ptOne[f'({n})'] = ptOne[n].apply(lambda x: float(str(x).split(' ')[0]) if str(x) not in ['None','nan'] else np.nan) 
 
         # CHI2, P-VALUE AND OR
-        c = combinations(['W_T2D','Overall','T2D_W_HTN','T2D_WH_HTN','WH_T2D'],2)
+        c = combinations(['W_T2D','Overall','T2D_W_HTN','T2D_WO_HTN','WO_T2D'],2)
         print(f'{"="*30}Adding CHI2{"="*30}')
         for n in c:
             total1 = float(ptOne.loc['n',f'({n[0]})'].values[0]) 
@@ -220,7 +243,7 @@ class TableConstruction:
             ptOne[colName] = ptOne.iloc[9:,:].apply(lambda x: self.chi_squared(total1,total2,x[f'({n[0]})'],x[f'({n[1]})']),axis=1).astype(float).round(8)
 
             
-        c = combinations(['W_T2D','Overall','T2D_W_HTN','T2D_WH_HTN','WH_T2D'],2)
+        c = combinations(['W_T2D','Overall','T2D_W_HTN','T2D_WO_HTN','WO_T2D'],2)
         print(f'{"="*30}Adding OR{"="*30}')
         for n in c:
             total1 = float(ptOne.loc['n',f'({n[0]})'].values[0]) 
@@ -230,7 +253,7 @@ class TableConstruction:
             ptOne[colName] = ptOne.iloc[9:,:].apply(lambda x: self.addOR(total1,total2,x[f'({n[0]})'],x[f'({n[1]})']),axis=1).astype(float).round(8)
 
 
-        c = [['W_T2D','Overall'],['T2D_W_HTN','W_T2D'],['T2D_W_HTN','T2D_WH_HTN']]
+        c = [['W_T2D','Overall'],['T2D_W_HTN','W_T2D'],['T2D_W_HTN','T2D_WO_HTN']]
         print(f'{"="*30}Adding CI{"="*30}')
         for n in c:
             total1 = float(ptOne.loc['n',f'({n[0]})'].values[0]) 
@@ -242,15 +265,12 @@ class TableConstruction:
         # SAVING TABLE 1
         finalPath = f'{self.outPath}/tbl1.csv'
         if os.path.exists(finalPath):
-            if input('Overwrite?[y/n]: ').lower() == 'y':
-                ptOne.to_csv(finalPath)
-                ptOne.to_excel(f'{self.outPath}/tbl1.xlsx')
-                print(f'{"="*30} SAVED! {"="*30}')
-            else:
-                print('Not saved!')
-        else:
             ptOne.to_csv(finalPath)
             ptOne.to_excel(f'{self.outPath}/tbl1.xlsx')
+            print(f'{"="*30} SAVED! {"="*30}')
+        else:
+            ptOne.to_csv(finalPath)
+            #ptOne.to_excel(f'{self.outPath}/tbl1.xlsx')
             print(f'{"="*30} SAVED! {"="*30}')
 
         return self.pt
@@ -263,6 +283,7 @@ def run():
     userInputOutFolder = OUT_PATH
 
     # confirm the path existance
+    logging.info(f"Checking paths")
     if not os.path.exists(userInputDataFolder):
         print(f"Path {userInputDataFolder} does not exist!")
         raise Exception(f"Path {userInputDataFolder} does not exist!")
@@ -271,8 +292,6 @@ def run():
         raise Exception(f"File {userInputFile} does not exist!")
     if not os.path.exists(userInputOutFolder):
         os.system(f"mkdir {userInputOutFolder}")
-
-    # preprocesing
 
     # run the table one construction
     tblOne = TableConstruction(
