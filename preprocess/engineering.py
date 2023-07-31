@@ -69,7 +69,15 @@ def labelDxEncoder(obj:list[int,int]) -> int:
     - [0,0] = 0
     - [0,1] = 1
     - [1,1] = 2
-    - [1,0] = error
+
+    TD2  -- Com
+    [0,0]  [0,0] = 0
+    [0,1]  [0,0] = 1
+    [0,1]  [0,1] = 2
+    [1,1]  [0,0] = 3
+    [1,1]  [0,1] = 4
+    [1,1]  [1,1] = 5
+     
     """
     try:
         if obj == [0,0]:
@@ -107,10 +115,12 @@ class DataEngineering:
             #..Transformations starts
             self.readFile()
             self.cleanHeaders()
-            self.dropCols()
+            #self.createAgeDx()
+            self.createYearSinceDx()
             self.categoricalCols()
             self.ordinalCols()
             self.updateDiagnosis()
+            self.dropCols()
 
             logging.info('Transformations done')
             return self.data
@@ -144,6 +154,7 @@ class DataEngineering:
         - unnecesary columns or informative
         - empty columns
         - all columns that are counts
+        - drop std (pending)
         """   
         try:
             #..Drop unncessesary columns by json file
@@ -226,15 +237,28 @@ class DataEngineering:
             #..Loop through dxCols dictionary to clean each dx
             with alive_bar(len(dxCols.keys()), title='### Y Values in transformation') as bar:
                 for cie, name in dxCols.items():
-                    self.data[cie] = self.data.apply(lambda x: labelDxEncoder(x[[name,cie]].to_list()), axis=1)
+                    #self.data[cie] = self.data.apply(lambda x: labelDxEncoder(x[[name,cie]].to_list()), axis=1)
+                    self.data.loc[(self.data[(self.data[name] == 0) & (self.data[cie]==0)]).index,cie] = 0
+                    self.data.loc[(self.data[(self.data[name] == 0) & (self.data[cie]==1)]).index,cie] = 1
+                    self.data.loc[(self.data[(self.data[name] == 1) & (self.data[cie]==1)]).index,cie] = 2
                     bar()
             return logging.info(f'Y Values transformed into labels')
         except Exception as e:
             return logging.warning(f'Y Values were not transformed. {e}')
         
-
-    def __str__(self):
-        return 'Data engineering transformations'
+    
+    def createYearSinceDx(self):
+        """
+        Function to update anio_dx for year since T2D diagnosis
+        """
+        try:
+            yearsSinceDx = pd.to_datetime(self.data['x_start']).dt.year
+            self.data.insert(3,'years_since_dx', yearsSinceDx)
+            self.data['years_since_dx'] = self.data.apply(lambda x: x['years_since_dx']-x['anio_dx'] if x['anio_dx'] > 0  else 0,axis=1)
+            self.data.loc[(self.data[self.data['years_since_dx']<0]).index,'years_since_dx'] = 0
+            return logging.info('Year since Dx updated')
+        except Exception as e:
+            return logging.warning(f'{self.createYearSinceDx.__name__} failed. {e}')
 
 
 def runDataEngineering() -> pd.DataFrame:
