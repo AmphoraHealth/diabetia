@@ -25,3 +25,7 @@ data/diabetia.csv: data/hk_database_cleaned.csv preprocess/imputation.py .venv/b
 
 data/fold_selection-%.json: data/diabetia.csv preprocess/fold_selection.py .venv/bin/activate
 	source .venv/bin/activate; python3 preprocess/fold_selection.py
+
+# statistical analysis
+data/table_one/tbl1.csv data/table_one/tbl1.xlsx: data/diabetia.csv scripts2print/table_one/__tableOne.py .venv/bin/activate
+	source .venv/bin/activate; python3 scripts2print/table_one/__tableOne.py
