@@ -205,9 +205,6 @@ class TableConstruction:
         age_1 = age_1.set_index([['Age at index']*4,list(age_1.index)])
         age_1 = age_1.rename_axis(['Variables','Levels'])
 
-        # Temporal change:
-        self.pt['age_diag'] = self.pt['age_at_wx']
-
         #..Age at diagnosis
         age_2 = pd.concat([
             self.pt[['age_diag']].agg([np.mean,np.median,np.std,'count']).round(2).rename(columns={'age_diag':'Overall'}),
