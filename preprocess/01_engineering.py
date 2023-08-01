@@ -51,7 +51,8 @@ def snakeCase(string:str) -> str:
         ',':'',
         '.':'',
         '[':'',
-        ']':''
+        ']':'',
+        '-':'_'
     }
     
     string = string.split()
@@ -85,6 +86,7 @@ class DataEngineering:
         try:
             #..Transformations starts
             self.readFile()
+            self.translateColumns()
             self.cleanHeaders()
             self.createAgeDx()
             self.createYearSinceDx()
@@ -106,6 +108,19 @@ class DataEngineering:
         except Exception as e:
             return logging.warning(f'File was not read. {e}')
           
+    
+    def translateColumns(self):
+        """
+        Function to translate spanish Columns into english. To consult this translation go to config.json file
+        """
+        try:
+            #..translation dictionary
+            translation:dict = self.config['columnNamesTranslation']
+            self.data.columns = [translation.get(name,'error') for name in self.data.columns]
+            logging.info(f'Columns translated into english')
+        except Exception as e:
+            logging.warning(f'{self.translateColumns.__name__} failed. {e}')
+
 
     def cleanHeaders(self):
         """
