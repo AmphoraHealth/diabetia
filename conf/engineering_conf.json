@@ -27,7 +27,7 @@
             ]
         },
         "ordinal_cols":[
-            "df_birth"
+            "birthdate"
         ],
         "categorical_cols":[
             "cs_sex"
@@ -36,7 +36,7 @@
     "columnNamesTranslation":{
         "id": "id",
         "cx_curp": "cx_curp",
-        "df_nacimiento": "df_birth",
+        "df_nacimiento": "birthdate",
         "cs_sexo": "cs_sex",
         "first_cx": "first_cx",
         "last_cx": "last_cx",

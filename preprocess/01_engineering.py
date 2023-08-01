@@ -251,11 +251,11 @@ class DataEngineering:
         Function to calculate age at T2D diagnosis
         """
         try:
-            aux = self.data[['id','df_nacimiento','anio_dx']].sort_values(by=['id','df_nacimiento'], ascending = True)
+            aux = self.data[['id','birthdate','anio_dx']].sort_values(by=['id','birthdate'], ascending = True)
             aux = aux[aux['anio_dx'].isnull()==False]
             aux = aux.drop_duplicates(subset='id', keep = 'first')
-            aux['df_nacimiento'] = pd.to_datetime(aux['df_nacimiento']).dt.year
-            aux['age_diag'] = aux['anio_dx'] - aux['df_nacimiento']
+            aux['birthdate'] = pd.to_datetime(aux['birthdate']).dt.year
+            aux['age_diag'] = aux['anio_dx'] - aux['birthdate']
             aux_ages:dict = dict(zip(aux['id'],aux['age_diag']))
             self.data.insert(4,'age_diag', self.data['id'].apply(lambda x: aux_ages.get(x,np.nan)))
             return logging.info('Age at Dx created')
