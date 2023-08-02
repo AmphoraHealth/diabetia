@@ -32,3 +32,6 @@ class CustomFormatter(logging.Formatter):
 handler = logging.StreamHandler()
 handler.setFormatter(CustomFormatter())
 logging.root.handlers = [handler]
+
+# set the logging level
+logging.getLogger().setLevel(logging.INFO)
