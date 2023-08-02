@@ -14,7 +14,7 @@
 import sys
 
 # constants
-DIAGNOSTICS = ['E112','E113','E114','E115']
+DIAGNOSTICS = ['e112','e113','e114','e115']
 ORIGINS = ['diabetia','discretized']
 FOLDS = range(5)
 BALANCING_METHODS = ['unbalanced','undersampling','oversampling','midsampling']
