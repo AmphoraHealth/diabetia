@@ -24,7 +24,7 @@ from sklearn.impute import IterativeImputer
 #..Default configurations
 logging_format = '%(asctime)s|%(name)s|%(levelname)s: %(message)s'
 logging.basicConfig(level=logging.INFO, format=logging_format, datefmt='%d-%m-%y %H:%M:%S')
-important_variables = ['cs_sexo','age_at_wx', 'diabetes_mellitus_tipo_2', 'hipertension_esencial_(primaria)']
+important_variables = ['cs_sex','age_at_wx', 'diabetes_mellitus_type_2', 'essential_(primary)_hypertension']
 
 def fill_with_zero(data:pd.DataFrame, columns:list) -> pd.DataFrame:
     """

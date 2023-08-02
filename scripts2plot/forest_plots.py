@@ -30,6 +30,7 @@ warnings.filterwarnings("ignore")
 logging_format = '%(asctime)s|%(name)s|%(levelname)s: %(message)s'
 logging.basicConfig(level=logging.INFO, format=logging_format, datefmt='%d-%m-%y %H:%M:%S')
 definitions = {
+            "e11":"Diabetes miellitus type 2",
             "e112":"DM2 with kidney complications",
             "e113":"DM2 with ophthalmological complications",
             "e114":"DM2 with neurological complications",
@@ -42,8 +43,8 @@ def read_data(file:str) -> pd.DataFrame:
     Function to read data
     """
     data = pd.read_csv(file, low_memory = True, index_col = 0)
-    X_data = data.iloc[:, :-4]
-    y_data = data.iloc[:, -4:]
+    X_data = data.iloc[:, :-5]
+    y_data = data.iloc[:, -5:]
     return X_data, y_data
 
 def get_binary_features(data:pd.DataFrame) -> pd.DataFrame:
