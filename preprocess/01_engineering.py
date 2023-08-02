@@ -51,7 +51,8 @@ def snakeCase(string:str) -> str:
         ',':'',
         '.':'',
         '[':'',
-        ']':''
+        ']':'',
+        '-':'_'
     }
     
     string = string.split()
@@ -75,7 +76,7 @@ class DataEngineering:
         self.in_path:str = IN_PATH
         self.config_path:str = CONFIG_PATH
         self.data:pd.DataFrame = pd.DataFrame()
-        self.config:dict = json.load(open(f'{self.config_path}', 'r'))
+        self.config:dict = json.load(open(f'{self.config_path}', 'r', encoding='UTF-8'))
 
 
     def mainTransform(self) -> pd.DataFrame:
@@ -85,8 +86,10 @@ class DataEngineering:
         try:
             #..Transformations starts
             self.readFile()
+            self.translateColumns()
             self.cleanHeaders()
             self.createAgeDx()
+            self.createAgeDxGroup()
             self.createYearSinceDx()
             self.categoricalCols()
             self.ordinalCols()
@@ -106,6 +109,19 @@ class DataEngineering:
         except Exception as e:
             return logging.warning(f'File was not read. {e}')
           
+    
+    def translateColumns(self):
+        """
+        Function to translate spanish Columns into english. To consult this translation go to config.json file
+        """
+        try:
+            #..translation dictionary
+            translation:dict = self.config['columnNamesTranslation']
+            self.data.columns = [translation.get(name,'error') for name in self.data.columns]
+            logging.info(f'Columns translated into english')
+        except Exception as e:
+            logging.warning(f'{self.translateColumns.__name__} failed. {e}')
+
 
     def cleanHeaders(self):
         """
@@ -236,16 +252,49 @@ class DataEngineering:
         Function to calculate age at T2D diagnosis
         """
         try:
-            aux = self.data[['id','df_nacimiento','anio_dx']].sort_values(by=['id','df_nacimiento'], ascending = True)
+            aux = self.data[['id','birthdate','anio_dx']].sort_values(by=['id','birthdate'], ascending = True)
             aux = aux[aux['anio_dx'].isnull()==False]
             aux = aux.drop_duplicates(subset='id', keep = 'first')
-            aux['df_nacimiento'] = pd.to_datetime(aux['df_nacimiento']).dt.year
-            aux['age_diag'] = aux['anio_dx'] - aux['df_nacimiento']
+            aux['birthdate'] = pd.to_datetime(aux['birthdate']).dt.year
+            aux['age_diag'] = aux['anio_dx'] - aux['birthdate']
             aux_ages:dict = dict(zip(aux['id'],aux['age_diag']))
             self.data.insert(4,'age_diag', self.data['id'].apply(lambda x: aux_ages.get(x,np.nan)))
             return logging.info('Age at Dx created')
         except Exception as e:
             return logging.warning(f'{self.createAgeDx.__name__} failed. {e}')
+
+
+    def createAgeDxGroup(self):
+        """
+        Function to stablish categories for Age at T2D diagnosis: 
+        18 - 44
+        45 - 64
+        65 >
+        """
+        try:
+            categories:dict = {
+                '18-44':[18,44],
+                '45-64':[45,64],
+                '65>':[65,120]
+            }
+
+            self.data.insert(5,'age_diag_cat',np.nan)
+            for cat,values in categories.items():
+                self.data.loc[
+                    (
+                        self.data[
+                                (self.data['age_diag']>=values[0]) &\
+                                (self.data['age_diag']<=values[1])
+                            ]
+                    ).index,
+                    'age_diag_cat'
+                    ] = cat
+
+            logging.info(f'Age at T2D Dx group added')
+
+        except Exception as e:
+            logging.warning(f'{self.createAgeDxGroup.__name__} failed. {e}')
+
 
     def __str__(self):
         return 'Data engineering transformations'

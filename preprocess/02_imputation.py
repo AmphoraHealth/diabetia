@@ -24,7 +24,7 @@ from sklearn.impute import IterativeImputer
 #..Default configurations
 logging_format = '%(asctime)s|%(name)s|%(levelname)s: %(message)s'
 logging.basicConfig(level=logging.INFO, format=logging_format, datefmt='%d-%m-%y %H:%M:%S')
-important_variables = ['df_nacimiento','cs_sexo','age_at_wx', 'diabetes_mellitus_tipo_2', 'hipertension_esencial_(primaria)']
+important_variables = ['cs_sexo','age_at_wx', 'diabetes_mellitus_tipo_2', 'hipertension_esencial_(primaria)']
 
 def fill_with_zero(data:pd.DataFrame, columns:list) -> pd.DataFrame:
     """
@@ -65,11 +65,14 @@ def imputation(data:pd.DataFrame) -> pd.DataFrame:
 
     return data
 
-if __name__ == '__main__':
+def main():
     logging.info('Reading data...')
     data = pd.read_csv(f'{IN_PATH}')
     logging.info('Imputation process started')
     imputed_data = imputation(data)
     logging.info('Imputation process finished')
-    imputed_data.to_csv(f'{OUT_PATH}')
+    imputed_data.to_csv(f'{OUT_PATH}', index = False)
     logging.info(f'Imputed data saved on {OUT_PATH}')
+
+if __name__ == '__main__':
+    main()
