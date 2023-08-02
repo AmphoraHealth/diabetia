@@ -32,6 +32,7 @@ import pickle
 
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import balanced_accuracy_score
 
 # Code: model training --------------------------------------------------------
 # general code for model training given the selected machine learning model
@@ -53,8 +54,8 @@ m = {
 logging.info(f"training model {MACHINE_LEARNING_MODEL}")
 m.fit(df[features], df[DIAGNOSTIC])
 
-# print the model accuracy
-logging.info(f"model train accuracy: {m.score(df[features], df[DIAGNOSTIC])}")
+# print the model balanced accuracy
+logging.info(f"model train accuracy: {balanced_accuracy_score(df[DIAGNOSTIC], m.predict(df[features]))}")
 
 # save the model
 logging.info(f"saving model to {OUT_PATH}")
