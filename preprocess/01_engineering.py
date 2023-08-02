@@ -76,7 +76,7 @@ class DataEngineering:
         self.in_path:str = IN_PATH
         self.config_path:str = CONFIG_PATH
         self.data:pd.DataFrame = pd.DataFrame()
-        self.config:dict = json.load(open(f'{self.config_path}', 'r'))
+        self.config:dict = json.load(open(f'{self.config_path}', 'r', encoding='UTF-8'))
 
 
     def mainTransform(self) -> pd.DataFrame:
@@ -89,6 +89,7 @@ class DataEngineering:
             self.translateColumns()
             self.cleanHeaders()
             self.createAgeDx()
+            self.createAgeDxGroup()
             self.createYearSinceDx()
             self.categoricalCols()
             self.ordinalCols()
@@ -261,6 +262,39 @@ class DataEngineering:
             return logging.info('Age at Dx created')
         except Exception as e:
             return logging.warning(f'{self.createAgeDx.__name__} failed. {e}')
+
+
+    def createAgeDxGroup(self):
+        """
+        Function to stablish categories for Age at T2D diagnosis: 
+        18 - 44
+        45 - 64
+        65 >
+        """
+        try:
+            categories:dict = {
+                '18-44':[18,44],
+                '45-64':[45,64],
+                '65>':[65,120]
+            }
+
+            self.data.insert(5,'age_diag_cat',np.nan)
+            for cat,values in categories.items():
+                self.data.loc[
+                    (
+                        self.data[
+                                (self.data['age_diag']>=values[0]) &\
+                                (self.data['age_diag']<=values[1])
+                            ]
+                    ).index,
+                    'age_diag_cat'
+                    ] = cat
+
+            logging.info(f'Age at T2D Dx group added')
+
+        except Exception as e:
+            logging.warning(f'{self.createAgeDxGroup.__name__} failed. {e}')
+
 
     def __str__(self):
         return 'Data engineering transformations'
