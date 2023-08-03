@@ -29,9 +29,9 @@ from libs.logging import logging
 IN_PATH = 'data/diabetia.csv'
 OUT_PATH = f"data/fold_selection-{DIAGNOSTIC}.json"
 
-COL_SEX = "cs_sexo"
-COL_HTN = "hipertension_esencial_(primaria)"
-COL_DM = "diabetes_mellitus_tipo_2"
+COL_SEX = "cs_sex"
+COL_HTN = "essential_(primary)_hypertension"
+COL_DM = "diabetes_mellitus_type_2"
 
 FOLDS = 5
 
