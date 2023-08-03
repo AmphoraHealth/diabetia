@@ -10,34 +10,41 @@ Additional outputs:
   - forest_plots.png(CHANGE)
 """
 
-#Constants
+# Environment preparation
+import os
+import sys
+
+ROOT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(ROOT_PATH)
+from conf.global_constants import *
+from libs.logging import logging
+
+
+# Constants from config files
+from conf.global_constants import DIAGNOSTIC
+
+
+# Constant definition
 IN_PATH = 'data/diabetia.csv'
 OUT_PATH = ''
+CONFIG_PATH = './conf/engineering_conf.json'
 
-#Import libraries
+
+#Libraries
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import seaborn as sns
 from scipy.stats.contingency import relative_risk
 from scipy.stats.contingency import odds_ratio
-import logging
+import json
 import warnings
 
-
-#..Default config
+#Default config
 warnings.filterwarnings("ignore")
-logging_format = '%(asctime)s|%(name)s|%(levelname)s: %(message)s'
-logging.basicConfig(level=logging.INFO, format=logging_format, datefmt='%d-%m-%y %H:%M:%S')
-definitions = {
-            "e11":"Diabetes miellitus type 2",
-            "e112":"DM2 with kidney complications",
-            "e113":"DM2 with ophthalmological complications",
-            "e114":"DM2 with neurological complications",
-            "e115":"DM2 with peripheral circulatory complications"
-        }
+definitions = json.load(open(f'{CONFIG_PATH}', 'r', encoding='UTF-8'))['config']['diagnosis']
 
 
+#Functions
 def read_data(file:str) -> pd.DataFrame:
     """
     Function to read data
@@ -92,12 +99,10 @@ def get_odds_ratio(X_data:pd.DataFrame, y_data:pd.Series) -> pd.DataFrame:
     X_data['label'] = list(y_data)
     for c in X_data.columns[:-1]:
         controlled = X_data[X_data[c] == 0]
-        # controlled_total = len(controlled)
         controlled_negative_cases = len(controlled[controlled['label'] == 0])
         controlled_positive_cases = len(controlled[controlled['label'] == 1])
         
         experimental = X_data[X_data[c] == 1]
-        # experimental_total = len(experimental)
         experimental_negative_cases = len(experimental[experimental['label'] == 0])
         experimental_positive_cases = len(experimental[experimental['label'] == 1])
 
@@ -147,20 +152,22 @@ def forest_plot(df:pd.DataFrame, variables:str, effect:str, low:str, high:str, p
 
 def main():
     logging.info('Reading data...')
-    X_data, y_data = read_data('../data/diabetia.csv')
+    X_data, y_data = read_data(f'{IN_PATH}')
     X_data = get_binary_features(X_data)
 
-    for label in y_data.columns:
-        logging.info(f'Calculating Relative Risk of {definitions[label]} for {len(X_data.columns)} variables...')
-        rr_df = get_relative_risk(X_data, y_data[label])
-        rr_df.to_csv(f'RelativeRisk_{label}.csv', index = False)
-        logging.info(f'Calculating Odds Ratio of {definitions[label]} for {len(X_data.columns)} variables...')
-        or_df = get_odds_ratio(X_data, y_data[label])
-        or_df.to_csv(f'OddsRatio_{label}.csv', index = False)
+    logging.info(f"Calculating Relative Risk of {definitions[DIAGNOSTIC].replace('type_2_diabetes_mellitus', 'DM2').replace('_',' ')} for {len(X_data.columns)} variables...")
+    rr_df = get_relative_risk(X_data, y_data[DIAGNOSTIC])
+    rr_df.to_csv(f'RelativeRisk_{DIAGNOSTIC}.csv', index = False)
 
-        logging.info('Generating forest plots...')
-        forest_plot(rr_df[rr_df['RelativeRisk'] > 0], 'Variable', 'RelativeRisk', 'Lower', 'Upper', f'RelativeRiskFp_{label}', logscale = True, figsize = (21,27))
-        forest_plot(or_df[or_df['OddsRatio'] > 0], 'Variable', 'OddsRatio', 'Lower', 'Upper', f'OddsRatioFp_{label}', logscale = True, figsize = (21,27))
+
+    logging.info(f"Calculating Odds Ratio of {definitions[DIAGNOSTIC].replace('type_2_diabetes_mellitus', 'DM2').replace('_',' ')} for {len(X_data.columns)} variables...")
+    or_df = get_odds_ratio(X_data, y_data[DIAGNOSTIC])
+    or_df.to_csv(f'OddsRatio_{DIAGNOSTIC}.csv', index = False)
+
+    logging.info('Generating forest plots...')
+    forest_plot(rr_df[rr_df['RelativeRisk'] > 0], 'Variable', 'RelativeRisk', 'Lower', 'Upper', f'RelativeRiskFp_{DIAGNOSTIC}', logscale = True, figsize = (21,27))
+    forest_plot(or_df[or_df['OddsRatio'] > 0], 'Variable', 'OddsRatio', 'Lower', 'Upper', f'OddsRatioFp_{DIAGNOSTIC}', logscale = True, figsize = (21,27))
+
 
 if __name__ == "__main__":
     main()
