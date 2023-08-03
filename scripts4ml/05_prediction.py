@@ -23,9 +23,9 @@ from conf.global_constants import DIAGNOSTIC, ORIGIN, TEST_FOLD, BALANCING_METHO
 # Constants -------------------------------------------------------------------
 IN_PATH = 'data/diabetia.csv' if ORIGIN == 'diabetia' else 'data/diabetia-disc.csv'
 FOLD_PATH = f"data/fold_selection-{DIAGNOSTIC}.json"
-MODEL_PATH = f"data/model-{DIAGNOSTIC}-{ORIGIN}-{TEST_FOLD}-{BALANCING_METHOD}-{NORMALIZATION_METHOD}-{FEATURE_SELECTION_METHOD}-{MACHINE_LEARNING_MODEL}.pkl"
+MODEL_PATH = f"data/model-{DIAGNOSTIC}-{TEST_FOLD}-{ORIGIN}-{BALANCING_METHOD}-{NORMALIZATION_METHOD}-{FEATURE_SELECTION_METHOD}-{MACHINE_LEARNING_MODEL}.pkl"
 
-OUT_PATH = f"data/prediction-{DIAGNOSTIC}-{ORIGIN}-{TEST_FOLD}-{BALANCING_METHOD}-{NORMALIZATION_METHOD}-{FEATURE_SELECTION_METHOD}-{MACHINE_LEARNING_MODEL}.csv"
+OUT_PATH = f"data/prediction-{DIAGNOSTIC}-{TEST_FOLD}-{ORIGIN}-{BALANCING_METHOD}-{NORMALIZATION_METHOD}-{FEATURE_SELECTION_METHOD}-{MACHINE_LEARNING_MODEL}.csv"
 
 # Import libraries ------------------------------------------------------------
 from sklearn.metrics import balanced_accuracy_score
@@ -53,6 +53,7 @@ logging.warning(f"features selection still not implemented, using all features")
 features = df.columns.tolist()
 features.remove("id")
 features.remove(DIAGNOSTIC)
+features.remove("age_diag_cat")
 
 # load the model
 logging.info(f"loading model from {MODEL_PATH}")
