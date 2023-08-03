@@ -29,9 +29,9 @@ from libs.logging import logging
 IN_PATH = 'data/diabetia.csv'
 OUT_PATH = f"data/fold_selection-{DIAGNOSTIC}.json"
 
-COL_SEX = "cs_sexo"
-COL_HTN = "hipertension_esencial_(primaria)"
-COL_DM = "diabetes_mellitus_tipo_2"
+COL_SEX = "cs_sex"
+COL_HTN = "essential_(primary)_hypertension"
+COL_DM = "diabetes_mellitus_type_2"
 
 FOLDS = 5
 
@@ -51,7 +51,7 @@ df = pd.read_csv(IN_PATH)
 df = df[[ "id", COL_SEX, COL_HTN, COL_DM, DIAGNOSTIC]]
 
 # make a combined column to stratify by
-df["_class"] = df[DIAGNOSTIC].astype(str)+"-"+df[COL_SEX].astype(str)+"-"+df[COL_HTN].astype(str)
+df["_class"] = df[DIAGNOSTIC].astype(str)+"-"+df[COL_SEX].astype(str)
 df = df[["id","_class"]]
 
 # change class names to numbers
