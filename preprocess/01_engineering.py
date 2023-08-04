@@ -88,7 +88,8 @@ class DataEngineering:
             self.readFile()
             self.translateColumns()
             self.cleanHeaders()
-            self.createAgeDx()
+            self.cleanCareunit()
+            #self.createAgeDx()
             self.createAgeDxGroup()
             self.createYearSinceDx()
             self.categoricalCols()
@@ -294,6 +295,26 @@ class DataEngineering:
 
         except Exception as e:
             logging.warning(f'{self.createAgeDxGroup.__name__} failed. {e}')
+
+
+    def cleanCareunit(self):
+        """
+        Function to clean careunit and transform it into onehot
+        """
+        try:
+            #....one hot for cd_hallazgo
+            auxOneHot: pd.DataFrame = pd.get_dummies(self.data['careunit'])
+            auxOneHot.columns = [ snakeCase(col) for col in auxOneHot.columns]
+            careunit_index:int = self.data.columns.get_loc('careunit')
+            self.data.drop(columns=['careunit'],inplace=True)
+
+            #..sort cols
+            for idx, col in enumerate(auxOneHot.columns):
+                self.data.insert(careunit_index + idx, col, auxOneHot[col])
+
+            logging.info(f'Careunit transformed into oneHot')
+        except Exception as e:
+            logging.warning(f'{self.cleanCareunit.__name__} failed. {e}')
 
 
     def __str__(self):
