@@ -12,11 +12,17 @@
 
 # Import libraries
 import sys
+import os
+
+ROOT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(ROOT_PATH)
+
+from libs.logging import logging
 
 # constants
 DIAGNOSTICS = ['e112','e113','e114','e115']
-ORIGINS = ['diabetia','discretized']
 FOLDS = range(5)
+ORIGINS = ['diabetia','discretized']
 BALANCING_METHODS = ['unbalanced','undersampling','oversampling','midsampling']
 NORMALIZATION_METHODS = ['zscore','power_transform']
 FS_METHODS = ['xi2','relieff','probabilistic','mutual_info']
@@ -24,8 +30,8 @@ ML_MODELS = ['logistic','dt','bernoulli','gaussian']
 
 # default values
 DIAGNOSTIC = DIAGNOSTICS[0]
-ORIGIN = ORIGINS[0]
 TEST_FOLD = FOLDS[0]
+ORIGIN = ORIGINS[0]
 BALANCING_METHOD = BALANCING_METHODS[0]
 NORMALIZATION_METHOD = NORMALIZATION_METHODS[0]
 FEATURE_SELECTION_METHOD = FS_METHODS[0]
@@ -34,14 +40,14 @@ MACHINE_LEARNING_MODEL = ML_MODELS[0]
 # get values from command line
 if len(sys.argv) == 1:
   # default values if no argument is given
-  print("\n  missing arguments, using default values")
+  logging.warning("no arguments given, using default values")
 else:
   # get values from command line
   try:
     args = sys.argv[1].split('-')
     DIAGNOSTIC = args[0]
-    ORIGIN = args[1]
-    TEST_FOLD = int(args[2])
+    TEST_FOLD = int(args[1])
+    ORIGIN = args[2]
     BALANCING_METHOD = args[3]
     NORMALIZATION_METHOD = args[4]
     FEATURE_SELECTION_METHOD = args[5]
@@ -52,10 +58,10 @@ else:
 # check values
 if not DIAGNOSTIC in DIAGNOSTICS:
   raise ValueError(f"given complication must be one of {', '.join(DIAGNOSTIC)}")
-if not ORIGIN in ORIGINS:
-  raise ValueError(f"given origin must be one of {', '.join(ORIGIN)}")
 if not TEST_FOLD in FOLDS:
   raise ValueError(f"given test fold must be one of {', '.join(TEST_FOLD)}")
+if not ORIGIN in ORIGINS:
+  raise ValueError(f"given origin must be one of {', '.join(ORIGIN)}")
 if not BALANCING_METHOD in BALANCING_METHODS:
   raise ValueError(f"given balancing method must be one of {', '.join(BALANCING_METHOD)}")
 if not NORMALIZATION_METHOD in NORMALIZATION_METHODS:

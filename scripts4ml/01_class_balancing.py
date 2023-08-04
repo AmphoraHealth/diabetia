@@ -28,7 +28,7 @@ import aux_01_class_balancing as aux
 IN_PATH = 'data/diabetia.csv' if ORIGIN == 'diabetia' else 'data/diabetia-disc.csv'
 FOLD_PATH = f"data/fold_selection-{DIAGNOSTIC}.json"
 
-OUT_PATH = f"data/balanced-{DIAGNOSTIC}-{ORIGIN}-{TEST_FOLD}-{BALANCING_METHOD}.csv"
+OUT_PATH = f"data/balanced-{DIAGNOSTIC}-{TEST_FOLD}-{ORIGIN}-{BALANCING_METHOD}.csv"
 
 # Import libraries ------------------------------------------------------------
 import pandas as pd

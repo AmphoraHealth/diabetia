@@ -51,7 +51,7 @@ df = pd.read_csv(IN_PATH)
 df = df[[ "id", COL_SEX, COL_HTN, COL_DM, DIAGNOSTIC]]
 
 # make a combined column to stratify by
-df["_class"] = df[DIAGNOSTIC].astype(str)+"-"+df[COL_SEX].astype(str)+"-"+df[COL_HTN].astype(str)
+df["_class"] = df[DIAGNOSTIC].astype(str)+"-"+df[COL_SEX].astype(str)
 df = df[["id","_class"]]
 
 # change class names to numbers

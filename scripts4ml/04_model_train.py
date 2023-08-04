@@ -22,10 +22,10 @@ from conf.global_constants import *
 from libs.logging import logging
 
 # Constants -------------------------------------------------------------------
-IN_PATH = f"data/balanced-{DIAGNOSTIC}-{ORIGIN}-{TEST_FOLD}-{BALANCING_METHOD}.csv"
-FEATURES_PATH = f"data/features-{DIAGNOSTIC}-{ORIGIN}-{TEST_FOLD}-{BALANCING_METHOD}-{NORMALIZATION_METHOD}-{FEATURE_SELECTION_METHOD}.json"
+IN_PATH = f"data/balanced-{DIAGNOSTIC}-{TEST_FOLD}-{ORIGIN}-{BALANCING_METHOD}.csv"
+FEATURES_PATH = f"data/features-{DIAGNOSTIC}-{TEST_FOLD}-{ORIGIN}-{BALANCING_METHOD}-{NORMALIZATION_METHOD}-{FEATURE_SELECTION_METHOD}.json"
 
-OUT_PATH = f"data/model-{DIAGNOSTIC}-{ORIGIN}-{TEST_FOLD}-{BALANCING_METHOD}-{NORMALIZATION_METHOD}-{FEATURE_SELECTION_METHOD}-{MACHINE_LEARNING_MODEL}.pkl"
+OUT_PATH = f"data/model-{DIAGNOSTIC}-{TEST_FOLD}-{ORIGIN}-{BALANCING_METHOD}-{NORMALIZATION_METHOD}-{FEATURE_SELECTION_METHOD}-{MACHINE_LEARNING_MODEL}.pkl"
 
 # Import libraries ------------------------------------------------------------
 import pickle
@@ -44,6 +44,7 @@ logging.warning(f"features selection still not implemented, using all features")
 features = df.columns.tolist()
 features.remove("id")
 features.remove(DIAGNOSTIC)
+features.remove("age_diag_cat")
 
 # select the model
 m = {
