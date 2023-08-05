@@ -278,8 +278,8 @@ class DataEngineering:
                 '45-64':[45,64],
                 '65>':[65,120]
             }
-
-            self.data.insert(5,'age_diag_cat',np.nan)
+            age_diag_index:int = self.data.columns.get_loc('age_diag')
+            self.data.insert(age_diag_index+1,'age_diag_cat',np.nan)
             for cat,values in categories.items():
                 self.data.loc[
                     (
