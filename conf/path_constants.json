@@ -1,0 +1,41 @@
+{
+  "diagnostics": [
+    "e112",
+    "e113",
+    "e114",
+    "e115"
+  ],
+  "folds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "origins": [
+    "diabetia",
+    "discretized"
+  ],
+  "balancing_methods": [
+    "unbalanced",
+    "undersampling",
+    "oversampling",
+    "midsampling"
+  ],
+  "normalization_methods": [
+    "zscore",
+    "power_transform"
+  ],
+  "feature_selection_methods": [
+    "xi2",
+    "relieff",
+    "probabilistic",
+    "mutual_info"
+  ],
+  "machine_learning_models": [
+    "logistic",
+    "dt",
+    "bernoulli",
+    "gaussian"
+  ]
+}

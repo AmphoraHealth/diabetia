@@ -11,6 +11,7 @@
 """
 
 # Import libraries
+import json
 import sys
 import os
 
@@ -20,13 +21,14 @@ sys.path.append(ROOT_PATH)
 from libs.logging import logging
 
 # constants
-DIAGNOSTICS = ['e112','e113','e114','e115']
-FOLDS = range(5)
-ORIGINS = ['diabetia','discretized']
-BALANCING_METHODS = ['unbalanced','undersampling','oversampling','midsampling']
-NORMALIZATION_METHODS = ['zscore','power_transform']
-FS_METHODS = ['xi2','relieff','probabilistic','mutual_info']
-ML_MODELS = ['logistic','dt','bernoulli','gaussian']
+_json = json.load(open(f"{ROOT_PATH}/conf/path_constants.json", "r"))
+DIAGNOSTICS = _json["diagnostics"]
+FOLDS = _json["folds"]
+ORIGINS = _json["origins"]
+BALANCING_METHODS = _json["balancing_methods"]
+NORMALIZATION_METHODS = _json["normalization_methods"]
+FS_METHODS = _json["feature_selection_methods"]
+ML_MODELS = _json["machine_learning_models"]
 
 # default values
 DIAGNOSTIC = DIAGNOSTICS[0]
