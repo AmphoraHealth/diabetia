@@ -37,5 +37,13 @@
     "dt",
     "bernoulli",
     "gaussian"
-  ]
+  ],
+  "_expected_order": [
+    "diagnostics",
+    "folds",
+    "origins",
+    "balancing_methods",
+    "normalization_methods",
+    "feature_selection_methods",
+    "machine_learning_models"]
 }
