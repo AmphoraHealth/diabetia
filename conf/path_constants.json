@@ -38,7 +38,15 @@
     "bernoulli",
     "gaussian"
   ],
-  "_expected_order": [
+  "_order_in_pipeline": [
+    "diagnostics",
+    "folds",
+    "origins",
+    "balancing_methods",
+    "normalization_methods",
+    "feature_selection_methods",
+    "machine_learning_models"],
+  "_order_in_pathname": [
     "diagnostics",
     "folds",
     "origins",

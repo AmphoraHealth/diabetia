@@ -45,16 +45,20 @@ if len(sys.argv) == 1:
 else:
   # get values from command line
   _args = sys.argv[1].split('-')
+  # get a list of expected arguments
+  _expected_args = _json["_order_in_pipeline"][:len(_args)]
+  # sort the list by order in pathname
+  _expected_args.sort(key=lambda x: _json["_order_in_pathname"].index(x))
   # auxiliar function to get the value of the argument
   def get_arg_value(arg:str) -> str:
-    # find the argument position in the list of expected arguments
-    arg_pos = _json["_expected_order"].index(arg)
+    # Set to None if the argument is not expected
+    if not arg in _expected_args:
+      return "None"
+    # get the position of the argument
+    arg_pos = _expected_args.index(arg)
     # get the value of the argument
-    if arg_pos < len(_args):
-      arg_value = _args[arg_pos]
-    else:
-      arg_value = "None"
-    return str(arg_value)
+    arg_val = _args[arg_pos]
+    return str(arg_val)
   # set the value of the argument
   DIAGNOSTIC = get_arg_value("diagnostics")
   TEST_FOLD = get_arg_value("folds")
@@ -83,3 +87,46 @@ if not MACHINE_LEARNING_MODEL in MACHINE_LEARNING_MODELS+["None"]:
 # temporary patch
 FS_METHOD = FEATURE_SELECTION_METHOD
 ML_MODEL = MACHINE_LEARNING_MODEL
+
+# map keys to values
+MAP = {
+  "diagnostics": DIAGNOSTIC,
+  "folds": TEST_FOLD,
+  "origins": ORIGIN,
+  "balancing_methods": BALANCING_METHOD,
+  "normalization_methods": NORMALIZATION_METHOD,
+  "feature_selection_methods": FEATURE_SELECTION_METHOD,
+  "machine_learning_models": MACHINE_LEARNING_MODEL,
+  "fs_methods": FS_METHOD,
+  "ml_models": ML_MODEL
+}
+
+# auxiliar function to get the arguments for an specific pipeline step
+def _get_args(step:str) -> list:
+  # get the mandatory arguments for a pipeline step
+  _args = _json["_order_in_pipeline"][:step+1]
+  # sort the list by order in pathname
+  _args.sort(key=lambda x: _json["_order_in_pathname"].index(x))
+  return [MAP[arg] for arg in _args]
+
+# constants for each pipeline step
+s00_fold_selection = "data/fold_selection-" + "-".join(_get_args(0))
+s01_balancing = "data/balanced-" + "-".join(_get_args(1))
+s02_normalization = "data/normalized-" + "-".join(_get_args(2))
+s03_feature_selection = "data/features_selected-" + "-".join(_get_args(3))
+s04_model_train = "data/model-" + "-".join(_get_args(4))
+s05_prediction = "data/prediction-" + "-".join(_get_args(5))
+s06_score_by_fold = "data/score-" + "-".join(_get_args(6))
+s07_global_score = "data/global_score-" + "-".join(_get_args(7))
+
+# print the values
+logging.debug(f"""
+  s00_fold_selection: {s00_fold_selection}
+  s01_balancing: {s01_balancing}
+  s02_normalization: {s02_normalization}
+  s03_feature_selection: {s03_feature_selection}
+  s04_model_train: {s04_model_train}
+  s05_prediction: {s05_prediction}
+  s06_score_by_fold: {s06_score_by_fold}
+  s07_global_score: {s07_global_score}
+""")
