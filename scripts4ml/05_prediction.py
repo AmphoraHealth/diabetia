@@ -53,6 +53,7 @@ logging.warning(f"features selection still not implemented, using all features")
 features = df.columns.tolist()
 features.remove("id")
 features.remove(DIAGNOSTIC)
+features.remove("age_diag_cat")
 
 # load the model
 logging.info(f"loading model from {MODEL_PATH}")

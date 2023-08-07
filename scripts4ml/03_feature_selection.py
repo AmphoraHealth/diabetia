@@ -61,6 +61,7 @@ def feature_selection(data:pd.DataFrame, label:pd.Series, n_features:int = 100) 
 def main():
     data = pd.read_csv(f'{DB_PATH}', index_col = 0)
     data.drop('e11', axis = 1, inplace = True)
+    data.drop('age_diag_cat', axis = 1, inplace = True)
     folds = json.load(open(f'{FOLD_PATH}', 'r', encoding='UTF-8'))
     data = get_fold_trainning(data, folds)
     X, y = data.iloc[:,:-4], data[DIAGNOSTIC]
