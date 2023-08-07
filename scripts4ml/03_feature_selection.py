@@ -49,6 +49,11 @@ def get_fold_trainning(data:pd.DataFrame, folds_file:json, n_folds:int = 5) -> p
     return train
 
 def feature_selection(data:pd.DataFrame, label:pd.Series, n_features:int = 100) -> dict:
+    # get a list of columns with negative values
+    cols = [col for col in data.columns if data[col].min() < 0]
+    # add the minimum value to each column to make them all positive
+    data[cols] = data[cols] + abs(data[cols].min())
+    # get the best features
     best_features = {}
     chi, p_vals = chi2(data, label)
     statistics = pd.DataFrame(zip(data.columns, chi, p_vals), columns = ['id', 'chi2', 'p-val']).sort_values('p-val')
