@@ -25,8 +25,8 @@ from conf.global_constants import (BALANCING_METHOD, DIAGNOSTIC,
 from libs.logging import logging
 
 # Constants -------------------------------------------------------------------
-IN_PATH = f"data/prediction-{DIAGNOSTIC}-{ORIGIN}-{TEST_FOLD}-{BALANCING_METHOD}-{NORMALIZATION_METHOD}-{FEATURE_SELECTION_METHOD}-{MACHINE_LEARNING_MODEL}.csv"
-OUT_PATH = f"data/score-{DIAGNOSTIC}-{ORIGIN}-{TEST_FOLD}-{BALANCING_METHOD}-{NORMALIZATION_METHOD}-{FEATURE_SELECTION_METHOD}-{MACHINE_LEARNING_MODEL}.json"
+IN_PATH = f"data/prediction-{DIAGNOSTIC}-{TEST_FOLD}-{ORIGIN}-{BALANCING_METHOD}-{NORMALIZATION_METHOD}-{FEATURE_SELECTION_METHOD}-{MACHINE_LEARNING_MODEL}.csv"
+OUT_PATH = f"data/score-{DIAGNOSTIC}-{TEST_FOLD}-{ORIGIN}-{BALANCING_METHOD}-{NORMALIZATION_METHOD}-{FEATURE_SELECTION_METHOD}-{MACHINE_LEARNING_MODEL}.csv"
 
 # Import libraries ------------------------------------------------------------
 from sklearn.metrics import balanced_accuracy_score, f1_score, roc_auc_score
@@ -47,4 +47,5 @@ f1 = f1_score(df["real"], df["pred"], average="macro")
 logging.info(f"balanced accuracy: {balanced_accuracy}")
 logging.info(f"f1 score: {f1}")
 logging.info(f"saving score to {OUT_PATH}")
-pd.DataFrame({"balanced_accuracy": [balanced_accuracy], "f1": [f1]}).to_json(OUT_PATH)
+df = pd.DataFrame({"fold": TEST_FOLD, "balanced_accuracy": [balanced_accuracy], "f1": [f1]})
+df.to_csv(OUT_PATH, index=False)
