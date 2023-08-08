@@ -21,11 +21,14 @@ import pandas as pd
 import numpy as np
 import re
 import os
-import logging
 import json
 import sys
 from sklearn import preprocessing
 from alive_progress import alive_bar
+
+ROOT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(ROOT_PATH)
+from libs.logging import logging
 
 #..Default configurations
 logging_format = '%(asctime)s|%(name)s|%(levelname)s: %(message)s'
