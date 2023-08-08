@@ -21,12 +21,12 @@ from conf.global_constants import *
 from libs.logging import logging
 
 # get constants from command line
-from conf.global_constants import DIAGNOSTIC, TEST_FOLD, FEATURE_SELECTION_METHOD
+from conf.global_constants import DIAGNOSTIC, TEST_FOLD, FEATURE_SELECTION_METHOD, AUX_ORIGIN_DATABASE, S00_FOLD_SPLITING, S03_FEATURE_SELECTION
 
 # Constants -------------------------------------------------------------------
-OUT_PATH = f"data/features_selected-{DIAGNOSTIC}-{TEST_FOLD}-{FEATURE_SELECTION_METHOD}.json"
-DB_PATH = 'data/diabetia.csv'
-FOLD_PATH = f"data/fold_selection-{DIAGNOSTIC}.json"
+OUT_PATH = f"{S03_FEATURE_SELECTION}.json"
+DB_PATH = f"{S02_NORMALIZATION}.csv"
+FOLD_PATH = f"{S00_FOLD_SPLITING}.json"
 
 # Import libraries ------------------------------------------------------------
 import pandas as pd
@@ -41,10 +41,10 @@ from sklearn.feature_selection import chi2
 def get_fold_trainning(data:pd.DataFrame, folds_file:json, n_folds:int = 5) -> pd.DataFrame:
     train = []
     for n in range(n_folds):
-        if n == TEST_FOLD:
+        if str(n) == TEST_FOLD:
             pass
         else:
-            train.append(data.loc[folds_file[str(n)]['ids']])
+            train.append(data.loc[data['id'].isin(folds_file[str(n)]['ids'])])
     train = pd.concat(train)
     return train
 

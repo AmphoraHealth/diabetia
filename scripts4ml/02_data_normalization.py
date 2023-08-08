@@ -22,13 +22,17 @@ Additional outputs:
 
 # prepare environment ---------------------------------------------------------
 # get constants from command line
-#from conf.global_constants import NORMALIZATION_METHODS 
+import os
+import sys
+ROOT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(ROOT_PATH)
+from conf.global_constants import S01_BALANCING, S02_NORMALIZATION
 
 # Constants -------------------------------------------------------------------
-DB_PATH:str = './data/diabetia.csv'
-OUT_PATH:str = './data/diabetia_normalized.csv'
-OUT_PATH_PKL:str = './data/diabetia_normalized.pkl'
-OUT_PATH_JSON:str = './data/diabetia_normalized.json'
+DB_PATH:str = f"{S01_BALANCING}.csv"
+OUT_PATH:str = f"{S02_NORMALIZATION}.csv"
+OUT_PATH_PKL:str = f"{S02_NORMALIZATION}.pkl"
+OUT_PATH_JSON:str = f"{S02_NORMALIZATION}.json"
 
 # Import libraries ------------------------------------------------------------
 import pandas as pd

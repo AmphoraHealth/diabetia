@@ -22,7 +22,7 @@ clean:
 	rm -rf data/table_one/tbl1.csv
 	rm -rf data/table_one/tbl1.xlsx
 
-test: data/global_score-e112-x-diabetia-unbalanced-zscore-xi2-logistic.csv
+test: data/score-0-e112-diabetia-unbalanced-zscore-xi2-logistic.csv
 
 clean-test: clean test
 
@@ -35,7 +35,7 @@ data/hk_database.csv:
 	@echo "Downloaded hk_database.csv"
 
 # Special targets
-.PRECIOUS: data/diabetia.csv data/hk_database.csv
+.PRECIOUS: data/diabetia.csv data/hk_database.csv data/ml_data/%
 .INTERMEDIATE: data/hk_database_cleaned.csv
 
 # preprocess data
@@ -45,35 +45,41 @@ data/hk_database_cleaned.csv: data/hk_database.csv preprocess/01_engineering.py 
 data/diabetia.csv: data/hk_database_cleaned.csv preprocess/02_imputation.py .venv/bin/activate
 	source .venv/bin/activate; python3 preprocess/02_imputation.py
 
-data/fold_selection-%.json: data/diabetia.csv preprocess/03_fold_selection.py .venv/bin/activate
-	source .venv/bin/activate; python3 preprocess/03_fold_selection.py $*
+data/ml_data/00_folds-%.json: data/diabetia.csv preprocess/03_fold_selection.py .venv/bin/activate
+	source .venv/bin/activate; python3 preprocess/03_fold_selection.py $@
+	test -f $@
 
 # Machine learning
-data/presel-%-0 data/presel-%-1 data/presel-%-2 data/presel-%-3 data/presel-%-4: data/fold_selection-%.json
+data/ml_data/fold_used-0-% data/ml_data/fold_used-1-% data/ml_data/fold_used-2-% data/ml_data/fold_used-3-% data/ml_data/fold_used-4-%: data/ml_data/00_folds-%.json
 	@rm $@ || echo "Ready to create $@"
 	touch $@
 
-data/prebalanced-%-diabetia: data/diabetia.csv data/presel-% .venv/bin/activate
-	@unlink data/prebalanced-$*-diabetia || echo "No file to unlink"
-	ln -s data/diabetia.csv data/prebalanced-$*-diabetia
+data/ml_data/prebalanced-%-diabetia: data/diabetia.csv data/ml_data/fold_used-% .venv/bin/activate
+	@unlink $@ || echo "No file to unlink"
+	ln -s data/diabetia.csv $@
 
-data/balanced-%-unbalanced.csv: data/prebalanced-% scripts4ml/01_class_balancing.py .venv/bin/activate
-	source .venv/bin/activate; python3 scripts4ml/01_class_balancing.py $(subst data/balanced-,,$(subst .csv,,$@))
+data/ml_data/01_balanced-%-unbalanced.csv: data/ml_data/prebalanced-% scripts4ml/01_class_balancing.py .venv/bin/activate
+	source .venv/bin/activate; python3 scripts4ml/01_class_balancing.py $@
+	test -f $@
 
-data/normalized-%-zscore.pkl: data/balanced-%.csv
-	echo "Normalizing data"
+data/ml_data/02_normalized-%-zscore.csv: data/ml_data/01_balanced-%.csv scripts4ml/02_data_normalization.py .venv/bin/activate
+	source .venv/bin/activate; python3 scripts4ml/02_data_normalization.py $@
+	echo $@ | sed 's/\.csv/\.pkl/' | xargs test -f
+	echo $@ | sed 's/\.csv/\.json/' | xargs test -f
+	test -f $@
 
-data/features_selected-%-xi2.json: data/normalized-%.pkl scripts4ml/03_feature_selection.py .venv/bin/activate
-	source .venv/bin/activate; python3 scripts4ml/03_feature_selection.py $(subst data/features_selected-,,$(subst .json,,$@))
+data/features_selected-%-xi2.json: data/ml_data/02_normalized-%.csv scripts4ml/03_feature_selection.py .venv/bin/activate
+	source .venv/bin/activate; python3 scripts4ml/03_feature_selection.py $@
+	test -f $@
 
 data/model-%-logistic.pkl: data/features_selected-%.json scripts4ml/04_model_train.py .venv/bin/activate
-	source .venv/bin/activate; python3 scripts4ml/04_model_train.py $(subst data/model-,,$(subst .pkl,,$@))
+	source .venv/bin/activate; python3 scripts4ml/04_model_train.py $@
 
 data/prediction-%.csv: data/model-%.pkl scripts4ml/05_prediction.py .venv/bin/activate
-	source .venv/bin/activate; python3 scripts4ml/05_prediction.py $(subst data/prediction-,,$(subst .csv,,$@))
+	source .venv/bin/activate; python3 scripts4ml/05_prediction.py $@
 
 data/score-%.csv: data/prediction-%.csv scripts4ml/06_score_by_fold.py .venv/bin/activate
-	source .venv/bin/activate; python3 scripts4ml/06_score_by_fold.py $(subst data/score-,,$(subst .csv,,$@))
+	source .venv/bin/activate; python3 scripts4ml/06_score_by_fold.py $@
 
 data/global_score-%.csv: scripts4ml/07_global_score.py .venv/bin/activate
 	make data/score-$(subst -x-,-0-,$*).csv
