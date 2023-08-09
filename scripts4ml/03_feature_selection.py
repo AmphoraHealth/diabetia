@@ -27,6 +27,8 @@ from conf.global_constants import DIAGNOSTIC, TEST_FOLD, FEATURE_SELECTION_METHO
 OUT_PATH = f"{S03_FEATURE_SELECTION}.json"
 DB_PATH = f"{S02_NORMALIZATION}.csv"
 FOLD_PATH = f"{S00_FOLD_SPLITING}.json"
+CONFIG_PATH = './conf/engineering_conf.json'
+definitions = json.load(open(f'{CONFIG_PATH}', 'r', encoding='UTF-8'))['config']['diagnosis']
 
 # Import libraries ------------------------------------------------------------
 import pandas as pd
@@ -44,11 +46,14 @@ def get_fold_trainning(data:pd.DataFrame, folds_file:json, n_folds:int = 5) -> p
         if str(n) == TEST_FOLD:
             pass
         else:
-            train.append(data.loc[data['id'].isin(folds_file[str(n)]['ids'])])
+            # train.append(data.loc[data['id'].isin(folds_file[str(n)]['ids'])])
+            train.append(data.loc[folds_file[str(n)]['ids']])
     train = pd.concat(train)
     return train
 
 def feature_selection(data:pd.DataFrame, label:pd.Series, n_features:int = 100) -> dict:
+    # print(data.info(verbose=3))
+    # print(data.head(10))
     # get a list of columns with negative values
     cols = [col for col in data.columns if data[col].min() < 0]
     # add the minimum value to each column to make them all positive
@@ -64,12 +69,14 @@ def feature_selection(data:pd.DataFrame, label:pd.Series, n_features:int = 100) 
     return best_features
 
 def main():
+    logging.info('Reading data...')
     data = pd.read_csv(f'{DB_PATH}', index_col = 0)
     data.drop('e11', axis = 1, inplace = True)
     data.drop('age_diag_cat', axis = 1, inplace = True)
     folds = json.load(open(f'{FOLD_PATH}', 'r', encoding='UTF-8'))
     data = get_fold_trainning(data, folds)
     X, y = data.iloc[:,:-4], data[DIAGNOSTIC]
+    logging.info(f"Selecting best features for {definitions[DIAGNOSTIC].replace('type_2_diabetes_mellitus', 'DM2').replace('_',' ')} using {FEATURE_SELECTION_METHOD}")
     features = feature_selection(X, y)
 
     with open(f'{OUT_PATH}', "w") as json_file:

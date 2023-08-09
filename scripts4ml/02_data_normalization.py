@@ -76,7 +76,7 @@ class DataNormalization:
           self.normalize()
           
           #..Saving new file
-          self.data.to_csv(OUT_PATH)
+          self.data.to_csv(OUT_PATH, index = False)
 
        except Exception as e:
           return logging.warning(f'{self.mainNormalization.__name__} failed. {e}')
@@ -131,7 +131,7 @@ def runDataNormalization():
   Function to run data normaliaztion
   """
   #..Files
-  data:pd.DataFrame = pd.read_csv(DB_PATH, low_memory=False, nrows=100)
+  data:pd.DataFrame = pd.read_csv(DB_PATH, low_memory=False)
   columnGroups:dict = json.load(open(f'{ROOT_PATH}/conf/columnGroups.json','r', encoding = 'Utf-8'))
 
   dataNorm = DataNormalization(
