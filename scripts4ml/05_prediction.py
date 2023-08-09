@@ -18,14 +18,14 @@ import sys
 ROOT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(ROOT_PATH)
 from libs.logging import logging
-from conf.global_constants import DIAGNOSTIC, ORIGIN, TEST_FOLD, BALANCING_METHOD, NORMALIZATION_METHOD, FEATURE_SELECTION_METHOD, MACHINE_LEARNING_MODEL
+from conf.global_constants import *
 
 # Constants -------------------------------------------------------------------
-IN_PATH = 'data/diabetia.csv' if ORIGIN == 'diabetia' else 'data/diabetia-disc.csv'
-FOLD_PATH = f"data/fold_selection-{DIAGNOSTIC}.json"
-MODEL_PATH = f"data/model-{DIAGNOSTIC}-{TEST_FOLD}-{ORIGIN}-{BALANCING_METHOD}-{NORMALIZATION_METHOD}-{FEATURE_SELECTION_METHOD}-{MACHINE_LEARNING_MODEL}.pkl"
+IN_PATH = f"{AUX_ORIGIN_DATABASE}"
+FOLD_PATH = f"{S00_FOLD_SPLITING}.json"
+MODEL_PATH = f"{S04_MODEL_TRAIN}.pkl"
 
-OUT_PATH = f"data/prediction-{DIAGNOSTIC}-{TEST_FOLD}-{ORIGIN}-{BALANCING_METHOD}-{NORMALIZATION_METHOD}-{FEATURE_SELECTION_METHOD}-{MACHINE_LEARNING_MODEL}.csv"
+OUT_PATH = f"{S05_PREDICTION}.csv"
 
 # Import libraries ------------------------------------------------------------
 from sklearn.metrics import balanced_accuracy_score
@@ -44,7 +44,7 @@ with open(FOLD_PATH) as f:
 
 # get the ids of the test fold and filter the data
 ids = fold_selection[str(TEST_FOLD)]["ids"]
-df = df[df["id"].isin(ids)]
+df = df.loc[df["id"].isin(ids)]
 
 # normalize the data
 

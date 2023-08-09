@@ -22,10 +22,10 @@ from conf.global_constants import *
 from libs.logging import logging
 
 # Constants -------------------------------------------------------------------
-IN_PATH = f"data/balanced-{DIAGNOSTIC}-{TEST_FOLD}-{ORIGIN}-{BALANCING_METHOD}.csv"
-FEATURES_PATH = f"data/features-{DIAGNOSTIC}-{TEST_FOLD}-{ORIGIN}-{BALANCING_METHOD}-{NORMALIZATION_METHOD}-{FEATURE_SELECTION_METHOD}.json"
+IN_PATH = f"{S02_NORMALIZATION}.csv"
+FEATURES_PATH = f"{S03_FEATURE_SELECTION}.json"
 
-OUT_PATH = f"data/model-{DIAGNOSTIC}-{TEST_FOLD}-{ORIGIN}-{BALANCING_METHOD}-{NORMALIZATION_METHOD}-{FEATURE_SELECTION_METHOD}-{MACHINE_LEARNING_MODEL}.pkl"
+OUT_PATH = f"{S04_MODEL_TRAIN}.pkl"
 
 # Import libraries ------------------------------------------------------------
 import pickle

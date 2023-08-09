@@ -6,23 +6,11 @@ diabetia: data/diabetia.csv
 download: data/hk_database.csv
 
 clean:
-	#rm -rf data/hk_database.csv
-	rm -rf data/hk_database_cleaned.csv
-	#rm -rf data/diabetia.csv
-	rm -rf data/fold_selection-*.json
-	rm -rf data/presel-*
-	rm -rf data/prebalanced-*
-	rm -rf data/balanced-*.csv
-	rm -rf data/normalized-*.pkl
-	rm -rf data/features_selected-*.json
-	rm -rf data/model-*.pkl
-	rm -rf data/prediction-*.csv
-	rm -rf data/score-*.csv
-	rm -rf data/global_score-*.csv
-	rm -rf data/table_one/tbl1.csv
-	rm -rf data/table_one/tbl1.xlsx
+	rm -rf data/ml_data/0*
+	rm -rf data/ml_data/fold_used-*
+	rm -rf data/ml_data/prebalanced-*
 
-test: data/score-0-e112-diabetia-unbalanced-zscore-xi2-logistic.csv
+test: data/ml_data/06_score-0-e112-diabetia-unbalanced-zscore-xi2-logistic.csv
 
 clean-test: clean test
 
@@ -68,20 +56,23 @@ data/ml_data/02_normalized-%-zscore.csv: data/ml_data/01_balanced-%.csv scripts4
 	echo $@ | sed 's/\.csv/\.json/' | xargs test -f
 	test -f $@
 
-data/features_selected-%-xi2.json: data/ml_data/02_normalized-%.csv scripts4ml/03_feature_selection.py .venv/bin/activate
+data/ml_data/03_features-%-xi2.json: data/ml_data/02_normalized-%.csv scripts4ml/03_feature_selection.py .venv/bin/activate
 	source .venv/bin/activate; python3 scripts4ml/03_feature_selection.py $@
 	test -f $@
 
-data/model-%-logistic.pkl: data/features_selected-%.json scripts4ml/04_model_train.py .venv/bin/activate
+data/ml_data/04_model-%-logistic.pkl: data/ml_data/03_features-%.json scripts4ml/04_model_train.py .venv/bin/activate
 	source .venv/bin/activate; python3 scripts4ml/04_model_train.py $@
+	test -f $@
 
-data/prediction-%.csv: data/model-%.pkl scripts4ml/05_prediction.py .venv/bin/activate
+data/ml_data/05_prediction-%.csv: data/ml_data/04_model-%.pkl scripts4ml/05_prediction.py .venv/bin/activate
 	source .venv/bin/activate; python3 scripts4ml/05_prediction.py $@
+	test -f $@
 
-data/score-%.csv: data/prediction-%.csv scripts4ml/06_score_by_fold.py .venv/bin/activate
+data/ml_data/06_score-%.csv: data/ml_data/05_prediction-%.csv scripts4ml/06_score_by_fold.py .venv/bin/activate
 	source .venv/bin/activate; python3 scripts4ml/06_score_by_fold.py $@
+	test -f $@
 
-data/global_score-%.csv: scripts4ml/07_global_score.py .venv/bin/activate
+data/ml_data/07_global_score-%.csv: scripts4ml/07_global_score.py .venv/bin/activate
 	make data/score-$(subst -x-,-0-,$*).csv
 	make data/score-$(subst -x-,-1-,$*).csv
 	make data/score-$(subst -x-,-2-,$*).csv
