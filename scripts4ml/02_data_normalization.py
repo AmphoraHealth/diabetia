@@ -37,8 +37,8 @@ import pickle
 from sklearn.preprocessing import PowerTransformer
 from sklearn.preprocessing import QuantileTransformer
 from sklearn.preprocessing import StandardScaler
-from aux_01_data_normalization import normalizers
-from aux_01_data_normalization import scalers
+from aux_02_data_normalization import normalizers
+from aux_02_data_normalization import scalers
 
 ROOT_PATH = os.path.abspath(
     os.path.join(
@@ -156,6 +156,8 @@ class DataNormalization:
           with open(OUT_PATH_SCALER_JSON, 'w') as file:
             json.dump({"columnsScaled":self.columnsToTransform}, file, indent=4, ensure_ascii=False)
           
+          return logging.info(f'Data scaled')  
+       
        except Exception as e:
           logging.warning(f'{self.standardize.__name__} failed. {e}')
 
