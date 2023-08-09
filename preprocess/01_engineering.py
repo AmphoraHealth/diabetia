@@ -148,13 +148,9 @@ class DataEngineering:
             dropUnnecessaryCols:list[str] = self.config['config']['columnsToDrop']['unnecessaryCols']
             self.data.drop(columns=dropUnnecessaryCols, inplace=True)
 
-            #..Drop empty columns
-            dropEmptyCols:list[str] = self.data.columns[self.data.isnull().all()]
+            #..Drop empty columns (Zero or NaN) 
+            dropEmptyCols:list[str] = self.data.columns[((self.data==0)|(self.data.isnull())).all()]
             self.data.drop(columns=dropEmptyCols, inplace=True)
-
-            #..Drop ZeroCols
-            dropZeroCols:list[str] = self.data.columns[(self.data==0).all()]
-            self.data.drop(columns=dropZeroCols, inplace=True)
 
             #..Drop counts
             dropCountColumns:list[str] = [n for n in self.data.columns if bool(re.match('^.*count$',n)) == True]
