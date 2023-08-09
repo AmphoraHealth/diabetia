@@ -21,14 +21,14 @@ import os
 import sys
 ROOT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(ROOT_PATH)
-from conf.global_constants import DIAGNOSTIC, ORIGIN, TEST_FOLD, BALANCING_METHOD
+from conf.global_constants import ORIGIN, TEST_FOLD, BALANCING_METHOD, AUX_ORIGIN_DATABASE ,S00_FOLD_SPLITING, S01_BALANCING
 import aux_01_class_balancing as aux
 
 # Constants -------------------------------------------------------------------
-IN_PATH = 'data/diabetia.csv' if ORIGIN == 'diabetia' else 'data/diabetia-disc.csv'
-FOLD_PATH = f"data/fold_selection-{DIAGNOSTIC}.json"
+IN_PATH = f"{AUX_ORIGIN_DATABASE}"
+FOLD_PATH = f"{S00_FOLD_SPLITING}.json"
 
-OUT_PATH = f"data/balanced-{DIAGNOSTIC}-{TEST_FOLD}-{ORIGIN}-{BALANCING_METHOD}.csv"
+OUT_PATH = f"{S01_BALANCING}.csv"
 
 # Import libraries ------------------------------------------------------------
 import pandas as pd

@@ -22,12 +22,12 @@ import os
 import sys
 ROOT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(ROOT_PATH)
-from conf.global_constants import DIAGNOSTIC
+from conf.global_constants import AUX_ORIGIN_DATABASE, S00_FOLD_SPLITING, DIAGNOSTIC
 from libs.logging import logging
 
 # Constants -------------------------------------------------------------------
-IN_PATH = 'data/diabetia.csv'
-OUT_PATH = f"data/fold_selection-{DIAGNOSTIC}.json"
+IN_PATH = f"{AUX_ORIGIN_DATABASE}"
+OUT_PATH = f"{S00_FOLD_SPLITING}.json"
 
 COL_SEX = "cs_sex"
 COL_HTN = "essential_(primary)_hypertension"
@@ -78,7 +78,9 @@ folds = {i:{
 # add the class mapping to the folds dictionary
 folds["class_mapping"] = class_mapping
 
-# save the folds
+# check directory existence and save the folds
+if not os.path.exists(os.path.dirname(OUT_PATH)):
+  os.makedirs(os.path.dirname(OUT_PATH))
 with open(OUT_PATH,"w") as f:
   json.dump(folds,f,indent=2)
 

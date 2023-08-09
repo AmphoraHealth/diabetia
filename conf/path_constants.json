@@ -47,8 +47,8 @@
     "feature_selection_methods",
     "machine_learning_models"],
   "_order_in_pathname": [
-    "diagnostics",
     "folds",
+    "diagnostics",
     "origins",
     "balancing_methods",
     "normalization_methods",

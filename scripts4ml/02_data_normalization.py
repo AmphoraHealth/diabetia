@@ -14,7 +14,11 @@ Additional outputs:
 
 # prepare environment ---------------------------------------------------------
 # get constants from command line
-#from conf.global_constants import NORMALIZATION_METHODS 
+import os
+import sys
+ROOT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(ROOT_PATH)
+from conf.global_constants import S01_BALANCING, S02_NORMALIZATION
 
 # Constants -------------------------------------------------------------------
 DB_PATH:str = './data/diabetia.csv'
@@ -85,7 +89,7 @@ class DataNormalization:
           self.standardize()
           
           #..Saving new file
-          self.data.to_csv(OUT_PATH)
+          self.data.to_csv(OUT_PATH, index = False)
 
        except Exception as e:
           return logging.warning(f'{self.mainNormalization.__name__} failed. {e}')
@@ -171,7 +175,8 @@ def runDataNormalization():
   Function to run data normaliaztion
   """
   #..Files
-  data:pd.DataFrame = pd.read_csv(DB_PATH, low_memory=False, nrows=None)
+  data:pd.DataFrame = pd.read_csv(DB_PATH, low_memory=False)
+
   columnGroups:dict = json.load(open(f'{ROOT_PATH}/conf/columnGroups.json','r', encoding = 'Utf-8'))
 
   #..Initialize normalization and standardization

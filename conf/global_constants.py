@@ -44,7 +44,7 @@ if len(sys.argv) == 1:
   MACHINE_LEARNING_MODEL = MACHINE_LEARNING_MODELS[0]
 else:
   # get values from command line
-  _args = sys.argv[1].split('-')
+  _args = sys.argv[1].split('.')[0].split('-')[1:]
   # get a list of expected arguments
   _expected_args = _json["_order_in_pipeline"][:len(_args)]
   # sort the list by order in pathname
@@ -68,6 +68,18 @@ else:
   FEATURE_SELECTION_METHOD = get_arg_value("feature_selection_methods")
   MACHINE_LEARNING_MODEL = get_arg_value("machine_learning_models")
   
+# report the values
+logging.info(f"""
+  arguments given:          {sys.argv}
+  DIAGNOSTIC:               {DIAGNOSTIC}
+  TEST_FOLD:                {TEST_FOLD}
+  ORIGIN:                   {ORIGIN}
+  BALANCING_METHOD:         {BALANCING_METHOD}
+  NORMALIZATION_METHOD:     {NORMALIZATION_METHOD}
+  FEATURE_SELECTION_METHOD: {FEATURE_SELECTION_METHOD}
+  MACHINE_LEARNING_MODEL:   {MACHINE_LEARNING_MODEL}
+""")
+
 # check values
 if not DIAGNOSTIC in DIAGNOSTICS+["None"]:
   raise ValueError(f"given complication ({DIAGNOSTIC}) must be one of {', '.join(DIAGNOSTICS)}")
@@ -90,6 +102,7 @@ ML_MODEL = MACHINE_LEARNING_MODEL
 
 # map keys to values
 MAP = {
+  "fake_fold": "x",
   "diagnostics": DIAGNOSTIC,
   "folds": TEST_FOLD,
   "origins": ORIGIN,
@@ -102,31 +115,42 @@ MAP = {
 }
 
 # auxiliar function to get the arguments for an specific pipeline step
-def _get_args(step:str) -> list:
+def _get_args(step:str,skip_fold:bool = False) -> list:
   # get the mandatory arguments for a pipeline step
   _args = _json["_order_in_pipeline"][:step+1]
   # sort the list by order in pathname
   _args.sort(key=lambda x: _json["_order_in_pathname"].index(x))
+  # remove folds if skip_fold is true
+  if skip_fold:
+    # if folds is in the list, change it for fake_fold
+    if "folds" in _args:
+      _args[_args.index("folds")] = "fake_fold"
   return [MAP[arg] for arg in _args]
 
 # constants for each pipeline step
-s00_fold_selection = "data/fold_selection-" + "-".join(_get_args(0))
-s01_balancing = "data/balanced-" + "-".join(_get_args(1))
-s02_normalization = "data/normalized-" + "-".join(_get_args(2))
-s03_feature_selection = "data/features_selected-" + "-".join(_get_args(3))
-s04_model_train = "data/model-" + "-".join(_get_args(4))
-s05_prediction = "data/prediction-" + "-".join(_get_args(5))
-s06_score_by_fold = "data/score-" + "-".join(_get_args(6))
-s07_global_score = "data/global_score-" + "-".join(_get_args(7))
+AUX_ORIGIN_DATABASE = "data/diabetia.csv"
+S00_FOLD_SPLITING = "data/ml_data/00_folds-" + "-".join(_get_args(0))
+AUX_FOLD_SELECTION = "data/ml_data/fold_used-" + "-".join(_get_args(1))
+AUX_ORIGIN_SELECTION = "data/ml_data/origin-" + "-".join(_get_args(2))
+S01_BALANCING = "data/ml_data/01_balanced-" + "-".join(_get_args(3))
+S02_NORMALIZATION = "data/ml_data/02_normalized-" + "-".join(_get_args(4))
+S03_FEATURE_SELECTION = "data/ml_data/03_features-" + "-".join(_get_args(5))
+S04_MODEL_TRAIN = "data/ml_data/04_model-" + "-".join(_get_args(6))
+S05_PREDICTION = "data/ml_data/05_prediction-" + "-".join(_get_args(7))
+S06_SCORE_BY_FOLD = "data/ml_data/06_score-" + "-".join(_get_args(8))
+S07_GLOBAL_SCORE = "data/ml_data/07_global_score-" + "-".join(_get_args(9,skip_fold=True))
 
 # print the values
-logging.debug(f"""
-  s00_fold_selection: {s00_fold_selection}
-  s01_balancing: {s01_balancing}
-  s02_normalization: {s02_normalization}
-  s03_feature_selection: {s03_feature_selection}
-  s04_model_train: {s04_model_train}
-  s05_prediction: {s05_prediction}
-  s06_score_by_fold: {s06_score_by_fold}
-  s07_global_score: {s07_global_score}
+logging.info(f"""
+  AUX_ORIGIN_DATABASE:   {AUX_ORIGIN_DATABASE}
+  S00_FOLD_SPLITING:     {S00_FOLD_SPLITING}
+  AUX_FOLD_SELECTION:    {AUX_FOLD_SELECTION}
+  AUX_ORIGIN_SELECTION:  {AUX_ORIGIN_SELECTION}
+  S01_BALANCING:         {S01_BALANCING}
+  S02_NORMALIZATION:     {S02_NORMALIZATION}
+  S03_FEATURE_SELECTION: {S03_FEATURE_SELECTION}
+  S04_MODEL_TRAIN:       {S04_MODEL_TRAIN}
+  S05_PREDICTION:        {S05_PREDICTION}
+  S06_SCORE_BY_FOLD:     {S06_SCORE_BY_FOLD}
+  S07_GLOBAL_SCORE:      {S07_GLOBAL_SCORE}
 """)
