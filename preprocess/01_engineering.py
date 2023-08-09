@@ -26,13 +26,9 @@ import sys
 from sklearn import preprocessing
 from alive_progress import alive_bar
 
-ROOT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT_PATH:str = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(ROOT_PATH)
 from libs.logging import logging
-
-#..Default configurations
-logging_format = '%(asctime)s|%(name)s|%(levelname)s: %(message)s'
-logging.basicConfig(level=logging.INFO, format=logging_format, datefmt='%d-%m-%y %H:%M:%S')
 
 #############################################################################
 # Auxiliar functions
@@ -152,8 +148,8 @@ class DataEngineering:
             dropUnnecessaryCols:list[str] = self.config['config']['columnsToDrop']['unnecessaryCols']
             self.data.drop(columns=dropUnnecessaryCols, inplace=True)
 
-            #..Drop empty columns
-            dropEmptyCols:list[str] = self.data.columns[self.data.isnull().all()]
+            #..Drop empty columns (Zero or NaN) 
+            dropEmptyCols:list[str] = self.data.columns[((self.data==0)|(self.data.isnull())).all()]
             self.data.drop(columns=dropEmptyCols, inplace=True)
 
             #..Drop counts
