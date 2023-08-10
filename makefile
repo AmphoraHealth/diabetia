@@ -85,12 +85,7 @@ data/ml_data/06_score-%.csv: data/ml_data/05_prediction-%.csv scripts4ml/06_scor
 	source .venv/bin/activate; python3 scripts4ml/06_score_by_fold.py $@
 	test -f $@
 
-data/ml_data/07_global_score-%.csv: scripts4ml/07_global_score.py .venv/bin/activate
-	make data/score-$(subst -x-,-0-,$*).csv
-	make data/score-$(subst -x-,-1-,$*).csv
-	make data/score-$(subst -x-,-2-,$*).csv
-	make data/score-$(subst -x-,-3-,$*).csv
-	make data/score-$(subst -x-,-4-,$*).csv
+data/ml_data/07_global_score-%.csv: data/ml_data/06_score-0-%.csv data/ml_data/06_score-1-%.csv data/ml_data/06_score-2-%.csv data/ml_data/06_score-3-%.csv data/ml_data/06_score-4-%.csv scripts4ml/07_global_score.py .venv/bin/activate
 	source .venv/bin/activate; python3 scripts4ml/07_global_score.py $(subst data/global_score-,,$(subst .csv,,$@))
 
 # statistical analysis
