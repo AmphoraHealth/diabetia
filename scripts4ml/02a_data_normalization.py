@@ -98,6 +98,7 @@ class DataNormalization:
            'age_at_wx',
            'age_diag'
            ]
+        self.columnsToTransform = [col for col in self.columnsToTransform if col in self.data.columns]
 
         #..identify cols with nulls or 0s
         EmptyCols:list[str] = self.data.columns[((self.data==0)|(self.data.isnull())).all()]
