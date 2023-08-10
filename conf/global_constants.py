@@ -140,13 +140,13 @@ S00_FOLD_SPLITING = "data/ml_data/00_folds-" + "-".join(_get_args(0))
 AUX_FOLD_SELECTION = "data/ml_data/fold_used-" + "-".join(_get_args(1))
 AUX_ORIGIN_SELECTION = "data/ml_data/origin-" + "-".join(_get_args(2))
 S01_BALANCING = "data/ml_data/01_balanced-" + "-".join(_get_args(3))
-S02A_NORMALIZATION = "data/ml_data/02_normalized-" + "-".join(_get_args(4))
-S02B_STANDARDIZATION = "data/ml_data/02_scaled-" + "-".join(_get_args(4))
-S03_FEATURE_SELECTION = "data/ml_data/03_features-" + "-".join(_get_args(5))
-S04_MODEL_TRAIN = "data/ml_data/04_model-" + "-".join(_get_args(6))
-S05_PREDICTION = "data/ml_data/05_prediction-" + "-".join(_get_args(7))
-S06_SCORE_BY_FOLD = "data/ml_data/06_score-" + "-".join(_get_args(8))
-S07_GLOBAL_SCORE = "data/ml_data/07_global_score-" + "-".join(_get_args(9,skip_fold=True))
+S02A_NORMALIZATION = "data/ml_data/02a_normalized-" + "-".join(_get_args(4))
+S02B_STANDARDIZATION = "data/ml_data/02b_scaled-" + "-".join(_get_args(5))
+S03_FEATURE_SELECTION = "data/ml_data/03_features-" + "-".join(_get_args(6))
+S04_MODEL_TRAIN = "data/ml_data/04_model-" + "-".join(_get_args(7))
+S05_PREDICTION = "data/ml_data/05_prediction-" + "-".join(_get_args(8))
+S06_SCORE_BY_FOLD = "data/ml_data/06_score-" + "-".join(_get_args(9))
+S07_GLOBAL_SCORE = "data/ml_data/07_global_score-" + "-".join(_get_args(10,skip_fold=True))
 
 # print the values
 logging.info(f"""
@@ -155,7 +155,7 @@ logging.info(f"""
   AUX_FOLD_SELECTION:    {AUX_FOLD_SELECTION}
   AUX_ORIGIN_SELECTION:  {AUX_ORIGIN_SELECTION}
   S01_BALANCING:         {S01_BALANCING}
-  S02A_NORMALIZATION:     {S02A_NORMALIZATION}
+  S02A_NORMALIZATION:    {S02A_NORMALIZATION}
   S02B_STANDARDIZATION:  {S02B_STANDARDIZATION}
   S03_FEATURE_SELECTION: {S03_FEATURE_SELECTION}
   S04_MODEL_TRAIN:       {S04_MODEL_TRAIN}
