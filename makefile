@@ -10,7 +10,7 @@ clean:
 	rm -rf data/ml_data/fold_used-*
 	rm -rf data/ml_data/prebalanced-*
 
-test: data/ml_data/06_score-0-e112-diabetia-unbalanced-z_score-xi2-logistic.csv
+test: data/ml_data/06_score-0-e112-diabetia-unbalanced-z_score-z_score-xi2-logistic.csv
 
 clean-test: clean test
 
@@ -56,16 +56,25 @@ data/ml_data/01_balanced-%.csv: ph/01_balanced-% scripts4ml/01_class_balancing.p
 	source .venv/bin/activate; python3 scripts4ml/01_class_balancing.py $@
 	test -f $@
 
-ph/02_scaled-%-z_score: data/ml_data/01_balanced-%.csv ph/01_balanced-%
+ph/02a_scaled-%-z_score: data/ml_data/01_balanced-%.csv ph/01_balanced-%
 	@echo "phony target $@"
-data/ml_data/02_scaled-%.csv: ph/02_scaled-% scripts4ml/02_data_normalization.py .venv/bin/activate
-	source .venv/bin/activate; python3 scripts4ml/02_data_normalization.py $@
+data/ml_data/02a_scaled-%.csv: ph/02a_scaled-% scripts4ml/02a_data_normalization.py .venv/bin/activate
+	source .venv/bin/activate; python3 scripts4ml/02a_data_normalization.py $@
 	ls data/ml_data/
 	echo $@ | sed 's/\.csv/\.pkl/' | xargs test -f
 	echo $@ | sed 's/\.csv/\.json/' | xargs test -f
 	test -f $@
 
-ph/03_features-%-xi2: data/ml_data/02_scaled-%.csv ph/02_scaled-%
+ph/02b_scaled-%-z_score: data/ml_data/02a_scaled-%.csv ph/02a_scaled-%
+	@echo "phony target $@"
+data/ml_data/02b_scaled-%.csv: ph/02b_scaled-% scripts4ml/02b_data_standardization.py .venv/bin/activate
+	source .venv/bin/activate; python3 scripts4ml/02b_data_standardization.py $@
+	ls data/ml_data/
+	echo $@ | sed 's/\.csv/\.pkl/' | xargs test -f
+	echo $@ | sed 's/\.csv/\.json/' | xargs test -f
+	test -f $@
+
+ph/03_features-%-xi2: data/ml_data/02b_scaled-%.csv ph/02b_scaled-%
 	@echo "phony target $@"
 data/ml_data/03_features-%.json: ph/03_features-% scripts4ml/03_feature_selection.py .venv/bin/activate
 	source .venv/bin/activate; python3 scripts4ml/03_feature_selection.py $@
