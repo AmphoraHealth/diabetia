@@ -25,7 +25,7 @@ from conf.global_constants import DIAGNOSTIC, TEST_FOLD, FEATURE_SELECTION_METHO
 
 # Constants -------------------------------------------------------------------
 OUT_PATH = f"{S03_FEATURE_SELECTION}.json"
-DB_PATH = f"{S02_NORMALIZATION}.csv"
+DB_PATH = f"{S02B_STANDARDIZATION}.csv"
 FOLD_PATH = f"{S00_FOLD_SPLITING}.json"
 CONFIG_PATH = './conf/engineering_conf.json'
 definitions = json.load(open(f'{CONFIG_PATH}', 'r', encoding='UTF-8'))['config']['diagnosis']

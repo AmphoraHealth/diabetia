@@ -28,6 +28,7 @@ FOLDS = [str(f) for f in _json["folds"]]
 ORIGINS = _json["origins"]
 BALANCING_METHODS = _json["balancing_methods"]
 NORMALIZATION_METHODS = _json["normalization_methods"]
+STANDARDIZATION_METHODS = _json["standardization_methods"]
 FEATURE_SELECTION_METHODS = _json["feature_selection_methods"]
 MACHINE_LEARNING_MODELS = _json["machine_learning_models"]
 
@@ -40,6 +41,7 @@ if len(sys.argv) == 1:
   ORIGIN = ORIGINS[0]
   BALANCING_METHOD = BALANCING_METHODS[0]
   NORMALIZATION_METHOD = NORMALIZATION_METHODS[0]
+  STANDARDIZATION_METHOD = STANDARDIZATION_METHODS[0]
   FEATURE_SELECTION_METHOD = FEATURE_SELECTION_METHODS[0]
   MACHINE_LEARNING_MODEL = MACHINE_LEARNING_MODELS[0]
 else:
@@ -65,6 +67,7 @@ else:
   ORIGIN = get_arg_value("origins")
   BALANCING_METHOD = get_arg_value("balancing_methods")
   NORMALIZATION_METHOD = get_arg_value("normalization_methods")
+  STANDARDIZATION_METHOD = get_arg_value("standardization_methods")
   FEATURE_SELECTION_METHOD = get_arg_value("feature_selection_methods")
   MACHINE_LEARNING_MODEL = get_arg_value("machine_learning_models")
   
@@ -76,6 +79,7 @@ logging.info(f"""
   ORIGIN:                   {ORIGIN}
   BALANCING_METHOD:         {BALANCING_METHOD}
   NORMALIZATION_METHOD:     {NORMALIZATION_METHOD}
+  STANDARDIZATION_METHOD:   {STANDARDIZATION_METHOD}
   FEATURE_SELECTION_METHOD: {FEATURE_SELECTION_METHOD}
   MACHINE_LEARNING_MODEL:   {MACHINE_LEARNING_MODEL}
 """)
@@ -91,6 +95,8 @@ if not BALANCING_METHOD in BALANCING_METHODS+["None"]:
   raise ValueError(f"given balancing method ({BALANCING_METHOD}) must be one of {', '.join(BALANCING_METHODS)}")
 if not NORMALIZATION_METHOD in NORMALIZATION_METHODS+["None"]:
   raise ValueError(f"given normalization method ({NORMALIZATION_METHOD}) must be one of {', '.join(NORMALIZATION_METHODS)}")
+if not STANDARDIZATION_METHOD in STANDARDIZATION_METHODS+["None"]:
+  raise ValueError(f"given standardization method ({STANDARDIZATION_METHOD}) must be one of {', '.join(STANDARDIZATION_METHODS)}")
 if not FEATURE_SELECTION_METHOD in FEATURE_SELECTION_METHODS+["None"]:
   raise ValueError(f"given feature selection method ({FEATURE_SELECTION_METHOD}) must be one of {', '.join(FEATURE_SELECTION_METHODS)}")
 if not MACHINE_LEARNING_MODEL in MACHINE_LEARNING_MODELS+["None"]:
@@ -108,6 +114,7 @@ MAP = {
   "origins": ORIGIN,
   "balancing_methods": BALANCING_METHOD,
   "normalization_methods": NORMALIZATION_METHOD,
+  "standardization_methods": STANDARDIZATION_METHOD,
   "feature_selection_methods": FEATURE_SELECTION_METHOD,
   "machine_learning_models": MACHINE_LEARNING_MODEL,
   "fs_methods": FS_METHOD,
@@ -133,12 +140,13 @@ S00_FOLD_SPLITING = "data/ml_data/00_folds-" + "-".join(_get_args(0))
 AUX_FOLD_SELECTION = "data/ml_data/fold_used-" + "-".join(_get_args(1))
 AUX_ORIGIN_SELECTION = "data/ml_data/origin-" + "-".join(_get_args(2))
 S01_BALANCING = "data/ml_data/01_balanced-" + "-".join(_get_args(3))
-S02_NORMALIZATION = "data/ml_data/02_normalized-" + "-".join(_get_args(4))
-S03_FEATURE_SELECTION = "data/ml_data/03_features-" + "-".join(_get_args(5))
-S04_MODEL_TRAIN = "data/ml_data/04_model-" + "-".join(_get_args(6))
-S05_PREDICTION = "data/ml_data/05_prediction-" + "-".join(_get_args(7))
-S06_SCORE_BY_FOLD = "data/ml_data/06_score-" + "-".join(_get_args(8))
-S07_GLOBAL_SCORE = "data/ml_data/07_global_score-" + "-".join(_get_args(9,skip_fold=True))
+S02A_NORMALIZATION = "data/ml_data/02a_normalized-" + "-".join(_get_args(4))
+S02B_STANDARDIZATION = "data/ml_data/02b_scaled-" + "-".join(_get_args(5))
+S03_FEATURE_SELECTION = "data/ml_data/03_features-" + "-".join(_get_args(6))
+S04_MODEL_TRAIN = "data/ml_data/04_model-" + "-".join(_get_args(7))
+S05_PREDICTION = "data/ml_data/05_prediction-" + "-".join(_get_args(8))
+S06_SCORE_BY_FOLD = "data/ml_data/06_score-" + "-".join(_get_args(9))
+S07_GLOBAL_SCORE = "data/ml_data/07_global_score-" + "-".join(_get_args(10,skip_fold=True))
 
 # print the values
 logging.info(f"""
@@ -147,7 +155,8 @@ logging.info(f"""
   AUX_FOLD_SELECTION:    {AUX_FOLD_SELECTION}
   AUX_ORIGIN_SELECTION:  {AUX_ORIGIN_SELECTION}
   S01_BALANCING:         {S01_BALANCING}
-  S02_NORMALIZATION:     {S02_NORMALIZATION}
+  S02A_NORMALIZATION:    {S02A_NORMALIZATION}
+  S02B_STANDARDIZATION:  {S02B_STANDARDIZATION}
   S03_FEATURE_SELECTION: {S03_FEATURE_SELECTION}
   S04_MODEL_TRAIN:       {S04_MODEL_TRAIN}
   S05_PREDICTION:        {S05_PREDICTION}

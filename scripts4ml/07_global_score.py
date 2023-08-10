@@ -16,12 +16,12 @@ import os
 import sys
 ROOT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(ROOT_PATH)
-from conf.global_constants import DIAGNOSTIC, ORIGIN, BALANCING_METHOD, NORMALIZATION_METHOD, FEATURE_SELECTION_METHOD, MACHINE_LEARNING_MODEL
+from conf.global_constants import *
 from libs.logging import logging
 
 # Constants -------------------------------------------------------------------
-IN_PATHS = [f"data/score-{DIAGNOSTIC}-{TEST_FOLD}-{ORIGIN}-{BALANCING_METHOD}-{NORMALIZATION_METHOD}-{FEATURE_SELECTION_METHOD}-{MACHINE_LEARNING_MODEL}.csv" for TEST_FOLD in range(5)]
-OUT_PATH = f"data/global_score-{DIAGNOSTIC}-x-{ORIGIN}-{BALANCING_METHOD}-{NORMALIZATION_METHOD}-{FEATURE_SELECTION_METHOD}-{MACHINE_LEARNING_MODEL}.csv"
+IN_PATHS = [f"{S06_SCORE_BY_FOLD}.csv" for TEST_FOLD in range(5)]
+OUT_PATH = f"{S07_GLOBAL_SCORE}.csv"
 
 # Import libraries ------------------------------------------------------------
 import pandas as pd

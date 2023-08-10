@@ -18,15 +18,12 @@ import sys
 
 ROOT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(ROOT_PATH)
-from conf.global_constants import (BALANCING_METHOD, DIAGNOSTIC,
-                                   FEATURE_SELECTION_METHOD,
-                                   MACHINE_LEARNING_MODEL,
-                                   NORMALIZATION_METHOD, ORIGIN, TEST_FOLD)
+from conf.global_constants import *
 from libs.logging import logging
 
 # Constants -------------------------------------------------------------------
-IN_PATH = f"data/prediction-{DIAGNOSTIC}-{TEST_FOLD}-{ORIGIN}-{BALANCING_METHOD}-{NORMALIZATION_METHOD}-{FEATURE_SELECTION_METHOD}-{MACHINE_LEARNING_MODEL}.csv"
-OUT_PATH = f"data/score-{DIAGNOSTIC}-{TEST_FOLD}-{ORIGIN}-{BALANCING_METHOD}-{NORMALIZATION_METHOD}-{FEATURE_SELECTION_METHOD}-{MACHINE_LEARNING_MODEL}.csv"
+IN_PATH = f"{S05_PREDICTION}.csv"
+OUT_PATH = f"{S06_SCORE_BY_FOLD}.csv"
 
 # Import libraries ------------------------------------------------------------
 from sklearn.metrics import balanced_accuracy_score, f1_score, roc_auc_score

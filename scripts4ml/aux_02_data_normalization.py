@@ -15,7 +15,7 @@ yeo_johnson = PowerTransformer(
     standardize = False
 )
 
-box_cos = PowerTransformer(
+box_cox = PowerTransformer(
     method = 'box_cox',
     standardize = False
 )
@@ -30,7 +30,7 @@ z_score = StandardScaler(with_mean=True, with_std=True)
 
 normalizers:dict[str:object] = {
     'yeo_johnson': yeo_johnson,
-    'box_cox': box_cos,
+    'box_cox': box_cox,
     'quantile_transform': quantile_transform    
 } 
 

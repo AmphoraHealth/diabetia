@@ -24,13 +24,14 @@ ROOT_PATH = os.path.abspath(
 )
 sys.path.append(ROOT_PATH)
 from libs.logging import logging
+from conf.global_constants import *
 
 # Constants -------------------------------------------------------------------
-DB_PATH:str = './data/diabetia_normalized.csv'
-OUT_PATH:str = './data/diabetia_standardized.csv'
-STANDARDIZATION_METHOD:str = 'z_score'
-OUT_PATH_SCALER:str = './data/standardizer.pkl'
-OUT_PATH_SCALER_JSON:str = './data/standardizer_columns.json'
+DB_PATH:str = f"{S02A_NORMALIZATION}.csv"
+OUT_PATH:str = f"{S02B_STANDARDIZATION}.csv"
+_STANDARDIZATION_METHOD:str = f"{STANDARDIZATION_METHOD}"
+OUT_PATH_SCALER:str = f"{S02B_STANDARDIZATION}.pkl"
+OUT_PATH_SCALER_JSON:str = f"{S02B_STANDARDIZATION}.json"
 
 # Import libraries ------------------------------------------------------------
 import pandas as pd
@@ -96,7 +97,8 @@ class DataNormalization:
            'age_at_wx',
            'age_diag'
            ]
-
+        self.columnsToTransform = [col for col in self.columnsToTransform if col in self.data.columns]
+        
         #..identify cols with nulls or 0s
         EmptyCols:list[str] = self.data.columns[((self.data==0)|(self.data.isnull())).all()]
         self.columnsToTransform = [col for col in self.columnsToTransform if col not in EmptyCols]
@@ -114,7 +116,7 @@ class DataNormalization:
        """
        try:
           #..Intialize scaler
-          scaler = scalers[STANDARDIZATION_METHOD]
+          scaler = scalers[_STANDARDIZATION_METHOD]
           scaler.fit(self.data[self.columnsToTransform])
 
           #..Scale data
@@ -135,7 +137,7 @@ class DataNormalization:
 
 
     def __str__(self):
-       return f'Data standardization by {STANDARDIZATION_METHOD}'
+       return f'Data standardization by {_STANDARDIZATION_METHOD}'
     
 
 def runDataStandardization():
