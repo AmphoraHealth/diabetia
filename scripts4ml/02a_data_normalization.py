@@ -1,5 +1,5 @@
 """
-02_data_normalization.py
+02a_data_normalization.py
   This file contains the code for data normalization and standardization.
 
 Input:
@@ -16,34 +16,6 @@ Additional outputs:
 # get constants from command line
 import os
 import sys
-ROOT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(ROOT_PATH)
-from conf.global_constants import S01_BALANCING, S02_NORMALIZATION
-
-# Constants -------------------------------------------------------------------
-DB_PATH:str = './data/diabetia.csv'
-OUT_PATH:str = './data/diabetia_normalized.csv'
-NORMALIZATION_METHOD:str = 'yeo_johnson'
-STANDARDIZATION_METHOD:str = 'z_score'
-OUT_PATH_NORMALIZER:str = './data/diabetia_normalizer.pkl'
-OUT_PATH_NORMALIZER_JSON:str = './data/diabetia_normalizer.json'
-OUT_PATH_SCALER:str = './data/diabetia_scaler.pkl'
-OUT_PATH_SCALER_JSON:str = './data/diabetia_scaler.json'
-
-# Import libraries ------------------------------------------------------------
-import pandas as pd
-import numpy as np
-import re
-import os
-import sys
-import json
-import pickle
-from sklearn.preprocessing import PowerTransformer
-from sklearn.preprocessing import QuantileTransformer
-from sklearn.preprocessing import StandardScaler
-from aux_02_data_normalization import normalizers
-from aux_02_data_normalization import scalers
-
 ROOT_PATH = os.path.abspath(
     os.path.join(
         os.path.dirname(__file__),
@@ -52,6 +24,23 @@ ROOT_PATH = os.path.abspath(
 )
 sys.path.append(ROOT_PATH)
 from libs.logging import logging
+#from conf.global_constants import S02_NORMALIZATION
+
+# Constants -------------------------------------------------------------------
+DB_PATH:str = './data/diabetia.csv'
+OUT_PATH:str = './data/diabetia_normalized.csv'
+NORMALIZATION_METHOD:str = 'yeo_johnson'
+OUT_PATH_NORMALIZER:str = './data/normalizer.pkl'
+OUT_PATH_NORMALIZER_JSON:str = './data/normalizer_columns.json'
+
+# Import libraries ------------------------------------------------------------
+import pandas as pd
+import numpy as np
+import os
+import sys
+import json
+import pickle
+from aux_02_data_normalization import normalizers
 
 # Code: data normalization and standardization -----------------------------------------------------
 
@@ -76,7 +65,6 @@ class DataNormalization:
       self.config = configFile
       self.columnsToTransform = []
       self.normalizer = None
-      self.scaler = None
 
 
     def mainNormalization(self):
@@ -86,7 +74,6 @@ class DataNormalization:
        try:
           self.columnsIdentification()
           self.normalize()
-          self.standardize()
           
           #..Saving new file
           self.data.to_csv(OUT_PATH, index = False)
@@ -104,7 +91,17 @@ class DataNormalization:
         self.columnsToTransform = \
         self.config['measuresCols']\
         + self.config['drugsCols']\
-        + ['birthdate','years_since_dx']
+        + [
+           'birthdate',
+           'years_since_dx',
+           'count_cx_w',
+           'age_at_wx',
+           'age_diag'
+           ]
+
+        #..identify cols with nulls or 0s
+        EmptyCols:list[str] = self.data.columns[((self.data==0)|(self.data.isnull())).all()]
+        self.columnsToTransform = [col for col in self.columnsToTransform if col not in EmptyCols]
         
         return logging.info('Columns indetified')
       
@@ -139,35 +136,8 @@ class DataNormalization:
           return pd.DataFrame()
        
 
-    def standardize(self):
-       """
-       Function to standardize data with z-score 
-       z = (x-u) / s
-       """
-       try:
-          #..Intialize scaler
-          scaler = scalers[STANDARDIZATION_METHOD]
-          scaler.fit(self.data[self.columnsToTransform])
-
-          #..Scale data
-          self.data[self.columnsToTransform] = scaler.transform(self.data[self.columnsToTransform])
-
-          #..Save sacaler pkl
-          with open(OUT_PATH_SCALER, 'wb') as file:
-            pickle.dump(scaler, file)
-          
-          #..Saving columns scaled
-          with open(OUT_PATH_SCALER_JSON, 'w') as file:
-            json.dump({"columnsScaled":self.columnsToTransform}, file, indent=4, ensure_ascii=False)
-          
-          return logging.info(f'Data scaled')  
-       
-       except Exception as e:
-          logging.warning(f'{self.standardize.__name__} failed. {e}')
-
-
     def __str__(self):
-       return 'Data normalization and standardization'
+       return 'Data normalization'
     
 
 def runDataNormalization():
@@ -175,8 +145,7 @@ def runDataNormalization():
   Function to run data normaliaztion
   """
   #..Files
-  data:pd.DataFrame = pd.read_csv(DB_PATH, low_memory=False)
-
+  data:pd.DataFrame = pd.read_csv(DB_PATH, low_memory=False, nrows=None)
   columnGroups:dict = json.load(open(f'{ROOT_PATH}/conf/columnGroups.json','r', encoding = 'Utf-8'))
 
   #..Initialize normalization and standardization
