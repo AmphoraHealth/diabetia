@@ -23,8 +23,8 @@ from conf.global_constants import *
 # Constants -------------------------------------------------------------------
 IN_PATH = f"{AUX_ORIGIN_DATABASE}"
 FOLD_PATH = f"{S00_FOLD_SPLITING}.json"
-NORM_PATH = f"{S02_NORMALIZATION}.json"
-STD_PATH = f"{S02_NORMALIZATION.replace('normalized', 'scaled')}.json"
+NORM_PATH = f"{S02A_NORMALIZATION}.json"
+STD_PATH = f"{S02A_NORMALIZATION.replace('normalized', 'scaled')}.json"
 FEAT_PATH = f"{S03_FEATURE_SELECTION}.json"
 MODEL_PATH = f"{S04_MODEL_TRAIN}.pkl"
 

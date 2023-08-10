@@ -10,7 +10,7 @@ clean:
 	rm -rf data/ml_data/fold_used-*
 	rm -rf data/ml_data/prebalanced-*
 
-test: data/ml_data/06_score-0-e112-diabetia-unbalanced-z_score-z_score-xi2-logistic.csv
+test: data/ml_data/06_score-0-e112-diabetia-unbalanced-yeo_johnson-z_score-xi2-logistic.csv
 
 clean-test: clean test
 
@@ -56,7 +56,7 @@ data/ml_data/01_balanced-%.csv: ph/01_balanced-% scripts4ml/01_class_balancing.p
 	source .venv/bin/activate; python3 scripts4ml/01_class_balancing.py $@
 	test -f $@
 
-ph/02a_scaled-%-z_score: data/ml_data/01_balanced-%.csv ph/01_balanced-%
+ph/02a_scaled-%-yeo_johnson: data/ml_data/01_balanced-%.csv ph/01_balanced-%
 	@echo "phony target $@"
 data/ml_data/02a_scaled-%.csv: ph/02a_scaled-% scripts4ml/02a_data_normalization.py .venv/bin/activate
 	source .venv/bin/activate; python3 scripts4ml/02a_data_normalization.py $@

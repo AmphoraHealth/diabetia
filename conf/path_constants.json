@@ -23,8 +23,12 @@
     "midsampling"
   ],
   "normalization_methods": [
-    "z_score",
-    "power_transform"
+    "yeo_johnson",
+    "box_cox",
+    "quantile_transform"
+  ],
+  "standardization_methods": [
+    "z_score"
   ],
   "feature_selection_methods": [
     "xi2",
@@ -44,6 +48,7 @@
     "origins",
     "balancing_methods",
     "normalization_methods",
+    "standardization_methods",
     "feature_selection_methods",
     "machine_learning_models"],
   "_order_in_pathname": [
@@ -52,6 +57,7 @@
     "origins",
     "balancing_methods",
     "normalization_methods",
+    "standardization_methods",
     "feature_selection_methods",
     "machine_learning_models"]
 }

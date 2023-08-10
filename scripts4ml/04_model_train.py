@@ -22,7 +22,7 @@ from conf.global_constants import *
 from libs.logging import logging
 
 # Constants -------------------------------------------------------------------
-IN_PATH = f"{S02_NORMALIZATION.replace('normalized', 'scaled')}.csv"
+IN_PATH = f"{S02A_NORMALIZATION.replace('normalized', 'scaled')}.csv"
 FEATURES_PATH = f"{S03_FEATURE_SELECTION}.json"
 
 OUT_PATH = f"{S04_MODEL_TRAIN}.pkl"
