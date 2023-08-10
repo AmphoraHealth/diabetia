@@ -1,12 +1,12 @@
 """
-02a_data_normalization.py
+02b_data_standardization.py
   This file contains the code for data normalization and standardization.
 
 Input:
-  - data/diabetia_balanced.csv
+  - data/diabetia_normalized.csv
   - conf/columnGroups.json
 Output:
-  - data/diabetia_normalized.csv
+  - data/diabetia_standardized.csv
 Additional outputs:
   - Pickle file
   - json file with col Names in pickle obj
@@ -24,31 +24,29 @@ ROOT_PATH = os.path.abspath(
 )
 sys.path.append(ROOT_PATH)
 from libs.logging import logging
-#from conf.global_constants import S02_NORMALIZATION
 
 # Constants -------------------------------------------------------------------
-DB_PATH:str = './data/diabetia.csv'
-OUT_PATH:str = './data/diabetia_normalized.csv'
-NORMALIZATION_METHOD:str = 'yeo_johnson'
-OUT_PATH_NORMALIZER:str = './data/normalizer.pkl'
-OUT_PATH_NORMALIZER_JSON:str = './data/normalizer_columns.json'
+DB_PATH:str = './data/diabetia_normalized.csv'
+OUT_PATH:str = './data/diabetia_standardized.csv'
+STANDARDIZATION_METHOD:str = 'z_score'
+OUT_PATH_SCALER:str = './data/standardizer.pkl'
+OUT_PATH_SCALER_JSON:str = './data/standardizer_columns.json'
 
 # Import libraries ------------------------------------------------------------
 import pandas as pd
 import numpy as np
-import os
-import sys
 import json
 import pickle
 from aux_02_data_normalization import normalizers
+from aux_02_data_normalization import scalers
 
-# Code: data normalization ----------------------------------------------------
+# Code: data standardization --------------------------------------------------
 
 class DataNormalization:
     """
-    This is class is to normalize and standardize data from diabetia. It is required to give
+    This is class is to standardize data from diabetia. It is required to give
     two inputs: 
-    - diabetia_balanced.csv
+    - diabetia_normalized.csv
     - columnGroups.json
 
     With json file, dtypes of cols will be identify to process only continues data. In next versions
@@ -64,22 +62,22 @@ class DataNormalization:
       self.data = data
       self.config = configFile
       self.columnsToTransform = []
-      self.normalizer = None
+      self.scaler = None
 
 
-    def mainNormalization(self):
+    def mainStandardization(self):
        """
        Function to run all required process to normalize and scale data
        """
        try:
           self.columnsIdentification()
-          self.normalize()
+          self.standardize()
           
           #..Saving new file
           self.data.to_csv(OUT_PATH, index = False)
 
        except Exception as e:
-          return logging.warning(f'{self.mainNormalization.__name__} failed. {e}')
+          return logging.warning(f'{self.mainStandardization.__name__} failed. {e}')
     
     
     def columnsIdentification(self):
@@ -107,41 +105,40 @@ class DataNormalization:
       
       except Exception as e:
          return logging.warning(f'{self.columnsIdentification.__name__} failed. {e}')
-        
+       
 
-    def normalize(self):
+    def standardize(self):
        """
-       Function to normalize by Yeo-Johnson
+       Function to standardize data with z-score 
+       z = (x-u) / s
        """
        try:
-          #..Initialize PowerTransformer
-          normalizer = normalizers[NORMALIZATION_METHOD]
-          
-          #..fitting transformer
-          normalizer.fit(self.data[self.columnsToTransform])
-          self.data[self.columnsToTransform] = normalizer.transform(self.data[self.columnsToTransform])
+          #..Intialize scaler
+          scaler = scalers[STANDARDIZATION_METHOD]
+          scaler.fit(self.data[self.columnsToTransform])
 
-          #..Saving pickle
-          with open(OUT_PATH_NORMALIZER, 'wb') as file:
-            pickle.dump(normalizer, file)
+          #..Scale data
+          self.data[self.columnsToTransform] = scaler.transform(self.data[self.columnsToTransform])
 
-          #..Saving columns normalized
-          with open(OUT_PATH_NORMALIZER_JSON, 'w') as file:
-            json.dump({"columnsNormalized":self.columnsToTransform}, file, indent=4, ensure_ascii=False)
+          #..Save scaler pkl
+          with open(OUT_PATH_SCALER, 'wb') as file:
+            pickle.dump(scaler, file)
           
-          return logging.info(f'Data normalized')  
+          #..Saving columns scaled
+          with open(OUT_PATH_SCALER_JSON, 'w') as file:
+            json.dump({"columnsStandardized":self.columnsToTransform}, file, indent=4, ensure_ascii=False)
+          
+          return logging.info(f'Data scaled')  
        
        except Exception as e:
-          return logging.warning(f'{self.normalize.__name__} failed. {e}')
-          
-          
-       
+          return logging.error(f'{self.standardize.__name__} failed. {e}')
+
 
     def __str__(self):
-       return f'Data normalization by {NORMALIZATION_METHOD}'
+       return f'Data standardization by {STANDARDIZATION_METHOD}'
     
 
-def runDataNormalization():
+def runDataStandardization():
   """
   Function to run data normaliaztion
   """
@@ -156,13 +153,13 @@ def runDataNormalization():
   )
 
   #..Run process
-  dataNorm.mainNormalization()
+  dataNorm.mainStandardization()
 
-  return logging.info('Normalization process finished')
+  return logging.info('Standardization process finished')
 
 
 if __name__=='__main__':
-   logging.info(f'{"="*30} DATA NORMALIZATION STARTS')
-   runDataNormalization()
-   logging.info(f'{"="*30} DATA NORMALIZATION FINISHED')
+   logging.info(f'{"="*30} DATA STANDARDIZATION STARTS')
+   runDataStandardization()
+   logging.info(f'{"="*30} DATA STANDARDIZATION FINISHED')
 
