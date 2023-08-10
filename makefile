@@ -23,7 +23,7 @@ data/hk_database.csv:
 	@echo "Downloaded hk_database.csv"
 
 # Special targets
-.PRECIOUS: data/diabetia.csv data/hk_database.csv data/ml_data/05_prediction-%.csv
+.PRECIOUS: data/diabetia.csv data/hk_database.csv data/ml_data/00_folds-%.json data/ml_data/fold_used-% data/ml_data/01_balanced-%.csv data/ml_data/02a_normalized-%.csv data/ml_data/03_features-%.json data/ml_data/05_prediction-%.csv
 .INTERMEDIATE: data/hk_database_cleaned.csv
 
 # preprocess data
@@ -56,16 +56,16 @@ data/ml_data/01_balanced-%.csv: ph/01_balanced-% scripts4ml/01_class_balancing.p
 	source .venv/bin/activate; python3 scripts4ml/01_class_balancing.py $@
 	test -f $@
 
-ph/02a_scaled-%-yeo_johnson: data/ml_data/01_balanced-%.csv ph/01_balanced-%
+ph/02a_normalized-%-yeo_johnson: data/ml_data/01_balanced-%.csv ph/01_balanced-%
 	@echo "phony target $@"
-data/ml_data/02a_scaled-%.csv: ph/02a_scaled-% scripts4ml/02a_data_normalization.py .venv/bin/activate
+data/ml_data/02a_normalized-%.csv: ph/02a_normalized-% scripts4ml/02a_data_normalization.py .venv/bin/activate
 	source .venv/bin/activate; python3 scripts4ml/02a_data_normalization.py $@
 	ls data/ml_data/
 	echo $@ | sed 's/\.csv/\.pkl/' | xargs test -f
 	echo $@ | sed 's/\.csv/\.json/' | xargs test -f
 	test -f $@
 
-ph/02b_scaled-%-z_score: data/ml_data/02a_scaled-%.csv ph/02a_scaled-%
+ph/02b_scaled-%-z_score: data/ml_data/02a_normalized-%.csv ph/02a_normalized-%
 	@echo "phony target $@"
 data/ml_data/02b_scaled-%.csv: ph/02b_scaled-% scripts4ml/02b_data_standardization.py .venv/bin/activate
 	source .venv/bin/activate; python3 scripts4ml/02b_data_standardization.py $@
