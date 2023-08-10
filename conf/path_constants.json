@@ -23,7 +23,7 @@
     "midsampling"
   ],
   "normalization_methods": [
-    "zscore",
+    "z_score",
     "power_transform"
   ],
   "feature_selection_methods": [

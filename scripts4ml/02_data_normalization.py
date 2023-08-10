@@ -18,17 +18,17 @@ import os
 import sys
 ROOT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(ROOT_PATH)
-from conf.global_constants import S01_BALANCING, S02_NORMALIZATION
+from conf.global_constants import *
 
 # Constants -------------------------------------------------------------------
-DB_PATH:str = './data/diabetia.csv'
-OUT_PATH:str = './data/diabetia_normalized.csv'
-NORMALIZATION_METHOD:str = 'yeo_johnson'
-STANDARDIZATION_METHOD:str = 'z_score'
-OUT_PATH_NORMALIZER:str = './data/diabetia_normalizer.pkl'
-OUT_PATH_NORMALIZER_JSON:str = './data/diabetia_normalizer.json'
-OUT_PATH_SCALER:str = './data/diabetia_scaler.pkl'
-OUT_PATH_SCALER_JSON:str = './data/diabetia_scaler.json'
+DB_PATH:str = f"{S01_BALANCING}.csv"
+OUT_PATH:str = f"{S02_NORMALIZATION.replace('normalized', 'scaled')}.csv"
+NORMALIZATION_MTH:str = 'yeo_johnson'
+STANDARDIZATION_MTH:str = f"{NORMALIZATION_METHOD}"
+OUT_PATH_NORMALIZER:str = f"{S02_NORMALIZATION}.pkl"
+OUT_PATH_NORMALIZER_JSON:str = f"{S02_NORMALIZATION}.json"
+OUT_PATH_SCALER:str = f"{S02_NORMALIZATION.replace('normalized', 'scaled')}.pkl"
+OUT_PATH_SCALER_JSON:str = f"{S02_NORMALIZATION.replace('normalized', 'scaled')}.json"
 
 # Import libraries ------------------------------------------------------------
 import pandas as pd
@@ -118,7 +118,7 @@ class DataNormalization:
        """
        try:
           #..Initialize PowerTransformer
-          normalizer = normalizers[NORMALIZATION_METHOD]
+          normalizer = normalizers[NORMALIZATION_MTH]
           
           #..fitting transformer
           normalizer.fit(self.data[self.columnsToTransform])
@@ -146,7 +146,7 @@ class DataNormalization:
        """
        try:
           #..Intialize scaler
-          scaler = scalers[STANDARDIZATION_METHOD]
+          scaler = scalers[STANDARDIZATION_MTH]
           scaler.fit(self.data[self.columnsToTransform])
 
           #..Scale data

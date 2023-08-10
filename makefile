@@ -10,7 +10,7 @@ clean:
 	rm -rf data/ml_data/fold_used-*
 	rm -rf data/ml_data/prebalanced-*
 
-test: data/ml_data/06_score-0-e112-diabetia-unbalanced-zscore-xi2-logistic.csv
+test: data/ml_data/06_score-0-e112-diabetia-unbalanced-z_score-xi2-logistic.csv
 
 clean-test: clean test
 
@@ -23,7 +23,7 @@ data/hk_database.csv:
 	@echo "Downloaded hk_database.csv"
 
 # Special targets
-.PRECIOUS: data/diabetia.csv data/hk_database.csv data/ml_data/%
+.PRECIOUS: data/diabetia.csv data/hk_database.csv data/ml_data/05_prediction-%.csv
 .INTERMEDIATE: data/hk_database_cleaned.csv
 
 # preprocess data
@@ -38,29 +38,42 @@ data/ml_data/00_folds-%.json: data/diabetia.csv preprocess/03_fold_selection.py 
 	test -f $@
 
 # Machine learning
-data/ml_data/fold_used-0-% data/ml_data/fold_used-1-% data/ml_data/fold_used-2-% data/ml_data/fold_used-3-% data/ml_data/fold_used-4-%: data/ml_data/00_folds-%.json
-	@rm $@ || echo "Ready to create $@"
+ph/fold_used-0-% ph/fold_used-1-% ph/fold_used-2-% ph/fold_used-3-% ph/fold_used-4-%: data/ml_data/00_folds-%.json
+	@echo "phony target $@"
+data/ml_data/fold_used-%: ph/fold_used-%
+	@rm $@ || true
 	touch $@
 
-data/ml_data/prebalanced-%-diabetia: data/diabetia.csv data/ml_data/fold_used-% .venv/bin/activate
-	@unlink $@ || echo "No file to unlink"
+ph/prebalanced-%-diabetia: data/ml_data/fold_used-% ph/fold_used-%
+	@echo "phony target $@"
+data/ml_data/prebalanced-%: data/diabetia.csv ph/prebalanced-% .venv/bin/activate
+	@unlink $@ || true
 	ln -s data/diabetia.csv $@
 
-data/ml_data/01_balanced-%-unbalanced.csv: data/ml_data/prebalanced-% scripts4ml/01_class_balancing.py .venv/bin/activate
+ph/01_balanced-%-unbalanced: data/ml_data/prebalanced-% ph/prebalanced-%
+	@echo "phony target $@"
+data/ml_data/01_balanced-%.csv: ph/01_balanced-% scripts4ml/01_class_balancing.py .venv/bin/activate
 	source .venv/bin/activate; python3 scripts4ml/01_class_balancing.py $@
 	test -f $@
 
-data/ml_data/02_normalized-%-zscore.csv: data/ml_data/01_balanced-%.csv scripts4ml/02_data_normalization.py .venv/bin/activate
+ph/02_scaled-%-z_score: data/ml_data/01_balanced-%.csv ph/01_balanced-%
+	@echo "phony target $@"
+data/ml_data/02_scaled-%.csv: ph/02_scaled-% scripts4ml/02_data_normalization.py .venv/bin/activate
 	source .venv/bin/activate; python3 scripts4ml/02_data_normalization.py $@
+	ls data/ml_data/
 	echo $@ | sed 's/\.csv/\.pkl/' | xargs test -f
 	echo $@ | sed 's/\.csv/\.json/' | xargs test -f
 	test -f $@
 
-data/ml_data/03_features-%-xi2.json: data/ml_data/02_normalized-%.csv scripts4ml/03_feature_selection.py .venv/bin/activate
+ph/03_features-%-xi2: data/ml_data/02_scaled-%.csv ph/02_scaled-%
+	@echo "phony target $@"
+data/ml_data/03_features-%.json: ph/03_features-% scripts4ml/03_feature_selection.py .venv/bin/activate
 	source .venv/bin/activate; python3 scripts4ml/03_feature_selection.py $@
 	test -f $@
 
-data/ml_data/04_model-%-logistic.pkl: data/ml_data/03_features-%.json scripts4ml/04_model_train.py .venv/bin/activate
+ph/04_model-%-logistic: data/ml_data/03_features-%.json ph/03_features-%
+	@echo "phony target $@"
+data/ml_data/04_model-%.pkl: ph/04_model-% scripts4ml/04_model_train.py .venv/bin/activate
 	source .venv/bin/activate; python3 scripts4ml/04_model_train.py $@
 	test -f $@
 

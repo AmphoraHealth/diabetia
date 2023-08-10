@@ -23,6 +23,9 @@ from conf.global_constants import *
 # Constants -------------------------------------------------------------------
 IN_PATH = f"{AUX_ORIGIN_DATABASE}"
 FOLD_PATH = f"{S00_FOLD_SPLITING}.json"
+NORM_PATH = f"{S02_NORMALIZATION}.json"
+STD_PATH = f"{S02_NORMALIZATION.replace('normalized', 'scaled')}.json"
+FEAT_PATH = f"{S03_FEATURE_SELECTION}.json"
 MODEL_PATH = f"{S04_MODEL_TRAIN}.pkl"
 
 OUT_PATH = f"{S05_PREDICTION}.csv"
@@ -48,12 +51,8 @@ df = df.loc[df["id"].isin(ids)]
 
 # normalize the data
 
-# feature selection
-logging.warning(f"features selection still not implemented, using all features")
-features = df.columns.tolist()
-features.remove("id")
-features.remove(DIAGNOSTIC)
-features.remove("age_diag_cat")
+# load features
+features = json.load(open(FEAT_PATH, "r", encoding="UTF-8"))["columns"]
 
 # load the model
 logging.info(f"loading model from {MODEL_PATH}")

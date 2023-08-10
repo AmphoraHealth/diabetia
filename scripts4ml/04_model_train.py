@@ -22,7 +22,7 @@ from conf.global_constants import *
 from libs.logging import logging
 
 # Constants -------------------------------------------------------------------
-IN_PATH = f"{S02_NORMALIZATION}.csv"
+IN_PATH = f"{S02_NORMALIZATION.replace('normalized', 'scaled')}.csv"
 FEATURES_PATH = f"{S03_FEATURE_SELECTION}.json"
 
 OUT_PATH = f"{S04_MODEL_TRAIN}.pkl"
@@ -40,11 +40,9 @@ from sklearn.metrics import balanced_accuracy_score
 
 # Load data
 df = pd.read_csv(IN_PATH)
-logging.warning(f"features selection still not implemented, using all features")
-features = df.columns.tolist()
-features.remove("id")
-features.remove(DIAGNOSTIC)
-features.remove("age_diag_cat")
+
+# load features
+features = json.load(open(FEATURES_PATH, "r", encoding="UTF-8"))["columns"]
 
 # select the model
 m = {
