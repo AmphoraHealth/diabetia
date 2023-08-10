@@ -24,14 +24,14 @@ ROOT_PATH = os.path.abspath(
 )
 sys.path.append(ROOT_PATH)
 from libs.logging import logging
-#from conf.global_constants import S02_NORMALIZATION
+from conf.global_constants import *
 
 # Constants -------------------------------------------------------------------
-DB_PATH:str = './data/diabetia.csv'
-OUT_PATH:str = './data/diabetia_normalized.csv'
-NORMALIZATION_METHOD:str = 'yeo_johnson'
-OUT_PATH_NORMALIZER:str = './data/normalizer.pkl'
-OUT_PATH_NORMALIZER_JSON:str = './data/normalizer_columns.json'
+DB_PATH:str = f"{S01_BALANCING}.csv"
+OUT_PATH:str = f"{S02A_NORMALIZATION}.csv"
+_NORMALIZATION_METHOD:str = f"{NORMALIZATION_METHOD}"
+OUT_PATH_NORMALIZER:str = f"{S02A_NORMALIZATION}.pkl"
+OUT_PATH_NORMALIZER_JSON:str = f"{S02A_NORMALIZATION}.json"
 
 # Import libraries ------------------------------------------------------------
 import pandas as pd
@@ -98,6 +98,7 @@ class DataNormalization:
            'age_at_wx',
            'age_diag'
            ]
+        self.columnsToTransform = [col for col in self.columnsToTransform if col in self.data.columns]
 
         #..identify cols with nulls or 0s
         EmptyCols:list[str] = self.data.columns[((self.data==0)|(self.data.isnull())).all()]
@@ -115,7 +116,7 @@ class DataNormalization:
        """
        try:
           #..Initialize PowerTransformer
-          normalizer = normalizers[NORMALIZATION_METHOD]
+          normalizer = normalizers[_NORMALIZATION_METHOD]
           
           #..fitting transformer
           normalizer.fit(self.data[self.columnsToTransform])
@@ -138,7 +139,7 @@ class DataNormalization:
        
 
     def __str__(self):
-       return f'Data normalization by {NORMALIZATION_METHOD}'
+       return f'Data normalization by {_NORMALIZATION_METHOD}'
     
 
 def runDataNormalization():
