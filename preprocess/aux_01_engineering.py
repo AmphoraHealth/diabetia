@@ -58,7 +58,7 @@ class CleanFunctions:
             self.data.columns = [translation.get(name,'error') for name in self.data.columns]
             logging.info(f'Columns translated into english')
         except Exception as e:
-            raise logging.warning(f'{self.translateColumns.__name__} failed. {e}')
+            raise logging.error(f'{self.translateColumns.__name__} failed. {e}')
     
 
     def cleanHeaders(self):
@@ -70,7 +70,7 @@ class CleanFunctions:
             self.data.columns = [snakeCase(str(column)) for column in self.data.columns]
             return logging.info('Headers converted into snakeCase')
         except Exception as e:
-            raise logging.warning(f'{self.cleanHeaders.__name__} failed. {e}')
+            raise logging.error(f'{self.cleanHeaders.__name__} failed. {e}')
 
     def cleanCareunit(self):
         """
@@ -89,7 +89,7 @@ class CleanFunctions:
 
             logging.info(f'Careunit transformed into oneHot')
         except Exception as e:
-            raise logging.warning(f'{self.cleanCareunit.__name__} failed. {e}')
+            raise logging.error(f'{self.cleanCareunit.__name__} failed. {e}')
 
 
     def categoricalCols(self):
@@ -110,7 +110,7 @@ class CleanFunctions:
             return logging.info('Categorical cols transformed')
         
         except Exception as e:
-            raise logging.warning(f'{self.categoricalCols.__name__} failed. {e}')
+            raise logging.error(f'{self.categoricalCols.__name__} failed. {e}')
         
 
     def ordinalCols(self):
@@ -130,7 +130,7 @@ class CleanFunctions:
                 
             return logging.info('Ordinal cols transformed')
         except Exception as e:
-            raise logging.warning(f'{self.ordinalCols.__name__} failed. {e}') 
+            raise logging.error(f'{self.ordinalCols.__name__} failed. {e}') 
         
 class CreateFunctions:
     def createYearSinceDx(self):
@@ -144,7 +144,7 @@ class CreateFunctions:
             self.data.loc[(self.data[self.data['years_since_dx']<0]).index,'years_since_dx'] = 0
             return logging.info('Year since Dx updated')
         except Exception as e:
-            raise logging.warning(f'{self.createYearSinceDx.__name__} failed. {e}')
+            raise logging.error(f'{self.createYearSinceDx.__name__} failed. {e}')
         
 
     def createAgeDx(self):
@@ -161,7 +161,7 @@ class CreateFunctions:
             self.data.insert(4,'age_diag', self.data['id'].apply(lambda x: aux_ages.get(x,np.nan)))
             return logging.info('Age at Dx created')
         except Exception as e:
-            raise logging.warning(f'{self.createAgeDx.__name__} failed. {e}')
+            raise logging.error(f'{self.createAgeDx.__name__} failed. {e}')
 
 
     def createAgeDxGroup(self):
@@ -193,9 +193,95 @@ class CreateFunctions:
             logging.info(f'Age at T2D Dx group added')
 
         except Exception as e:
-            raise logging.warning(f'{self.createAgeDxGroup.__name__} failed. {e}')
+            raise logging.error(f'{self.createAgeDxGroup.__name__} failed. {e}')
         
 
+    def createBmiCategory(self):
+        """
+        Function to add BMI categories
+        """
+        try:
+            targetCol:str = 'fn_weight_mean'
+            col_index:int = self.data.columns.get_loc(targetCol)
+            self.data.insert(col_index,'bmi',np.nan)
+            self.data.insert(col_index+1,'bmi_label',np.nan)
+
+
+            self.data.loc[(self.data[(self.data['fn_weight_mean']>0)&(self.data['fn_height_mean']>0)]).index,'bmi'] = \
+                self.data.loc[(self.data[(self.data['fn_weight_mean']>0)&(self.data['fn_height_mean']>0)]).index,['fn_weight_mean','fn_height_mean']].apply(lambda x: x['fn_weight_mean'] / (x['fn_height_mean']**2), axis=1)
+
+            self.data['bmi_label'] = pd.cut(
+                 self.data['bmi'],
+                bins = [0,18.5,25,30,35,40,150],
+                right = False,
+                labels = ['Underweight','Normal weight','Pre-obesity','Obesity (class 1)','Obesity (class 2)','Obesity (class 3)']
+            )
+
+            logging.info('BMI categorical col created')
+        except Exception as e:
+            raise logging.error(f'{self.createBmiCategory.__name__} failed. {e}')
+        
+
+    def createGlucoseCategory(self):
+        """
+        140
+        140-200
+        200>
+        """
+        try:
+            logging.info('Glucose categorical col created')
+        except Exception as e:
+            raise logging.error(f'{self.createGlucoseCategory.__name__} failed. {e}')
+        
+
+    def createHemoglobinCategory(self):
+        """
+        man:
+        <6
+        6-8
+        8-10
+        10-12
+        12-16
+        16>
+        """
+        try:
+            logging.info('Hemoglobin categorical col created')
+        except Exception as e:
+            raise logging.error(f'{self.createHemoglobinCategory.__name__} failed. {e}')
+        
+    
+    def createTriglyceridesCategory(self):
+        try:
+            logging.info('Triglycerides categorical col created')
+        except Exception as e:
+            raise logging.error(f'{self.createTriglyceridesCategory.__name__} failed. {e}')
+        
+
+    def createDiabeticFootCategory(self):
+        try:
+            logging.info('Diabetic foot categorical col created')
+        except Exception as e:
+            raise logging.error(f'{self.createDiabeticFootCategory.__name__} failed. {e}')
+        
+
+    def createCreatinineCategory(self):
+        try:
+            logging.info('Creatinine categorical col created')
+        except Exception as e:
+            raise logging.error(f'{self.createCreatinineCategory.__name__} failed. {e}')
+        
+
+    def createCholesterolCategory(self):
+        try:
+            logging.info('Cholesterol categorical col created')
+        except Exception as e:
+            raise logging.error(f'{self.createCholesterolCategory.__name__} failed. {e}')
+     
+    
+    
+
+        
+        
     def __str__(self):
         return 'Data engineering functions'
 
@@ -224,7 +310,7 @@ class UpdateFunctions:
                     bar()
             return logging.info(f'Y Values transformed into labels')
         except Exception as e:
-            raise logging.warning(f'Y Values were not transformed. {e}')
+            raise logging.error(f'Y Values were not transformed. {e}')
 
 
 class DeleteFunctions:
@@ -256,4 +342,4 @@ class DeleteFunctions:
             return logging.info(f'{columnsDropped} columns dropped')
         
         except Exception as e:
-            raise logging.warning(f'Columns were not dropped. {e}')
+            raise logging.error(f'Columns were not dropped. {e}')

@@ -67,14 +67,23 @@ class DataEngineering(
         try:
             #..Transformations starts
             self.readFile()
+
+            #..clean functions
             self.translateColumns()
             self.cleanHeaders()
             self.cleanCareunit()
+
+            #..create functions
             self.createAgeDxGroup()
             self.createYearSinceDx()
+            self.createBmiCategory()
             self.categoricalCols()
             self.ordinalCols()
+
+            #..update functions
             self.updateDiagnosis()
+
+            #..delete functions
             self.dropCols()
 
             logging.info('Transformations done')
