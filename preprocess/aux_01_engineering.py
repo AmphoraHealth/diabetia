@@ -201,14 +201,14 @@ class CreateFunctions:
         Function to add BMI categories
         """
         try:
-            targetCol:str = 'fn_weight_mean'
+            targetCol:str = 'fn_weight_median'
             col_index:int = self.data.columns.get_loc(targetCol)
             self.data.insert(col_index,'bmi',np.nan)
             self.data.insert(col_index+1,'bmi_label',np.nan)
 
 
-            self.data.loc[(self.data[(self.data['fn_weight_mean']>0)&(self.data['fn_height_mean']>0)]).index,'bmi'] = \
-                self.data.loc[(self.data[(self.data['fn_weight_mean']>0)&(self.data['fn_height_mean']>0)]).index,['fn_weight_mean','fn_height_mean']].apply(lambda x: x['fn_weight_mean'] / (x['fn_height_mean']**2), axis=1)
+            self.data.loc[(self.data[(self.data['fn_weight_median']>0)&(self.data['fn_height_median']>0)]).index,'bmi'] = \
+                self.data.loc[(self.data[(self.data['fn_weight_median']>0)&(self.data['fn_height_median']>0)]).index,['fn_weight_median','fn_height_median']].apply(lambda x: x['fn_weight_median'] / (x['fn_height_median']**2), axis=1)
 
             self.data['bmi_label'] = pd.cut(
                  self.data['bmi'],
@@ -224,11 +224,50 @@ class CreateFunctions:
 
     def createGlucoseCategory(self):
         """
-        140
-        140-200
-        200>
+        Function to add glucose categories. There is an imputation for glucose level:
+        1. If patient has in_glucose_median = use in_glucose_median
+        2. If patient does not have in_glucose_median = use mean of:
+            -fn_fasting_glucose_mean,fn_capillary_glucose_mean,fn_glycemia_mean
         """
         try:
+            #..default vars
+            ranges:list[int] = self.config['categoricalMeasuresConfig']["glucose"]['ranges']
+            labels:list[int] = self.config['categoricalMeasuresConfig']["glucose"]['labels']
+            targetCols:list[str] = [
+                'in_glucose_median',
+                'fn_fasting_glucose_median',
+                'fn_capillary_glucose_median',
+                'fn_glycemia_median'
+                ]
+            
+            #..Insert new cols in index
+            col_index:int = self.data.columns.get_loc(targetCols[0])
+            self.data.insert(col_index, 'glucose_total', self.data[targetCols[0]])
+            self.data.insert(col_index+1, 'glucose_label', np.nan)
+
+            #..glucose imputation
+            self.data.loc[
+                (self.data[
+                    (self.data['glucose_total'].isnull())\
+                    & (self.data[targetCols[1:]].isnull().all(axis=1)==False)
+                    ]).index,
+                'glucose_total'
+                ] = self.data.loc[
+                    (self.data[
+                        (self.data['glucose_total'].isnull())\
+                        & (self.data[targetCols[1:]].isnull().all(axis=1)==False)
+                        ]).index,
+                    targetCols[1:]
+                    ].mean(axis=1)
+            
+            #..Build label var
+            self.data['glucose_label'] = pd.cut(
+                self.data['glucose_total'],
+                bins = ranges,
+                labels = labels,
+                right = False
+                )
+
             logging.info('Glucose categorical col created')
         except Exception as e:
             raise logging.error(f'{self.createGlucoseCategory.__name__} failed. {e}')

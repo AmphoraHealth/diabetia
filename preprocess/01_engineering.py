@@ -77,6 +77,7 @@ class DataEngineering(
             self.createAgeDxGroup()
             self.createYearSinceDx()
             self.createBmiCategory()
+            self.createGlucoseCategory()
             self.categoricalCols()
             self.ordinalCols()
 
