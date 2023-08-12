@@ -51,10 +51,11 @@ df.loc[df["pred"] == 2.0, "pred"] = 1.0
 logging.info(f"calculating metrics")
 balanced_accuracy = balanced_accuracy_score(df["real"], df["pred"])
 f1 = f1_score(df["real"], df["pred"])
+roc = roc_auc_score(df["real"], df["pred"])
 
 # save and print the metrics
 logging.info(f"balanced accuracy: {balanced_accuracy}")
 logging.info(f"f1 score: {f1}")
 logging.info(f"saving score to {OUT_PATH}")
-df = pd.DataFrame({"fold": TEST_FOLD, "balanced_accuracy": [balanced_accuracy], "f1": [f1]})
+df = pd.DataFrame({"fold": TEST_FOLD, "balanced_accuracy": [balanced_accuracy], "f1": [f1], "roc": [roc]})
 df.to_csv(OUT_PATH, index=False)
