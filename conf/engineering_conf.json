@@ -51,6 +51,32 @@
             "cs_sex"
         ]
     },
+    "categoricalMeasuresConfig":{
+        "bmi":{
+            "ranges":[0,18.5,25,30,35,40,999],
+            "labels":["Underweight","Normal weight","Pre-obesity","Obesity (class 1)","Obesity (class 2)","Obesity (class 3)"]
+        },
+        "glucose":{
+            "ranges":[25,60,126,250,450,9999],
+            "labels":["A","B","C","D","E"]
+        },
+        "hemoglobin":{
+            "ranges":[2.5,3.7,6.0,10.3,17.3,99],
+            "labels":["A","B","C","D","E"]
+        },
+        "triglycerides":{
+            "ranges":[0,150,500,1000,99999],
+            "labels":["Normal","High","Very high","Extremly high"]
+        },
+        "creatinine":{
+            "ranges":[0,15,30,45,60,90,9999],
+            "labels":["G1","G22","G3a","G3b","G4","G5"]
+        },
+        "cholesterol":{
+            "ranges":[0,200,240,999],
+            "labels":["Normal","High","Very high"]
+        }
+    },
     "columnNamesTranslation":{
         "id": "id",
         "cx_curp": "cx_curp",
@@ -244,7 +270,7 @@
         "fn_peso_std": "fn_weight_std",
         "fn_peso_slope": "fn_weight_slope",
         "fn_talla_mean": "fn_height_mean",
-        "fn_talla_median": "fn_height_medium",
+        "fn_talla_median": "fn_height_median",
         "fn_talla_max": "fn_height_max",
         "fn_talla_min": "fn_height_min",
         "fn_talla_count": "fn_height_count",
