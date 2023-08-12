@@ -75,7 +75,7 @@ data/ml_data/02a_normalized-%.csv: ph/02a_normalized-% scripts4ml/02a_data_norma
 	echo $@ | sed 's/\.csv/\.json/' | xargs test -f
 	test -f $@
 
-ph/02b_scaled-%-z_score: data/ml_data/02a_normalized-%.csv ph/02a_normalized-%
+ph/02b_scaled-%-z_score: data/ml_data/02a_normalized-%.csv ph/02a_normalized-% scripts4ml/aux_02b_data_standardization/z_score.py
 	@echo "phony target $@"
 data/ml_data/02b_scaled-%.csv: ph/02b_scaled-% scripts4ml/02b_data_standardization.py .venv/bin/activate
 	source .venv/bin/activate; python3 scripts4ml/02b_data_standardization.py $@
