@@ -62,7 +62,11 @@ data/ml_data/01_balanced-%.csv: ph/01_balanced-% scripts4ml/01_class_balancing.p
 	source .venv/bin/activate; python3 scripts4ml/01_class_balancing.py $@
 	test -f $@
 
-ph/02a_normalized-%-yeo_johnson: data/ml_data/01_balanced-%.csv ph/01_balanced-%
+ph/02a_normalized-%-yeo_johnson: data/ml_data/01_balanced-%.csv ph/01_balanced-% scripts4ml/aux_02a_data_normalization/yeo_johnson.py
+	@echo "phony target $@"
+ph/02a_normalized-%-box_cox: data/ml_data/01_balanced-%.csv ph/01_balanced-% scripts4ml/aux_02a_data_normalization/box_cox.py
+	@echo "phony target $@"
+ph/02a_normalized-%-quantile: data/ml_data/01_balanced-%.csv ph/01_balanced-% scripts4ml/aux_02a_data_normalization/quantile.py
 	@echo "phony target $@"
 data/ml_data/02a_normalized-%.csv: ph/02a_normalized-% scripts4ml/02a_data_normalization.py .venv/bin/activate
 	source .venv/bin/activate; python3 scripts4ml/02a_data_normalization.py $@
