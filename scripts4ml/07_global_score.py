@@ -20,8 +20,9 @@ from conf.global_constants import *
 from libs.logging import logging
 
 # Constants -------------------------------------------------------------------
-IN_PATHS = [f"{S06_SCORE_BY_FOLD}.csv" for TEST_FOLD in range(5)]
+IN_PATHS = [f"{S06_SCORE_BY_FOLD.replace('-{TEST_FOLD}-', str(i))}.csv" for i in range(len(FOLDS))]
 OUT_PATH = f"{S07_GLOBAL_SCORE}.csv"
+CODE_NAME = "-".join(S07_GLOBAL_SCORE.split("-")[1:])
 
 # Import libraries ------------------------------------------------------------
 import pandas as pd
@@ -36,7 +37,7 @@ dfs = {i: pd.read_csv(IN_PATH) for i, IN_PATH in enumerate(IN_PATHS)}
 df = pd.concat(dfs.values(), ignore_index=True)
 
 # Get average of the scores
-d = {"code": "-".join([DIAGNOSTIC, ORIGIN, BALANCING_METHOD, NORMALIZATION_METHOD, FEATURE_SELECTION_METHOD, MACHINE_LEARNING_MODEL])}
+d = {"code": CODE_NAME}
 for col in [c for c in df.columns if c != "fold"]:
   d[col] = df[col].mean()
 

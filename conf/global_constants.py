@@ -87,7 +87,7 @@ logging.info(f"""
 # check values
 if not DIAGNOSTIC in DIAGNOSTICS+["None"]:
   raise ValueError(f"given complication ({DIAGNOSTIC}) must be one of {', '.join(DIAGNOSTICS)}")
-if not TEST_FOLD in FOLDS+["None"]:
+if not TEST_FOLD in FOLDS+["None","x"]:
   raise ValueError(f"given test fold ({TEST_FOLD}) must be one of {', '.join(FOLDS)}")
 if not ORIGIN in ORIGINS+["None"]:
   raise ValueError(f"given origin ({ORIGIN}) must be one of {', '.join(ORIGINS)}")
