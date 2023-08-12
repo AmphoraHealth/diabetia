@@ -50,7 +50,13 @@ data/ml_data/prebalanced-%: data/diabetia.csv ph/prebalanced-% .venv/bin/activat
 	@unlink $@ || true
 	ln -s data/diabetia.csv $@
 
-ph/01_balanced-%-unbalanced: data/ml_data/prebalanced-% ph/prebalanced-%
+ph/01_balanced-%-unbalanced: data/ml_data/prebalanced-% ph/prebalanced-% scripts4ml/aux_01_class_balancing/unbalanced.py
+	@echo "phony target $@"
+ph/01_balanced-%-oversampling: data/ml_data/prebalanced-% ph/prebalanced-% scripts4ml/aux_01_class_balancing/oversampling.py
+	@echo "phony target $@"
+ph/01_balanced-%-undersampling: data/ml_data/prebalanced-% ph/prebalanced-% scripts4ml/aux_01_class_balancing/undersampling.py
+	@echo "phony target $@"
+ph/01_balanced-%-mixed: data/ml_data/prebalanced-% ph/prebalanced-% scripts4ml/aux_01_class_balancing/mixed.py
 	@echo "phony target $@"
 data/ml_data/01_balanced-%.csv: ph/01_balanced-% scripts4ml/01_class_balancing.py .venv/bin/activate
 	source .venv/bin/activate; python3 scripts4ml/01_class_balancing.py $@
