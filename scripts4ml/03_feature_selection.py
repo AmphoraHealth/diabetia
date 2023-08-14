@@ -17,11 +17,8 @@ import sys
 
 ROOT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(ROOT_PATH)
-from conf.global_constants import *
+from libs.global_constants import *
 from libs.logging import logging
-
-# get constants from command line
-from conf.global_constants import DIAGNOSTIC, TEST_FOLD, FEATURE_SELECTION_METHOD, AUX_ORIGIN_DATABASE, S00_FOLD_SPLITING, S03_FEATURE_SELECTION
 
 # Constants -------------------------------------------------------------------
 OUT_PATH = f"{S03_FEATURE_SELECTION}.json"
