@@ -90,21 +90,21 @@ data/ml_data/03_features-%.json: ph/03_features-% scripts4ml/03_feature_selectio
 	source .venv/bin/activate; python3 scripts4ml/03_feature_selection.py $@
 	test -f $@
 
-ph/04_model-%-ada_boost: data/ml_data/03_features-%.json ph/03_features-% scripts4ml/aux_04_model_selection/ada_boost.py
+ph/04_model-%-ada_boost: data/ml_data/03_features-%.json ph/03_features-% scripts4ml/aux_04_model_train/ada_boost.py
 	@echo "phony target $@"
-ph/04_model-%-gaussian: data/ml_data/03_features-%.json ph/03_features-% scripts4ml/aux_04_model_selection/gaussian.py
+ph/04_model-%-gaussian: data/ml_data/03_features-%.json ph/03_features-% scripts4ml/aux_04_model_train/gaussian.py
 	@echo "phony target $@"
-ph/04_model-%-knc: data/ml_data/03_features-%.json ph/03_features-% scripts4ml/aux_04_model_selection/knc.py
+ph/04_model-%-knc: data/ml_data/03_features-%.json ph/03_features-% scripts4ml/aux_04_model_train/knc.py
 	@echo "phony target $@"
-ph/04_model-%-logistic: data/ml_data/03_features-%.json ph/03_features-% scripts4ml/aux_04_model_selection/logistic.py
+ph/04_model-%-logistic: data/ml_data/03_features-%.json ph/03_features-% scripts4ml/aux_04_model_train/logistic.py
 	@echo "phony target $@"
-ph/04_model-%-mlpc: data/ml_data/03_features-%.json ph/03_features-% scripts4ml/aux_04_model_selection/mlpc.py
+ph/04_model-%-mlpc: data/ml_data/03_features-%.json ph/03_features-% scripts4ml/aux_04_model_train/mlpc.py
 	@echo "phony target $@"
-ph/04_model-%-naive_bayes: data/ml_data/03_features-%.json ph/03_features-% scripts4ml/aux_04_model_selection/naive_bayes.py
+ph/04_model-%-naive_bayes: data/ml_data/03_features-%.json ph/03_features-% scripts4ml/aux_04_model_train/naive_bayes.py
 	@echo "phony target $@"
-ph/04_model-%-random_forest: data/ml_data/03_features-%.json ph/03_features-% scripts4ml/aux_04_model_selection/random_forest.py
+ph/04_model-%-random_forest: data/ml_data/03_features-%.json ph/03_features-% scripts4ml/aux_04_model_train/random_forest.py
 	@echo "phony target $@"
-ph/p4_model-%-svc: data/ml_data/03_features-%.json ph/03_features-% scripts4ml/aux_04_model_selection/svc.py
+ph/p4_model-%-svc: data/ml_data/03_features-%.json ph/03_features-% scripts4ml/aux_04_model_train/svc.py
 	@echo "phony target $@"
 data/ml_data/04_model-%.pkl: ph/04_model-% scripts4ml/04_model_train.py .venv/bin/activate
 	source .venv/bin/activate; python3 scripts4ml/04_model_train.py $@
