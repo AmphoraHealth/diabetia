@@ -43,6 +43,34 @@ def snakeCase(string:str) -> str:
         string = string.replace(k,v)
     
     return string
+
+def calculateGFR(factors,sex,age,creatinine):
+    """
+    Function to calculate estimated glomerular filtration rate (eGFR).
+    Input:
+    - factors: factor by sex. Located in engieneering_config.json file
+    - sex: "female" or "male"
+    - age: int value
+    - creatinine: float value. Bewteen 0.2 to 20
+
+    Output:
+    - eGFR: int value
+
+    This funtion was guided by the equation from: Pottel H. Cystatin C-Based Equation to 
+    Estimate GFR without the Inclusion of Race and Sex. N Engl J Med.
+    2023 Jan 26;388(4):333-343. doi: 10.1056/NEJMoa2203769. PMID: 36720134.
+    """
+    try: 
+        sexFactor = factors[sex]['sexFactor']
+        alpha = factors[sex]['alpha']
+        kappa = factors[sex]['kappa']
+
+        GFR = \
+            142 * (np.min([creatinine/kappa,1])**alpha) * (np.max([creatinine/kappa,1])**-1.2) * (0.9938**age) * sexFactor
+    
+        return GFR
+    except Exception as e:
+        raise logging.warning(f'Calculation of eGFR failed. {e}')
 #############################################################################   
 
 
@@ -201,20 +229,26 @@ class CreateFunctions:
         Function to add BMI categories
         """
         try:
-            targetCol:str = 'fn_weight_median'
-            col_index:int = self.data.columns.get_loc(targetCol)
+            #..default vars
+            ranges:list[int] = self.config['categoricalMeasuresConfig']["bmi"]['ranges']
+            labels:list[int] = self.config['categoricalMeasuresConfig']["bmi"]['labels']
+            targetCols:str = self.config['categoricalMeasuresConfig']['bmi']['targetCols']
+            weight:str = targetCols[0]
+            height:str = targetCols[1]
+
+            col_index:int = self.data.columns.get_loc(targetCols[0])
             self.data.insert(col_index,'bmi',np.nan)
             self.data.insert(col_index+1,'bmi_label',np.nan)
 
 
-            self.data.loc[(self.data[(self.data['fn_weight_median']>0)&(self.data['fn_height_median']>0)]).index,'bmi'] = \
-                self.data.loc[(self.data[(self.data['fn_weight_median']>0)&(self.data['fn_height_median']>0)]).index,['fn_weight_median','fn_height_median']].apply(lambda x: x['fn_weight_median'] / (x['fn_height_median']**2), axis=1)
+            self.data.loc[(self.data[(self.data[weight]>0)&(self.data[height]>0)]).index,'bmi'] = \
+                self.data.loc[(self.data[(self.data[weight]>0)&(self.data[height]>0)]).index,[weight,height]].apply(lambda x: x[weight] / (x[height]**2), axis=1)
 
             self.data['bmi_label'] = pd.cut(
                  self.data['bmi'],
-                bins = [0,18.5,25,30,35,40,150],
+                bins = ranges,
                 right = False,
-                labels = ['Underweight','Normal weight','Pre-obesity','Obesity (class 1)','Obesity (class 2)','Obesity (class 3)']
+                labels = labels
             )
 
             logging.info('BMI categorical col created')
@@ -233,28 +267,31 @@ class CreateFunctions:
             #..default vars
             ranges:list[int] = self.config['categoricalMeasuresConfig']["glucose"]['ranges']
             labels:list[int] = self.config['categoricalMeasuresConfig']["glucose"]['labels']
-            targetCols:list[str] = [
-                'in_glucose_median',
-                'fn_fasting_glucose_median',
-                'fn_capillary_glucose_median',
-                'fn_glycemia_median'
-                ]
+            targetCols:list[str] = self.config['categoricalMeasuresConfig']['glucose']['targetCols']
             
             #..Insert new cols in index
             col_index:int = self.data.columns.get_loc(targetCols[0])
-            self.data.insert(col_index, 'glucose_total', self.data[targetCols[0]])
+            self.data.insert(col_index, 'glucose_index', self.data[targetCols[0]])
             self.data.insert(col_index+1, 'glucose_label', np.nan)
+
+            #..clean glucose under 25
+            self.data.loc[
+                (self.data[
+                    self.data['glucose_index']<25\
+                    ]).index,
+                'glucose_index'
+                ] = np.nan
 
             #..glucose imputation
             self.data.loc[
                 (self.data[
-                    (self.data['glucose_total'].isnull())\
+                    (self.data['glucose_index'].isnull())\
                     & (self.data[targetCols[1:]].isnull().all(axis=1)==False)
                     ]).index,
-                'glucose_total'
+                'glucose_index'
                 ] = self.data.loc[
                     (self.data[
-                        (self.data['glucose_total'].isnull())\
+                        (self.data['glucose_index'].isnull())\
                         & (self.data[targetCols[1:]].isnull().all(axis=1)==False)
                         ]).index,
                     targetCols[1:]
@@ -262,7 +299,7 @@ class CreateFunctions:
             
             #..Build label var
             self.data['glucose_label'] = pd.cut(
-                self.data['glucose_total'],
+                self.data['glucose_index'],
                 bins = ranges,
                 labels = labels,
                 right = False
@@ -275,22 +312,55 @@ class CreateFunctions:
 
     def createHemoglobinCategory(self):
         """
-        man:
-        <6
-        6-8
-        8-10
-        10-12
-        12-16
-        16>
+        Function to create hemoglobin categorical col. It is a simple discretization
         """
         try:
+            #..default vars
+            ranges:list[int] = self.config['categoricalMeasuresConfig']['hemoglobin']['ranges']
+            labels:list[int] = self.config['categoricalMeasuresConfig']['hemoglobin']['labels']
+            targetCols:str = self.config['categoricalMeasuresConfig']['hemoglobin']['targetCols']
+
+            #..create new cols
+            col_index:int = self.data.columns.get_loc(targetCols[0])
+            self.data.insert(col_index,'hemoglobin_index', np.nan)
+            self.data.insert(col_index+1,'hemoglobin_label', np.nan)
+
+            #..Build label var
+            self.data['hemoglobin_label'] = pd.cut(
+                self.data[targetCols[0]],
+                bins = ranges,
+                labels = labels,
+                right = False
+                )
+
             logging.info('Hemoglobin categorical col created')
         except Exception as e:
             raise logging.error(f'{self.createHemoglobinCategory.__name__} failed. {e}')
         
     
     def createTriglyceridesCategory(self):
+        """
+        Function to create triglicerides columns. It is a simple discretization
+        """
         try:
+            #..default vars
+            ranges:list[int] = self.config['categoricalMeasuresConfig']['triglycerides']['ranges']
+            labels:list[int] = self.config['categoricalMeasuresConfig']['triglycerides']['labels']
+            targetCols:str = self.config['categoricalMeasuresConfig']['triglycerides']['targetCols']
+
+            #..create new cols
+            col_index:int = self.data.columns.get_loc(targetCols[0])
+            self.data.insert(col_index,'triglycerides_index', np.nan)
+            self.data.insert(col_index+1,'triglycerides_label', np.nan)
+
+            #..Build label var
+            self.data['triglycerides_label'] = pd.cut(
+                self.data[targetCols[0]],
+                bins = ranges,
+                labels = labels,
+                right = False
+                )
+            
             logging.info('Triglycerides categorical col created')
         except Exception as e:
             raise logging.error(f'{self.createTriglyceridesCategory.__name__} failed. {e}')
@@ -305,6 +375,42 @@ class CreateFunctions:
 
     def createCreatinineCategory(self):
         try:
+            #..default vars
+            ranges:list[int] = self.config['categoricalMeasuresConfig']['creatinine']['ranges']
+            labels:list[int] = self.config['categoricalMeasuresConfig']['creatinine']['labels']
+            targetCols:str = self.config['categoricalMeasuresConfig']['creatinine']['targetCols']
+            eGFR_Factors:dict = self.config['categoricalMeasuresConfig']['creatinine']['factors']
+
+            #..create new cols
+            col_index:int = self.data.columns.get_loc(targetCols[0])
+            self.data.insert(col_index,'creatinine_index', np.nan)
+            self.data.insert(col_index+1,'creatinine_label', np.nan)
+
+            #..apply eGFR
+            self.data.loc[
+                (self.data[self.data[targetCols[0]].isnull()==False]).index,
+                'creatinine_index'
+            ] = self.data.loc[
+                (self.data[self.data[targetCols[0]].isnull()==False]).index,
+                targetCols
+            ].apply(
+                lambda x: calculateGFR(
+                    factors = eGFR_Factors,
+                    sex = x[targetCols[2]],
+                    age = x[targetCols[1]],
+                    creatinine = x[targetCols[0]]
+                    ),
+                axis = 1
+                )
+            
+            #..Build label var
+            self.data['creatinine_label'] = pd.cut(
+                self.data['creatinine_index'],
+                bins = ranges,
+                labels = labels,
+                right = False
+                )
+
             logging.info('Creatinine categorical col created')
         except Exception as e:
             raise logging.error(f'{self.createCreatinineCategory.__name__} failed. {e}')
@@ -312,15 +418,29 @@ class CreateFunctions:
 
     def createCholesterolCategory(self):
         try:
+            #..default vars
+            ranges:list[int] = self.config['categoricalMeasuresConfig']['cholesterol']['ranges']
+            labels:list[int] = self.config['categoricalMeasuresConfig']['cholesterol']['labels']
+            targetCols:str = self.config['categoricalMeasuresConfig']['cholesterol']['targetCols']
+
+            #..create new cols
+            col_index:int = self.data.columns.get_loc(targetCols[0])
+            self.data.insert(col_index,'cholesterol_index', np.nan)
+            self.data.insert(col_index+1,'cholesterol_label', np.nan)
+
+            #..Build label var
+            self.data['cholesterol_label'] = pd.cut(
+                self.data[targetCols[0]],
+                bins = ranges,
+                labels = labels,
+                right = False
+                )
+
             logging.info('Cholesterol categorical col created')
         except Exception as e:
             raise logging.error(f'{self.createCholesterolCategory.__name__} failed. {e}')
-     
-    
-    
+        
 
-        
-        
     def __str__(self):
         return 'Data engineering functions'
 
