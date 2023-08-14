@@ -23,8 +23,8 @@ from conf.global_constants import *
 # Constants -------------------------------------------------------------------
 IN_PATH = f"{AUX_ORIGIN_DATABASE}"
 FOLD_PATH = f"{S00_FOLD_SPLITING}.json"
-NORM_PATH = f"{S02A_NORMALIZATION}.json"
-STD_PATH = f"{S02A_NORMALIZATION.replace('normalized', 'scaled')}.json"
+NORM_PATH = f"{S02A_NORMALIZATION}"
+STD_PATH = f"{S02B_STANDARDIZATION}"
 FEAT_PATH = f"{S03_FEATURE_SELECTION}.json"
 MODEL_PATH = f"{S04_MODEL_TRAIN}.pkl"
 
@@ -49,10 +49,23 @@ with open(FOLD_PATH) as f:
 ids = fold_selection[str(TEST_FOLD)]["ids"]
 df = df.loc[df["id"].isin(ids)]
 
-# normalize the data
+# prepare normalization
+cols = json.load(open(f"{NORM_PATH}.json", "r", encoding="UTF-8"))["columnsNormalized"]
+norm = pickle.load(open(f"{NORM_PATH}.pkl", "rb"))
 
-# load features
+# normalize the data
+df[cols] = norm.transform(df[cols])
+
+# prepare standardization
+cols = json.load(open(f"{STD_PATH}.json", "r", encoding="UTF-8"))["columnsStandardized"]
+std = pickle.load(open(f"{STD_PATH}.pkl", "rb"))
+
+# standardize the data
+df[cols] = std.transform(df[cols])
+
+# load features and filter the data
 features = json.load(open(FEAT_PATH, "r", encoding="UTF-8"))["columns"]
+df = df[["id"]+features+[DIAGNOSTIC]]
 
 # load the model
 logging.info(f"loading model from {MODEL_PATH}")
@@ -60,6 +73,7 @@ with open(MODEL_PATH, "rb") as f:
   m = pickle.load(f)
 
 # predict
+ids = df["id"]
 pred = m.predict(df[features])
 real = df[DIAGNOSTIC]
 

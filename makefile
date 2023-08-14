@@ -23,7 +23,7 @@ data/hk_database.csv:
 	@echo "Downloaded hk_database.csv"
 
 # Special targets
-.PRECIOUS: data/diabetia.csv data/hk_database.csv data/ml_data/00_folds-%.json data/ml_data/fold_used-% data/ml_data/01_balanced-%.csv data/ml_data/02a_normalized-%.csv data/ml_data/03_features-%.json data/ml_data/05_prediction-%.csv
+.PRECIOUS: data/diabetia.csv data/hk_database.csv data/ml_data/00_folds-%.json data/ml_data/fold_used-% data/ml_data/01_balanced-%.csv data/ml_data/02a_normalized-%.csv data/ml_data/03_features-%.json data/ml_data/04_model-%.pkl data/ml_data/05_prediction-%.csv
 .INTERMEDIATE: data/hk_database_cleaned.csv
 
 # preprocess data
@@ -66,7 +66,7 @@ ph/02a_normalized-%-yeo_johnson: data/ml_data/01_balanced-%.csv ph/01_balanced-%
 	@echo "phony target $@"
 ph/02a_normalized-%-box_cox: data/ml_data/01_balanced-%.csv ph/01_balanced-% scripts4ml/aux_02a_data_normalization/box_cox.py
 	@echo "phony target $@"
-ph/02a_normalized-%-quantile: data/ml_data/01_balanced-%.csv ph/01_balanced-% scripts4ml/aux_02a_data_normalization/quantile.py
+ph/02a_normalized-%-quantile_transform: data/ml_data/01_balanced-%.csv ph/01_balanced-% scripts4ml/aux_02a_data_normalization/quantile_transform.py
 	@echo "phony target $@"
 data/ml_data/02a_normalized-%.csv: ph/02a_normalized-% scripts4ml/02a_data_normalization.py .venv/bin/activate
 	source .venv/bin/activate; python3 scripts4ml/02a_data_normalization.py $@
@@ -92,6 +92,12 @@ data/ml_data/03_features-%.json: ph/03_features-% scripts4ml/03_feature_selectio
 
 ph/04_model-%-ada_boost: data/ml_data/03_features-%.json ph/03_features-% scripts4ml/aux_04_model_train/ada_boost.py
 	@echo "phony target $@"
+ph/04_model-%-bernoulli_nb: data/ml_data/03_features-%.json ph/03_features-% scripts4ml/aux_04_model_train/bernoulli_nb.py
+	@echo "phony target $@"
+ph/04_model-%-decision_tree: data/ml_data/03_features-%.json ph/03_features-% scripts4ml/aux_04_model_train/decision_tree.py
+	@echo "phony target $@"
+ph/04_model-%-extra_trees: data/ml_data/03_features-%.json ph/03_features-% scripts4ml/aux_04_model_train/extra_trees.py
+	@echo "phony target $@"
 ph/04_model-%-gaussian_nb: data/ml_data/03_features-%.json ph/03_features-% scripts4ml/aux_04_model_train/gaussian_nb.py
 	@echo "phony target $@"
 ph/04_model-%-knc: data/ml_data/03_features-%.json ph/03_features-% scripts4ml/aux_04_model_train/knc.py
@@ -100,9 +106,13 @@ ph/04_model-%-logistic: data/ml_data/03_features-%.json ph/03_features-% scripts
 	@echo "phony target $@"
 ph/04_model-%-mlpc: data/ml_data/03_features-%.json ph/03_features-% scripts4ml/aux_04_model_train/mlpc.py
 	@echo "phony target $@"
+ph/04_model-%-nearest_centroid: data/ml_data/03_features-%.json ph/03_features-% scripts4ml/aux_04_model_train/nearest_centroid.py
+	@echo "phony target $@"
+ph/04_model-%-quadratic_discriminant: data/ml_data/03_features-%.json ph/03_features-% scripts4ml/aux_04_model_train/quadratic_discriminant.py
+	@echo "phony target $@"
 ph/04_model-%-random_forest: data/ml_data/03_features-%.json ph/03_features-% scripts4ml/aux_04_model_train/random_forest.py
 	@echo "phony target $@"
-ph/p4_model-%-svc: data/ml_data/03_features-%.json ph/03_features-% scripts4ml/aux_04_model_train/svc.py
+ph/04_model-%-svc: data/ml_data/03_features-%.json ph/03_features-% scripts4ml/aux_04_model_train/svc.py
 	@echo "phony target $@"
 data/ml_data/04_model-%.pkl: ph/04_model-% scripts4ml/04_model_train.py .venv/bin/activate
 	source .venv/bin/activate; python3 scripts4ml/04_model_train.py $@
@@ -120,21 +130,24 @@ data/ml_data/07_global_score-%.csv: data/ml_data/06_score-0-%.csv data/ml_data/0
 	source .venv/bin/activate; python3 scripts4ml/07_global_score.py $(subst data/global_score-,,$(subst .csv,,$@))
 
 # single fold test
-data/scores_sample.csv: ph/sample_01-0
+sample-scores: data/ml_data/merged_06_scores-0-e112.csv
 	@echo "phony target $@"
+data/ml_data/merged_06_scores-0-e112.csv: ph/sample_01-0
+	source .venv/bin/activate; python3 scripts4ml/merge_06_scores.py
+	head -n 5 $@
 ph/sample_01-%: ph/sample_02-%-e112
 	@echo "phony target $@"
 ph/sample_02-%: ph/sample_03-%-diabetia
 	@echo "phony target $@"
 ph/sample_03-%: ph/sample_04-%-unbalanced
 	@echo "phony target $@"
-ph/sample_04-%: ph/sample_05-%-yeo_johnson
+ph/sample_04-%: ph/sample_05-%-yeo_johnson ph/sample_05-%-quantile_transform
 	@echo "phony target $@"
 ph/sample_05-%: ph/sample_06-%-z_score
 	@echo "phony target $@"
 ph/sample_06-%: ph/sample_07-%-xi2
 	@echo "phony target $@"
-ph/sample_07-%: ph/sample_08-%-ada_boost ph/sample_08-%-gaussian_nb
+ph/sample_07-%: ph/sample_08-%-gaussian_nb ph/sample_08-%-bernoulli_nb ph/sample_08-%-nearest_centroid ph/sample_08-%-quadratic_discriminant ph/sample_08-%-extra_trees ph/sample_08-%-decision_tree ph/sample_08-%-mlpc
 	@echo "phony target $@"
 ph/sample_08-%: data/ml_data/06_score-%.csv
 	@echo "phony target $@"

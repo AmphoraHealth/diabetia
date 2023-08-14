@@ -38,12 +38,16 @@
   ],
   "machine_learning_models": [
     "ada_boost",
-    "bernoulli",
+    "bernoulli_nb",
+    "decision_tree",
     "dt",
+    "extra_trees",
     "gaussian_nb",
     "knc",
     "logistic",
     "mlpc",
+    "nearest_centroid",
+    "quadratic_discriminant",
     "random_forest",
     "svc"
   ],
