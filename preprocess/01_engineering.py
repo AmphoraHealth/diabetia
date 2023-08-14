@@ -54,7 +54,7 @@ class DataEngineering(
     
     def readFile(self,rows:int = None):
         try:
-            self.data = pd.read_csv(f'{self.in_path}', low_memory=False, nrows=rows)
+            self.data = pd.read_csv(f'{self.in_path}', low_memory=False, nrows=None)
             return logging.info('File read')
         except Exception as e:
             raise logging.warning(f'File was not read. {e}')
@@ -65,30 +65,34 @@ class DataEngineering(
         Function to run all transformations.
         """
         try:
-            #..Transformations starts
-            self.readFile()
+          #..Transformations starts
+          self.readFile()
 
-            #..clean functions
-            self.translateColumns()
-            self.cleanHeaders()
-            self.cleanCareunit()
+          #..clean functions
+          self.translateColumns()
+          self.cleanHeaders()
+          self.cleanCareunit()
 
-            #..create functions
-            self.createAgeDxGroup()
-            self.createYearSinceDx()
-            self.createBmiCategory()
-            self.createGlucoseCategory()
-            self.categoricalCols()
-            self.ordinalCols()
+          #..create functions
+          self.createAgeDxGroup()
+          self.createYearSinceDx()
+          self.createBmiCategory()
+          self.createGlucoseCategory()
+          self.createHemoglobinCategory()
+          self.createTriglyceridesCategory()
+          self.createCreatinineCategory()
+          self.createCholesterolCategory()
+          self.categoricalCols()
+          self.ordinalCols()
 
-            #..update functions
-            self.updateDiagnosis()
+          #..update functions
+          self.updateDiagnosis()
 
-            #..delete functions
-            self.dropCols()
+          #..delete functions
+          self.dropCols()
 
-            logging.info('Transformations done')
-            return self.data
+          logging.info('Transformations done')
+          return self.data
         except Exception as e:
             raise logging.warning(f'Transformations failed. {e}')
             
