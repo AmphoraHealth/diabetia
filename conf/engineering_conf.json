@@ -53,28 +53,89 @@
     },
     "categoricalMeasuresConfig":{
         "bmi":{
-            "ranges":[0,18.5,25,30,35,40,999],
-            "labels":["Underweight","Normal weight","Pre-obesity","Obesity (class 1)","Obesity (class 2)","Obesity (class 3)"]
+            "ranges":[
+                0,18.5,25,30,35,40,999
+            ],
+            "labels":[
+                "Underweight",
+                "Normal weight",
+                "Pre-obesity",
+                "Obesity (class 1)",
+                "Obesity (class 2)",
+                "Obesity (class 3)"]
+                ,
+            "targetCols":[
+                "fn_weight_median",
+                "fn_height_median"
+            ]
         },
         "glucose":{
-            "ranges":[25,60,126,250,450,9999],
-            "labels":["A","B","C","D","E"]
+            "ranges":[
+                25,60,126,250,450,9999
+            ],
+            "labels":[
+                "A","B","C","D","E"
+            ],
+            "targetCols":[
+                "in_glucose_median",
+                "fn_fasting_glucose_median",
+                "fn_capillary_glucose_median",
+                "fn_glycemia_median"
+            ]
         },
         "hemoglobin":{
-            "ranges":[2.5,3.7,6.0,10.3,17.3,99],
-            "labels":["A","B","C","D","E"]
+            "ranges":[
+                2.5,3.7,6.0,10.3,17.3,99
+            ],
+            "labels":[
+                "A","B","C","D","E"
+            ],
+            "targetCols":[
+                "fn_hemoglobin_median"
+            ]
         },
         "triglycerides":{
-            "ranges":[0,150,500,1000,99999],
-            "labels":["Normal","High","Very high","Extremly high"]
+            "ranges":
+            [
+                0,150,500,1000,99999
+        ],
+            "labels":[
+                "Normal",
+                "High",
+                "Very high",
+                "Extremly high"
+            ],
+            "targetCols":[
+                "fn_triglycerides_median"
+            ]
         },
         "creatinine":{
             "ranges":[0,15,30,45,60,90,9999],
-            "labels":["G1","G22","G3a","G3b","G4","G5"]
+            "labels":["G1","G22","G3a","G3b","G4","G5"],
+            "factors":{
+                "F":{
+                    "sexFactor":1.012,
+                    "alpha":-0.241,
+                    "kappa":0.7
+                },
+                "M":{
+                    "sexFactor":1,
+                    "alpha":-0.302,
+                    "kappa":0.9
+                }
+            },
+            "targetCols":[
+                "fn_creatinine_median",
+                "age_at_wx",
+                "cs_sex"
+            ]
         },
         "cholesterol":{
             "ranges":[0,200,240,999],
-            "labels":["Normal","High","Very high"]
+            "labels":["Normal","High","Very high"],
+            "targetCols":[
+                "fn_cholesterol_median"
+            ]
         }
     },
     "columnNamesTranslation":{
