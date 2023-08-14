@@ -30,7 +30,12 @@ from aux_01_engineering import CreateFunctions
 from aux_01_engineering import DeleteFunctions
 from aux_01_engineering import UpdateFunctions
 
-ROOT_PATH:str = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT_PATH = os.path.abspath(
+    os.path.join(
+        os.path.dirname(__file__),
+        os.path.pardir
+    )
+)
 sys.path.append(ROOT_PATH)
 from libs.logging import logging
 
@@ -54,7 +59,7 @@ class DataEngineering(
     
     def readFile(self,rows:int = None):
         try:
-            self.data = pd.read_csv(f'{self.in_path}', low_memory=False, nrows=None)
+            self.data = pd.read_csv(f'{self.in_path}', low_memory=False, nrows=rows)
             return logging.info('File read')
         except Exception as e:
             raise logging.warning(f'File was not read. {e}')
