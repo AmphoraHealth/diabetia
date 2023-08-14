@@ -10,7 +10,7 @@ clean:
 	rm -rf data/ml_data/fold_used-*
 	rm -rf data/ml_data/prebalanced-*
 
-test: data/ml_data/06_score-0-e112-diabetia-unbalanced-yeo_johnson-z_score-xi2-logistic.csv
+test: data/ml_data/06_score-0-e112-diabetia-unbalanced-yeo_johnson-z_score-xi2-knc.csv
 
 clean-test: clean test
 
@@ -92,15 +92,13 @@ data/ml_data/03_features-%.json: ph/03_features-% scripts4ml/03_feature_selectio
 
 ph/04_model-%-ada_boost: data/ml_data/03_features-%.json ph/03_features-% scripts4ml/aux_04_model_train/ada_boost.py
 	@echo "phony target $@"
-ph/04_model-%-gaussian: data/ml_data/03_features-%.json ph/03_features-% scripts4ml/aux_04_model_train/gaussian.py
+ph/04_model-%-gaussian_nb: data/ml_data/03_features-%.json ph/03_features-% scripts4ml/aux_04_model_train/gaussian_nb.py
 	@echo "phony target $@"
 ph/04_model-%-knc: data/ml_data/03_features-%.json ph/03_features-% scripts4ml/aux_04_model_train/knc.py
 	@echo "phony target $@"
 ph/04_model-%-logistic: data/ml_data/03_features-%.json ph/03_features-% scripts4ml/aux_04_model_train/logistic.py
 	@echo "phony target $@"
 ph/04_model-%-mlpc: data/ml_data/03_features-%.json ph/03_features-% scripts4ml/aux_04_model_train/mlpc.py
-	@echo "phony target $@"
-ph/04_model-%-naive_bayes: data/ml_data/03_features-%.json ph/03_features-% scripts4ml/aux_04_model_train/naive_bayes.py
 	@echo "phony target $@"
 ph/04_model-%-random_forest: data/ml_data/03_features-%.json ph/03_features-% scripts4ml/aux_04_model_train/random_forest.py
 	@echo "phony target $@"
@@ -120,6 +118,26 @@ data/ml_data/06_score-%.csv: data/ml_data/05_prediction-%.csv scripts4ml/06_scor
 
 data/ml_data/07_global_score-%.csv: data/ml_data/06_score-0-%.csv data/ml_data/06_score-1-%.csv data/ml_data/06_score-2-%.csv data/ml_data/06_score-3-%.csv data/ml_data/06_score-4-%.csv scripts4ml/07_global_score.py .venv/bin/activate
 	source .venv/bin/activate; python3 scripts4ml/07_global_score.py $(subst data/global_score-,,$(subst .csv,,$@))
+
+# single fold test
+data/scores_sample.csv: ph/sample_01-0
+	@echo "phony target $@"
+ph/sample_01-%: ph/sample_02-%-e112
+	@echo "phony target $@"
+ph/sample_02-%: ph/sample_03-%-diabetia
+	@echo "phony target $@"
+ph/sample_03-%: ph/sample_04-%-unbalanced
+	@echo "phony target $@"
+ph/sample_04-%: ph/sample_05-%-yeo_johnson
+	@echo "phony target $@"
+ph/sample_05-%: ph/sample_06-%-z_score
+	@echo "phony target $@"
+ph/sample_06-%: ph/sample_07-%-xi2
+	@echo "phony target $@"
+ph/sample_07-%: ph/sample_08-%-ada_boost ph/sample_08-%-gaussian_nb
+	@echo "phony target $@"
+ph/sample_08-%: data/ml_data/06_score-%.csv
+	@echo "phony target $@"
 
 # statistical analysis
 data/table_one/tbl1.csv data/table_one/tbl1.xlsx: data/diabetia.csv scripts2print/table_one/__tableOne__.py .venv/bin/activate

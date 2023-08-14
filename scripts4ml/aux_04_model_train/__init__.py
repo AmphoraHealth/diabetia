@@ -1,5 +1,5 @@
 from .ada_boost import ada_boost
-from .gaussian import gaussian
+from .gaussian_nb import gaussian_nb
 from .knc import knc
 from .logistic import logistic
 from .mlpc import mlpc
@@ -8,7 +8,7 @@ from .svc import svc
 
 models:dict[str:object] = {
     'ada_boost': ada_boost,
-    'gaussian': gaussian,
+    'gaussian_nb': gaussian_nb,
     'knc': knc,
     'logistic': logistic,
     'mlpc': mlpc,
