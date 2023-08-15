@@ -17,11 +17,8 @@ import sys
 
 ROOT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(ROOT_PATH)
-from conf.global_constants import *
+from libs.global_constants import *
 from libs.logging import logging
-
-# get constants from command line
-from conf.global_constants import DIAGNOSTIC, TEST_FOLD, FEATURE_SELECTION_METHOD, AUX_ORIGIN_DATABASE, S00_FOLD_SPLITING, S03_FEATURE_SELECTION
 
 # Constants -------------------------------------------------------------------
 OUT_PATH = f"{S03_FEATURE_SELECTION}.json"
@@ -34,7 +31,8 @@ definitions = json.load(open(f'{CONFIG_PATH}', 'r', encoding='UTF-8'))['config']
 import pandas as pd
 import json
 from sklearn.feature_selection import chi2
-
+from sklearn.naive_bayes import GaussianNB
+from sklearn.feature_selection import SequentialFeatureSelector
 
 # Code: feature selection -----------------------------------------------------
 # general code for feature selection given the selected FEATURE_SELECTION_METHOD
@@ -51,9 +49,7 @@ def get_fold_trainning(data:pd.DataFrame, folds_file:json, n_folds:int = 5) -> p
     train = pd.concat(train)
     return train
 
-def feature_selection(data:pd.DataFrame, label:pd.Series, n_features:int = 100) -> dict:
-    # print(data.info(verbose=3))
-    # print(data.head(10))
+def xi2_feature_selection(data:pd.DataFrame, label:pd.Series, n_features:int = 100) -> dict:
     # get a list of columns with negative values
     cols = [col for col in data.columns if data[col].min() < 0]
     # add the minimum value to each column to make them all positive
@@ -68,16 +64,37 @@ def feature_selection(data:pd.DataFrame, label:pd.Series, n_features:int = 100) 
     best_features['p_val'] = list(statistics['p-val'])
     return best_features
 
+def probabilistic_feature_selection(data:pd.DataFrame, label:pd.Series, n_features:int = 100):
+    best_features = {}
+    naive_bayes = GaussianNB()
+    forward_selection = SequentialFeatureSelector(naive_bayes, n_features_to_select=n_features, direction="forward")
+    forward_selection.fit(data, label)
+    best_features['columns'] = list(data.columns[forward_selection.get_support()])
+    
+    return best_features
+
+def dummy_feature_selection(data:pd.DataFrame, label:pd.Series):
+    best_features = {}
+    best_features['columns'] = list(data.columns)
+
+    return best_features
+
 def main():
     logging.info('Reading data...')
     data = pd.read_csv(f'{DB_PATH}', index_col = 0)
     data.drop('e11', axis = 1, inplace = True)
     data.drop('age_diag_cat', axis = 1, inplace = True)
     folds = json.load(open(f'{FOLD_PATH}', 'r', encoding='UTF-8'))
+    logging.info(f"Selecting fold {TEST_FOLD} as test and rest for feature selection")
     data = get_fold_trainning(data, folds)
     X, y = data.iloc[:,:-4], data[DIAGNOSTIC]
-    logging.info(f"Selecting best features for {definitions[DIAGNOSTIC].replace('type_2_diabetes_mellitus', 'DM2').replace('_',' ')} using {FEATURE_SELECTION_METHOD}")
-    features = feature_selection(X, y)
+    logging.info(f"Starting feature selection process for {definitions[DIAGNOSTIC].replace('type_2_diabetes_mellitus', 'DM2').replace('_',' ')} using {FEATURE_SELECTION_METHOD} approach")
+    if FEATURE_SELECTION_METHOD == 'xi2':
+        features = xi2_feature_selection(X, y)
+    elif FEATURE_SELECTION_METHOD == 'probabilistic':
+        features = probabilistic_feature_selection(X, y, n_features = 3)
+    elif FEATURE_SELECTION_METHOD == 'dummy':
+        features = dummy_feature_selection(X, y)
 
     with open(f'{OUT_PATH}', "w") as json_file:
         json.dump(features, json_file)

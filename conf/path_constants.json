@@ -34,7 +34,8 @@
     "xi2",
     "relieff",
     "probabilistic",
-    "mutual_info"
+    "mutual_info",
+    "dummy"
   ],
   "machine_learning_models": [
     "ada_boost",

@@ -24,7 +24,7 @@ ROOT_PATH = os.path.abspath(
 )
 sys.path.append(ROOT_PATH)
 from libs.logging import logging
-from conf.global_constants import *
+from libs.global_constants import *
 
 # Constants -------------------------------------------------------------------
 DB_PATH:str = f"{S01_BALANCING}.csv"
