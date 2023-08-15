@@ -37,10 +37,19 @@
     "mutual_info"
   ],
   "machine_learning_models": [
-    "logistic",
+    "ada_boost",
+    "bernoulli_nb",
+    "decision_tree",
     "dt",
-    "bernoulli",
-    "gaussian"
+    "extra_trees",
+    "gaussian_nb",
+    "knc",
+    "logistic",
+    "mlpc",
+    "nearest_centroid",
+    "quadratic_discriminant",
+    "random_forest",
+    "svc"
   ],
   "_order_in_pipeline": [
     "diagnostics",

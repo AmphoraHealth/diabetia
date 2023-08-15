@@ -35,14 +35,34 @@ import pandas as pd
 # Load data
 df = pd.read_csv(IN_PATH)
 
+# make a confusion matrix of this data
+confusion_matrix = pd.crosstab(df["real"], df["pred"], rownames=["real"], colnames=["pred"])
+confusion_matrix = confusion_matrix.to_string()
+confusion_matrix = "\n".join(["\t"+line for line in confusion_matrix.split("\n")])
+logging.info(f"confusion matrix before:\n{confusion_matrix}")
+
+# get only the rows where real is not 2.0
+df = df.loc[df["real"] != 2.0]
+
+# when predicted data is 2.0, change it to 1.0
+df.loc[df["pred"] == 2.0, "pred"] = 1.0
+
+# make a confusion matrix of the final data
+confusion_matrix = pd.crosstab(df["real"], df["pred"], rownames=["real"], colnames=["pred"])
+confusion_matrix = confusion_matrix.to_string()
+confusion_matrix = "\n".join(["\t"+line for line in confusion_matrix.split("\n")])
+logging.info(f"confusion matrix after:\n{confusion_matrix}")
+
 # calculate the metrics
 logging.info(f"calculating metrics")
 balanced_accuracy = balanced_accuracy_score(df["real"], df["pred"])
-f1 = f1_score(df["real"], df["pred"], average="macro")
+f1 = f1_score(df["real"], df["pred"],pos_label=1)
+roc = roc_auc_score(df["real"], df["pred"])
 
 # save and print the metrics
-logging.info(f"balanced accuracy: {balanced_accuracy}")
-logging.info(f"f1 score: {f1}")
-logging.info(f"saving score to {OUT_PATH}")
-df = pd.DataFrame({"fold": TEST_FOLD, "balanced_accuracy": [balanced_accuracy], "f1": [f1]})
+logging.info(f"""
+\tbalanced accuracy: {balanced_accuracy}
+\tf1 score:          {f1}
+\tsaving score to    {OUT_PATH}""")
+df = pd.DataFrame({"fold": TEST_FOLD, "balanced_accuracy": [balanced_accuracy], "f1": [f1], "roc": [roc]})
 df.to_csv(OUT_PATH, index=False)

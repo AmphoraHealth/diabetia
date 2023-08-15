@@ -40,7 +40,7 @@ import os
 import sys
 import json
 import pickle
-from aux_02_data_normalization import normalizers
+from aux_02a_data_normalization import normalizers
 
 # Code: data normalization ----------------------------------------------------
 

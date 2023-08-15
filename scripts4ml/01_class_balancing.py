@@ -43,16 +43,8 @@ df = pd.read_csv(IN_PATH)
 with open(FOLD_PATH) as f:
   fold_selection = json.load(f)
 
-# function to balance the data
-f = {
-  "unbalanced": aux.unbalanced,
-  "undersampling": aux.undersampling,
-  "oversampling": aux.oversampling,
-  "mixed": aux.mixed
-}
-
 # balance the data
-df = f[BALANCING_METHOD](df, fold_selection, TEST_FOLD)
+df = aux.methods[BALANCING_METHOD](df, fold_selection, TEST_FOLD)
 
 # save the data
 df.to_csv(OUT_PATH, index=False)

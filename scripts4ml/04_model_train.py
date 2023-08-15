@@ -33,6 +33,7 @@ import pickle
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import balanced_accuracy_score
+from aux_04_model_train import models
 
 # Code: model training --------------------------------------------------------
 # general code for model training given the selected machine learning model
@@ -45,9 +46,7 @@ df = pd.read_csv(IN_PATH)
 features = json.load(open(FEATURES_PATH, "r", encoding="UTF-8"))["columns"]
 
 # select the model
-m = {
-  "logistic": LogisticRegression()
-}[MACHINE_LEARNING_MODEL]
+m = models[MACHINE_LEARNING_MODEL]
 
 # train the model
 logging.info(f"training model {MACHINE_LEARNING_MODEL}")

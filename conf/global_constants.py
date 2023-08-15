@@ -83,11 +83,40 @@ logging.info(f"""
   FEATURE_SELECTION_METHOD: {FEATURE_SELECTION_METHOD}
   MACHINE_LEARNING_MODEL:   {MACHINE_LEARNING_MODEL}
 """)
+             
+# Auxiliar function to determine if the required code is available
+def is_available(var:str, code:str, available:list) -> bool:
+  logging.info(f"checking if requested {var} is available")
+  # if the code is available, return True
+  if code in available:
+    return True
+  # if the code is not available, send a warning and search for his path
+  logging.warning(f"code {code} not available, searching for its path")
+  dirname = os.path.abspath(os.path.dirname(__file__))\
+    .replace(".py", "")\
+    .replace("/ml_data/", "/ml_data/aux_")
+  file = f"{dirname}/__init__.py"
+  # search for the code in the file
+  with open(file, "r") as f:
+    for line in f.readlines():
+      if "import" in line and code in line:
+        logging.error(f"code {code} found in {file}\n\tremember to include the code in the file conf/path_constants.json")
+        raise ValueError(f"code {code}")
+        return True
+  # search for the code's file
+  file = f"{dirname}/{code}.py"
+  if os.path.isfile(file):
+    logging.error(f"code {code} found in {file}\n\tremember to include the apropiate line in the file {dirname}/__init__.py")
+    raise ValueError(f"code {code}")
+  # otherwise, raise an error
+  raise ValueError(f"code {code} not found")
+
+is_available("DIAGNOSTIC", DIAGNOSTIC, DIAGNOSTICS+["None"])
 
 # check values
 if not DIAGNOSTIC in DIAGNOSTICS+["None"]:
   raise ValueError(f"given complication ({DIAGNOSTIC}) must be one of {', '.join(DIAGNOSTICS)}")
-if not TEST_FOLD in FOLDS+["None"]:
+if not TEST_FOLD in FOLDS+["None","x"]:
   raise ValueError(f"given test fold ({TEST_FOLD}) must be one of {', '.join(FOLDS)}")
 if not ORIGIN in ORIGINS+["None"]:
   raise ValueError(f"given origin ({ORIGIN}) must be one of {', '.join(ORIGINS)}")
