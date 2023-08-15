@@ -51,6 +51,13 @@
             "cs_sex"
         ]
     },
+    "ageAtDxConfig":{
+        "categories":{
+            "18-44":[18,44],
+            "45-64":[45,64],
+            "65>":[65,120]
+        }
+    },
     "categoricalMeasuresConfig":{
         "bmi":{
             "ranges":[
@@ -67,7 +74,10 @@
             "targetCols":[
                 "fn_weight_median",
                 "fn_height_median"
-            ]
+            ],
+            "valueCol":"bmi_index",
+            "labelCol":"bmi_label",
+            "ordinalCol":"bmi_ordinal"
         },
         "glucose":{
             "ranges":[
@@ -81,7 +91,10 @@
                 "fn_fasting_glucose_median",
                 "fn_capillary_glucose_median",
                 "fn_glycemia_median"
-            ]
+            ],
+            "valueCol":"glucose_index",
+            "labelCol":"glucose_label",
+            "ordinalCol":"glucose_ordinal"
         },
         "hemoglobin":{
             "ranges":[
@@ -92,7 +105,10 @@
             ],
             "targetCols":[
                 "fn_hemoglobin_median"
-            ]
+            ],
+            "valueCol":"hemoglobin_index",
+            "labelCol":"hemoglobin_label",
+            "ordinalCol":"hemoglobin_ordinal"
         },
         "triglycerides":{
             "ranges":
@@ -107,11 +123,14 @@
             ],
             "targetCols":[
                 "fn_triglycerides_median"
-            ]
+            ],
+            "valueCol":"triglycerides_index",
+            "labelCol":"triglycerides_label",
+            "ordinalCol":"triglycerides_ordinal"
         },
         "creatinine":{
             "ranges":[0,15,30,45,60,90,9999],
-            "labels":["G1","G22","G3a","G3b","G4","G5"],
+            "labels":["G5","G4","G3b","G3a","G2","G1"],
             "factors":{
                 "F":{
                     "sexFactor":1.012,
@@ -128,14 +147,20 @@
                 "fn_creatinine_median",
                 "age_at_wx",
                 "cs_sex"
-            ]
+            ],
+            "valueCol":"creatinine_index",
+            "labelCol":"creatinine_label",
+            "ordinalCol":"creatinine_ordinal"
         },
         "cholesterol":{
             "ranges":[0,200,240,999],
             "labels":["Normal","High","Very high"],
             "targetCols":[
                 "fn_cholesterol_median"
-            ]
+            ],
+            "valueCol":"cholesterol_index",
+            "labelCol":"cholesterol_label",
+            "ordinalCol":"cholesterol_ordinal"
         }
     },
     "columnNamesTranslation":{
