@@ -1,5 +1,6 @@
 # Import libraries
 import pandas as pd
+import numpy as np
 import os
 import sys
 from sklearn import preprocessing
@@ -90,7 +91,10 @@ class CleanFunctions:
                     category:index for index, category in enumerate(labels)
                 }
 
-                self.data[measure[1]['indexCol']] = self.data[measure[1]['labelCol']].map(categories)
+                #..inserting new col
+                col_index:int = self.data.columns.get_loc(measure[1]['labelCol'])
+                self.data.insert(col_index+1,measure[1]['ordinalCol'],np.nan)
+                self.data[measure[1]['ordinalCol']] = self.data[measure[1]['labelCol']].map(categories)
                 
                 
             return logging.info('Categorical cols transformed')
