@@ -18,6 +18,24 @@
                 "x_end",
                 "y_start",
                 "y_end",
+                "fn_peri_cephalic_mean",
+                "fn_peri_cephalic_median",
+                "fn_peri_cephalic_max",
+                "fn_peri_cephalic_min",
+                "fn_peri_cephalic_std",
+                "fn_peri_cephalic_slope",
+                "fn_peri_thoracic_mean",
+                "fn_peri_thoracic_median",
+                "fn_peri_thoracic_max",
+                "fn_peri_thoracic_min",
+                "fn_peri_thoracic_std",
+                "fn_peri_thoracic_slope",
+                "fn_peri_abdominal_mean",
+                "fn_peri_abdominal_median",
+                "fn_peri_abdominal_max",
+                "fn_peri_abdominal_min",
+                "fn_peri_abdominal_std",
+                "fn_peri_abdominal_slope",
                 "e110",
                 "e111",
                 "e116",
@@ -32,6 +50,118 @@
         "categorical_cols":[
             "cs_sex"
         ]
+    },
+    "ageAtDxConfig":{
+        "categories":{
+            "18-44":[18,44],
+            "45-64":[45,64],
+            "65>":[65,120]
+        }
+    },
+    "categoricalMeasuresConfig":{
+        "bmi":{
+            "ranges":[
+                0,18.5,25,30,35,40,999
+            ],
+            "labels":[
+                "Underweight",
+                "Normal weight",
+                "Pre-obesity",
+                "Obesity (class 1)",
+                "Obesity (class 2)",
+                "Obesity (class 3)"]
+                ,
+            "targetCols":[
+                "fn_weight_median",
+                "fn_height_median"
+            ],
+            "valueCol":"bmi_index",
+            "labelCol":"bmi_label",
+            "ordinalCol":"bmi_ordinal"
+        },
+        "glucose":{
+            "ranges":[
+                25,60,126,250,450,9999
+            ],
+            "labels":[
+                "A","B","C","D","E"
+            ],
+            "targetCols":[
+                "in_glucose_median",
+                "fn_fasting_glucose_median",
+                "fn_capillary_glucose_median",
+                "fn_glycemia_median"
+            ],
+            "valueCol":"glucose_index",
+            "labelCol":"glucose_label",
+            "ordinalCol":"glucose_ordinal"
+        },
+        "hemoglobin":{
+            "ranges":[
+                2.5,3.7,6.0,10.3,17.3,99
+            ],
+            "labels":[
+                "A","B","C","D","E"
+            ],
+            "targetCols":[
+                "fn_hemoglobin_median"
+            ],
+            "valueCol":"hemoglobin_index",
+            "labelCol":"hemoglobin_label",
+            "ordinalCol":"hemoglobin_ordinal"
+        },
+        "triglycerides":{
+            "ranges":
+            [
+                0,150,500,1000,99999
+        ],
+            "labels":[
+                "Normal",
+                "High",
+                "Very high",
+                "Extremly high"
+            ],
+            "targetCols":[
+                "fn_triglycerides_median"
+            ],
+            "valueCol":"triglycerides_index",
+            "labelCol":"triglycerides_label",
+            "ordinalCol":"triglycerides_ordinal"
+        },
+        "creatinine":{
+            "ranges":[0,15,30,45,60,90,9999],
+            "labels":["G5","G4","G3b","G3a","G2","G1"],
+            "factors":{
+                "F":{
+                    "sexFactor":1.012,
+                    "alpha":-0.241,
+                    "kappa":0.7
+                },
+                "M":{
+                    "sexFactor":1,
+                    "alpha":-0.302,
+                    "kappa":0.9
+                }
+            },
+            "targetCols":[
+                "fn_creatinine_median",
+                "age_at_wx",
+                "cs_sex"
+            ],
+            "valueCol":"creatinine_index",
+            "labelCol":"creatinine_label",
+            "ordinalCol":"creatinine_ordinal"
+        },
+        "cholesterol":{
+            "ranges":[0,200,240,999],
+            "labels":["Normal","High","Very high"],
+            "targetCols":[
+                "fn_cholesterol_median"
+            ],
+            "valueCol":"cholesterol_index",
+            "labelCol":"cholesterol_label",
+            "ordinalCol":"cholesterol_ordinal"
+        }
     },
     "columnNamesTranslation":{
         "id": "id",
@@ -226,7 +356,7 @@
         "fn_peso_std": "fn_weight_std",
         "fn_peso_slope": "fn_weight_slope",
         "fn_talla_mean": "fn_height_mean",
-        "fn_talla_median": "fn_height_medium",
+        "fn_talla_median": "fn_height_median",
         "fn_talla_max": "fn_height_max",
         "fn_talla_min": "fn_height_min",
         "fn_talla_count": "fn_height_count",
