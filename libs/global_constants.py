@@ -85,7 +85,7 @@ logging.info(f"""
 """)
              
 # Auxiliar function to determine if the required code is available
-def is_available(var:str, code:str, available:list) -> bool:
+def is_available(var:str, code:str, available:list, add_it:bool=False) -> bool:
   logging.info(f"checking if requested {var} is available")
   # if the code is available, return True
   if code in available:

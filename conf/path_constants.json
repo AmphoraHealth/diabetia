@@ -48,9 +48,12 @@
     "logistic",
     "mlpc",
     "nearest_centroid",
+    "passive_aggressive",
     "quadratic_discriminant",
     "random_forest",
-    "svc"
+    "sgdc",
+    "svc",
+    "xgboost"
   ],
   "_order_in_pipeline": [
     "diagnostics",
