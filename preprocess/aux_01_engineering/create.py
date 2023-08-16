@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import os
 import sys
+from math import ceil
 from aux_01_engineering.aux_functions import calculateGFR
 
 ROOT_PATH:str = os.path.abspath(
@@ -309,6 +310,41 @@ class CreateFunctions:
             logging.info('Cholesterol categorical col created')
         except Exception as e:
             raise logging.error(f'{self.createCholesterolCategory.__name__} failed. {e}')
+        
+
+    def createDiabeticFoot(self):
+        """
+        Funtion to create an ordinal and rounded. This column only is rounded to up,
+        orginal column is ordinal, but it has some vallues with decimals in fn_..._median vars.
+        """
+        try:
+            #..crete new col
+            index_col_left:int = self.data.columns.get_loc('fn_left_foot_median')
+            index_col_right:int = self.data.columns.get_loc('fn_left_foot_median')
+            self.data.insert(index_col_left,'diabetic_left_foot_ordinal',self.data['fn_left_foot_median'])
+            self.data.insert(index_col_right,'diabetic_right_foot_ordinal',self.data['fn_left_foot_median'])
+            
+            #..ceil left foot
+            self.data.loc[
+                (self.data[self.data['diabetic_left_foot_ordinal'].isnull()==False]).index,\
+                'diabetic_left_foot_ordinal'
+                ] = self.data.loc[
+                    (self.data[self.data['diabetic_left_foot_ordinal'].isnull()==False]).index,\
+                    'diabetic_left_foot_ordinal'
+                ].apply(lambda x: ceil(x))
+            
+            #..ceil right foot
+            self.data.loc[
+                (self.data[self.data['diabetic_right_foot_ordinal'].isnull()==False]).index,\
+                'diabetic_right_foot_ordinal'
+                ] = self.data.loc[
+                    (self.data[self.data['diabetic_right_foot_ordinal'].isnull()==False]).index,\
+                    'diabetic_right_foot_ordinal'
+                ].apply(lambda x: ceil(x))
+
+            logging.info(f'Diabetic foot cols created')
+        except Exception as e:
+            raise logging.error(f'{self.createDiabeticFoot.__name__} failed. {e}')
         
 
     def __str__(self):
