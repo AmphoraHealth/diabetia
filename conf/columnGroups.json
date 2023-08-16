@@ -184,6 +184,28 @@
         "diabetes_mellitus_type_2_with_coma",
         "type_2_diabetes_mellitus_with_ketoacidosis"
     ],
+    "categoricalCols": [
+        "bmi_index",
+        "bmi_label",
+        "bmi_ordinal",
+        "glucose_index",
+        "glucose_label",
+        "glucose_ordinal",
+        "hemoglobin_index",
+        "hemoglobin_label",
+        "hemoglobin_ordinal",
+        "triglycerides_index",
+        "triglycerides_label",
+        "triglycerides_ordinal",
+        "creatinine_index",
+        "creatinine_label",
+        "creatinine_ordinal",
+        "cholesterol_index",
+        "cholesterol_label",
+        "cholesterol_ordinal",
+        "diabetic_left_foot_ordinal",
+        "diabetic_right_foot_ordinal"
+    ],
     "measuresCols": [
         "fn_weight_mean",
         "fn_weight_median",
