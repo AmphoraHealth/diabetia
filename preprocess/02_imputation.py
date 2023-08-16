@@ -26,6 +26,7 @@ CONFIG_PATH = 'conf/columnGroups.json'
 import pandas as pd
 import numpy as np
 import json
+import re
 from sklearn.experimental import enable_iterative_imputer
 from sklearn.impute import IterativeImputer
 
@@ -41,6 +42,8 @@ def validate(columns:list) -> list:
         else:
             valid_columns.append(c)
 
+    #..drop label cols from categoricalCols group
+    valid_columns = [col for col in valid_columns if bool(re.match('^.*_label$',str(col)))==False]
     return valid_columns
 
 def fill_with_zero(data:pd.DataFrame, columns:list) -> pd.DataFrame:
