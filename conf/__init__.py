@@ -1,1 +1,1 @@
-from .global_constants import *
+from ..libs.global_constants import *

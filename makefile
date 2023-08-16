@@ -108,9 +108,13 @@ ph/04_model-%-mlpc: data/ml_data/03_features-%.json ph/03_features-% scripts4ml/
 	@echo "phony target $@"
 ph/04_model-%-nearest_centroid: data/ml_data/03_features-%.json ph/03_features-% scripts4ml/aux_04_model_train/nearest_centroid.py
 	@echo "phony target $@"
+ph/04_model-%-passive_aggressive: data/ml_data/03_features-%.json ph/03_features-% scripts4ml/aux_04_model_train/passive_aggressive.py
+	@echo "phony target $@"
 ph/04_model-%-quadratic_discriminant: data/ml_data/03_features-%.json ph/03_features-% scripts4ml/aux_04_model_train/quadratic_discriminant.py
 	@echo "phony target $@"
 ph/04_model-%-random_forest: data/ml_data/03_features-%.json ph/03_features-% scripts4ml/aux_04_model_train/random_forest.py
+	@echo "phony target $@"
+ph/04_model-%-sgdc: data/ml_data/03_features-%.json ph/03_features-% scripts4ml/aux_04_model_train/sgdc.py
 	@echo "phony target $@"
 ph/04_model-%-svc: data/ml_data/03_features-%.json ph/03_features-% scripts4ml/aux_04_model_train/svc.py
 	@echo "phony target $@"
@@ -152,6 +156,7 @@ ph/sample_06-%: ph/sample_07-%-xi2
 ph/sample_07-%: ph/sample_08-%-gaussian_nb ph/sample_08-%-bernoulli_nb ph/sample_08-%-nearest_centroid ph/sample_08-%-quadratic_discriminant ph/sample_08-%-extra_trees ph/sample_08-%-decision_tree ph/sample_08-%-mlpc ph/sample_08-%-sgdc ph/sample_08-%-passive_aggressive ph/sample_08-%-random_forest ph/sample_08-%-logistic ph/sample_08-%-xgboost ph/sample_08-%-knc ph/sample_08-%-svc
 	@echo "phony target $@"
 ph/sample_08-%: data/ml_data/06_score-%.csv
+	source .venv/bin/activate; python3 scripts4ml/merge_06_scores.py
 	@echo "phony target $@"
 
 # statistical analysis

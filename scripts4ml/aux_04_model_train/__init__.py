@@ -7,9 +7,12 @@ from .knc import knc
 from .logistic import logistic
 from .mlpc import mlpc
 from .nearest_centroid import nearest_centroid
+from .passive_aggressive import passive_aggressive
 from .quadratic_discriminant import quadratic_discriminant
 from .random_forest import random_forest
+from .sgdc import sgdc
 from .svc import svc
+from .xgboost import xgboost
 
 models:dict[str:object] = {
     'ada_boost': ada_boost,
@@ -21,7 +24,10 @@ models:dict[str:object] = {
     'logistic': logistic,
     'mlpc': mlpc,
     'nearest_centroid': nearest_centroid,
+    'passive_aggressive': passive_aggressive,
     'quadratic_discriminant': quadratic_discriminant,
     'random_forest': random_forest,
-    'svc': svc
+    'sgdc': sgdc,
+    'svc': svc,
+    'xgboost': 'xgboost'
 }
