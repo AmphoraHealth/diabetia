@@ -66,7 +66,7 @@
             "labels":[
                 "Underweight",
                 "Normal weight",
-                "Pre-obesity",
+                "Overweight",
                 "Obesity (class 1)",
                 "Obesity (class 2)",
                 "Obesity (class 3)"]
@@ -129,8 +129,17 @@
             "ordinalCol":"triglycerides_ordinal"
         },
         "creatinine":{
-            "ranges":[0,15,30,45,60,90,9999],
-            "labels":["G5","G4","G3b","G3a","G2","G1"],
+            "ranges":[
+                0,15,30,45,60,90,9999
+            ],
+            "labels":[
+                "G5",
+                "G4",
+                "G3b",
+                "G3a",
+                "G2",
+                "G1"
+            ],
             "factors":{
                 "F":{
                     "sexFactor":1.012,
@@ -153,8 +162,14 @@
             "ordinalCol":"creatinine_ordinal"
         },
         "cholesterol":{
-            "ranges":[0,200,240,999],
-            "labels":["Normal","High","Very high"],
+            "ranges":[
+                0,200,240,999
+            ],
+            "labels":[
+                "Normal",
+                "High",
+                "Very high"
+            ],
             "targetCols":[
                 "fn_cholesterol_median"
             ],
