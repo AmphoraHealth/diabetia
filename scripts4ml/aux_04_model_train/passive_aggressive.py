@@ -1,0 +1,3 @@
+from sklearn.linear_model import PassiveAggressiveClassifier
+
+passive_aggressive = PassiveAggressiveClassifier()

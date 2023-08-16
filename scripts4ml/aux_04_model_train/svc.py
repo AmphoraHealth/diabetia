@@ -1,3 +1,5 @@
 from sklearn.svm import SVC
 
-svc = SVC()
+svc = SVC(
+    kernel='linear'
+)

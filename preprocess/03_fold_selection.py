@@ -22,7 +22,7 @@ import os
 import sys
 ROOT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(ROOT_PATH)
-from conf.global_constants import AUX_ORIGIN_DATABASE, S00_FOLD_SPLITING, DIAGNOSTIC
+from libs.global_constants import AUX_ORIGIN_DATABASE, S00_FOLD_SPLITING, DIAGNOSTIC
 from libs.logging import logging
 
 # Constants -------------------------------------------------------------------
