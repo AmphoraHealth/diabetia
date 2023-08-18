@@ -95,10 +95,10 @@ class DataNormalization:
            'years_since_dx',
            'count_cx_w',
            'age_at_wx',
-           'age_diag'
+           'dx_age_e11'
            ]
         self.columnsToTransform = [col for col in self.columnsToTransform if col in self.data.columns]
-        self.columnsToTransform = [col for col in self.columnsToTransform if bool(re.match('^.*_label$',str(col)))]
+        self.columnsToTransform = [col for col in self.columnsToTransform if bool(re.match('^.*_label$',str(col)))==False]
         
         #..identify cols with nulls or 0s
         EmptyCols:list[str] = self.data.columns[((self.data==0)|(self.data.isnull())).all()]
