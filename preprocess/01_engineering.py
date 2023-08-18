@@ -62,7 +62,7 @@ class DataEngineering(
             self.data = pd.read_csv(f'{self.in_path}', low_memory=False, nrows=rows)
             return logging.info('File read')
         except Exception as e:
-            raise logging.warning(f'File was not read. {e}')
+            raise logging.error(f'File was not read. {e}')
         
 
     def mainTransform(self) -> pd.DataFrame:
@@ -74,8 +74,6 @@ class DataEngineering(
           self.readFile()
 
           #..clean functions
-          self.translateColumns()
-          self.cleanHeaders()
           self.cleanCareunit()
 
           #..create functions
@@ -96,11 +94,12 @@ class DataEngineering(
 
           #..delete functions
           self.dropCols()
+          self.dropRows()
 
           logging.info('Transformations done')
           return self.data
         except Exception as e:
-            raise logging.warning(f'Transformations failed. {e}')
+            raise logging.error(f'Transformations failed. {e}')
             
 
     def __str__(self):
@@ -127,7 +126,7 @@ def runDataEngineering() -> pd.DataFrame:
       return logging.info(f'File saved on {OUT_PATH}')
     
     except Exception as e:
-        raise logging.warning(f'{runDataEngineering.__name__} process failed. {e}')
+        raise logging.error(f'{runDataEngineering.__name__} process failed. {e}')
 
 
 if __name__ == '__main__':
