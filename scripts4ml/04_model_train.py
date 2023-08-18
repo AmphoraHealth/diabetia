@@ -22,10 +22,10 @@ from conf.global_constants import *
 from libs.logging import logging
 
 # Constants -------------------------------------------------------------------
-IN_PATH = f"data/balanced-{DIAGNOSTIC}-{TEST_FOLD}-{ORIGIN}-{BALANCING_METHOD}.csv"
-FEATURES_PATH = f"data/features-{DIAGNOSTIC}-{TEST_FOLD}-{ORIGIN}-{BALANCING_METHOD}-{NORMALIZATION_METHOD}-{FEATURE_SELECTION_METHOD}.json"
+IN_PATH = f"{S02B_STANDARDIZATION}.csv"
+FEATURES_PATH = f"{S03_FEATURE_SELECTION}.json"
 
-OUT_PATH = f"data/model-{DIAGNOSTIC}-{TEST_FOLD}-{ORIGIN}-{BALANCING_METHOD}-{NORMALIZATION_METHOD}-{FEATURE_SELECTION_METHOD}-{MACHINE_LEARNING_MODEL}.pkl"
+OUT_PATH = f"{S04_MODEL_TRAIN}.pkl"
 
 # Import libraries ------------------------------------------------------------
 import pickle
@@ -33,6 +33,7 @@ import pickle
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import balanced_accuracy_score
+from aux_04_model_train import models
 
 # Code: model training --------------------------------------------------------
 # general code for model training given the selected machine learning model
@@ -40,16 +41,12 @@ from sklearn.metrics import balanced_accuracy_score
 
 # Load data
 df = pd.read_csv(IN_PATH)
-logging.warning(f"features selection still not implemented, using all features")
-features = df.columns.tolist()
-features.remove("id")
-features.remove(DIAGNOSTIC)
-features.remove("age_diag_cat")
+
+# load features
+features = json.load(open(FEATURES_PATH, "r", encoding="UTF-8"))["columns"]
 
 # select the model
-m = {
-  "logistic": LogisticRegression()
-}[MACHINE_LEARNING_MODEL]
+m = models[MACHINE_LEARNING_MODEL]
 
 # train the model
 logging.info(f"training model {MACHINE_LEARNING_MODEL}")

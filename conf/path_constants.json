@@ -23,8 +23,12 @@
     "midsampling"
   ],
   "normalization_methods": [
-    "zscore",
-    "power_transform"
+    "yeo_johnson",
+    "box_cox",
+    "quantile_transform"
+  ],
+  "standardization_methods": [
+    "z_score"
   ],
   "feature_selection_methods": [
     "xi2",
@@ -33,10 +37,19 @@
     "mutual_info"
   ],
   "machine_learning_models": [
-    "logistic",
+    "ada_boost",
+    "bernoulli_nb",
+    "decision_tree",
     "dt",
-    "bernoulli",
-    "gaussian"
+    "extra_trees",
+    "gaussian_nb",
+    "knc",
+    "logistic",
+    "mlpc",
+    "nearest_centroid",
+    "quadratic_discriminant",
+    "random_forest",
+    "svc"
   ],
   "_order_in_pipeline": [
     "diagnostics",
@@ -44,6 +57,7 @@
     "origins",
     "balancing_methods",
     "normalization_methods",
+    "standardization_methods",
     "feature_selection_methods",
     "machine_learning_models"],
   "_order_in_pathname": [
@@ -52,6 +66,7 @@
     "origins",
     "balancing_methods",
     "normalization_methods",
+    "standardization_methods",
     "feature_selection_methods",
     "machine_learning_models"]
 }

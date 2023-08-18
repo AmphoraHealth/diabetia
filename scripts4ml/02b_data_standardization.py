@@ -38,8 +38,7 @@ import pandas as pd
 import numpy as np
 import json
 import pickle
-from aux_02_data_normalization import normalizers
-from aux_02_data_normalization import scalers
+from aux_02b_data_standardization import scalers
 
 # Code: data standardization --------------------------------------------------
 
