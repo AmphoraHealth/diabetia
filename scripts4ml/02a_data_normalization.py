@@ -16,6 +16,7 @@ Additional outputs:
 # get constants from command line
 import os
 import sys
+import re
 ROOT_PATH = os.path.abspath(
     os.path.join(
         os.path.dirname(__file__),
@@ -24,7 +25,7 @@ ROOT_PATH = os.path.abspath(
 )
 sys.path.append(ROOT_PATH)
 from libs.logging import logging
-from conf.global_constants import *
+from libs.global_constants import *
 
 # Constants -------------------------------------------------------------------
 DB_PATH:str = f"{S01_BALANCING}.csv"
@@ -96,11 +97,11 @@ class DataNormalization:
            'years_since_dx',
            'count_cx_w',
            'age_at_wx',
-           'age_diag'
+           'dx_age_e11'
            ]
         self.columnsToTransform = [col for col in self.columnsToTransform if col in self.data.columns]
-        self.columnsToTransform = [col for col in self.columnsToTransform if bool(re.match('^.*_label$',str(col)))]
-        self.columnsToTransform = [col for col in self.columnsToTransform if bool(re.match('^.*_ordinal$',str(col)))]
+        self.columnsToTransform = [col for col in self.columnsToTransform if bool(re.match('^.*_label$',str(col)))==False]
+        self.columnsToTransform = [col for col in self.columnsToTransform if bool(re.match('^.*_ordinal$',str(col)))==False]
 
         #..identify cols with nulls or 0s
         EmptyCols:list[str] = self.data.columns[((self.data==0)|(self.data.isnull())).all()]
