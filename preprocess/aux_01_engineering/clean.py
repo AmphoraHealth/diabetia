@@ -18,31 +18,6 @@ from libs.logging import logging
 
 
 class CleanFunctions:   
-    def translateColumns(self):
-        """
-        Function to translate spanish Columns into english. To consult this translation go to config.json file
-        """
-        try:
-            #..translation dictionary
-            translation:dict = self.config['columnNamesTranslation']
-            self.data.columns = [translation.get(name,'error') for name in self.data.columns]
-            logging.info(f'Columns translated into english')
-        except Exception as e:
-            raise logging.error(f'{self.translateColumns.__name__} failed. {e}')
-    
-
-    def cleanHeaders(self):
-        """
-        function to clean headers and json file
-        """    
-        try:
-            #..updating names in file
-            self.data.columns = [snakeCase(str(column)) for column in self.data.columns]
-            return logging.info('Headers converted into snakeCase')
-        except Exception as e:
-            raise logging.error(f'{self.cleanHeaders.__name__} failed. {e}')
-
-
     def cleanCareunit(self):
         """
         Function to clean careunit and transform it into onehot
