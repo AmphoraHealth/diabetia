@@ -96,6 +96,9 @@ class DataEngineering(
           self.dropCols()
           self.dropRows()
 
+          #..update json file with ColNames
+          self.updateJsonCols()
+
           logging.info('Transformations done')
           return self.data
         except Exception as e:
