@@ -20,12 +20,12 @@ from libs.logging import logging
 class CreateFunctions:
     def createYearSinceDx(self):
         """
-        Function to update anio_dx for year since T2D diagnosis
+        Function to update dx_year_e11 for year since T2D diagnosis
         """
         try:
             yearsSinceDx = pd.to_datetime(self.data['x_start']).dt.year
             self.data.insert(3,'years_since_dx', yearsSinceDx)
-            self.data['years_since_dx'] = self.data.apply(lambda x: x['years_since_dx']-x['anio_dx'] if x['anio_dx'] > 0  else 0,axis=1)
+            self.data['years_since_dx'] = self.data.apply(lambda x: x['years_since_dx']-x['dx_year_e11'] if x['dx_year_e11'] > 0  else 0,axis=1)
             self.data.loc[(self.data[self.data['years_since_dx']<0]).index,'years_since_dx'] = 0
             return logging.info('Year since Dx updated')
         except Exception as e:
@@ -38,15 +38,15 @@ class CreateFunctions:
         """
         try:
             #..auxiliar frame to calculate age at first T2D diagnosis
-            aux = self.data[['id','birthdate','anio_dx']].sort_values(by=['id','birthdate'], ascending = True)
-            aux = aux[aux['anio_dx'].isnull()==False]
+            aux = self.data[['id','birthdate','dx_year_e11']].sort_values(by=['id','birthdate'], ascending = True)
+            aux = aux[aux['dx_year_e11'].isnull()==False]
             aux = aux.drop_duplicates(subset='id', keep = 'first')
             aux['birthdate'] = pd.to_datetime(aux['birthdate']).dt.year
-            aux['age_diag'] = aux['anio_dx'] - aux['birthdate']
-            aux_ages:dict = dict(zip(aux['id'],aux['age_diag']))
+            aux['dx_age_e11'] = aux['dx_year_e11'] - aux['birthdate']
+            aux_ages:dict = dict(zip(aux['id'],aux['dx_age_e11']))
 
             #..mapping ages by cx_curp
-            self.data.insert(4,'age_diag', self.data['id'].apply(lambda x: aux_ages.get(x,np.nan)))
+            self.data.insert(4,'dx_age_e11', self.data['id'].apply(lambda x: aux_ages.get(x,np.nan)))
 
             return logging.info('Age at Dx created')
         except Exception as e:
@@ -63,17 +63,17 @@ class CreateFunctions:
         try:
             #..setting default vales
             categories:dict = self.config['ageAtDxConfig']['categories']
-            age_diag_index:int = self.data.columns.get_loc('age_diag')
-            self.data.insert(age_diag_index+1,'age_diag_cat',np.nan)
+            dx_age_e11_index:int = self.data.columns.get_loc('dx_age_e11')
+            self.data.insert(dx_age_e11_index+1,'dx_age_e11_cat',np.nan)
             for cat,values in categories.items():
                 self.data.loc[
                     (
                         self.data[
-                                (self.data['age_diag']>=values[0]) &\
-                                (self.data['age_diag']<=values[1])
+                                (self.data['dx_age_e11']>=values[0]) &\
+                                (self.data['dx_age_e11']<=values[1])
                             ]
                     ).index,
-                    'age_diag_cat'
+                    'dx_age_e11_cat'
                     ] = cat
 
             logging.info(f'Age at T2D Dx group added')

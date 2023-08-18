@@ -43,4 +43,19 @@ class DeleteFunctions:
             return logging.info(f'{columnsDropped} columns dropped')
         
         except Exception as e:
-            raise logging.error(f'Columns were not dropped. {e}')
+            raise logging.error(f'{self.dropCols.__name__} failed. {e}')
+
+
+    def dropRows(self):
+        """
+        Function to drop rows: 
+        - where count_cx_w == 0
+        """
+        try:
+            #..drop rows without consults reported.
+            intialRows:int = self.data.shape[0] 
+            self.data = self.data[(self.data['count_cx_w']!=0)&(self.data['count_cx_w'].isnull()==False)]
+
+            logging.info(f'{intialRows-self.data.shape[0]} rows with 0 consults dropped.')
+        except Exception as e:
+            raise logging.error(f'{self.dropRows.__name__} failed. {e}')
