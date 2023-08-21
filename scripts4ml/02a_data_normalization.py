@@ -73,8 +73,19 @@ class DataNormalization:
        Function to run all required process to normalize and scale data
        """
        try:
+          #..Run process
           self.columnsIdentification()
           self.normalize()
+
+          #..Filter categorical columns
+          """Only ID string col is saved. Other string cols are removed"""
+          categoricalCols:list[str] = [
+              col for col in self.data.columns \
+                if bool(re.match('^.*_label',str(col))) == True \
+                or col == 'dx_age_e11_cat'
+            ]
+          self.data = self.data.loc[:,~self.data.columns.isin(categoricalCols)]
+          logging.info(f'{len(categoricalCols)} categorical cols were dropped')
           
           #..Saving new file
           self.data.to_csv(OUT_PATH, index = False)

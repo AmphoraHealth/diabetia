@@ -83,7 +83,6 @@ def main():
     logging.info('Reading data...')
     data = pd.read_csv(f'{DB_PATH}', index_col = 0)
     data.drop('e11', axis = 1, inplace = True)
-    data.drop('age_diag_cat', axis = 1, inplace = True)
     folds = json.load(open(f'{FOLD_PATH}', 'r', encoding='UTF-8'))
     logging.info(f"Selecting fold {TEST_FOLD} as test and rest for feature selection")
     data = get_fold_trainning(data, folds)
