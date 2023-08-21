@@ -34,7 +34,8 @@
     "xi2",
     "relieff",
     "probabilistic",
-    "mutual_info"
+    "mutual_info",
+    "dummy"
   ],
   "machine_learning_models": [
     "ada_boost",
@@ -47,9 +48,12 @@
     "logistic",
     "mlpc",
     "nearest_centroid",
+    "passive_aggressive",
     "quadratic_discriminant",
     "random_forest",
-    "svc"
+    "sgdc",
+    "svc",
+    "xgboost"
   ],
   "_order_in_pipeline": [
     "diagnostics",

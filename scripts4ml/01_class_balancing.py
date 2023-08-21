@@ -21,7 +21,7 @@ import os
 import sys
 ROOT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(ROOT_PATH)
-from conf.global_constants import ORIGIN, TEST_FOLD, BALANCING_METHOD, AUX_ORIGIN_DATABASE ,S00_FOLD_SPLITING, S01_BALANCING
+from libs.global_constants import ORIGIN, TEST_FOLD, BALANCING_METHOD, AUX_ORIGIN_DATABASE ,S00_FOLD_SPLITING, S01_BALANCING
 import aux_01_class_balancing as aux
 
 # Constants -------------------------------------------------------------------

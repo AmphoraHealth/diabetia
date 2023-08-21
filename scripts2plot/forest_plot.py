@@ -16,12 +16,12 @@ import sys
 
 ROOT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(ROOT_PATH)
-from conf.global_constants import *
+from libs.global_constants import *
 from libs.logging import logging
 
 
 # Constants from config files
-from conf.global_constants import DIAGNOSTIC
+from libs.global_constants import DIAGNOSTIC
 
 
 # Constant definition
