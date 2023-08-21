@@ -37,7 +37,7 @@ definitions = json.load(open(f'{CONFIG_PATH}', 'r', encoding='UTF-8'))
 def validate(columns:list) -> list:
     valid_columns = []
     for c in columns:
-        if c in definitions['diagnosisCols'] or c in definitions['drugsCols'] or c == "age_diag":
+        if c in definitions['diagnosisCols'] or c in definitions['drugsCols'] or c == "dx_age_e11":
             logging.warning(f'Invalid column to impute: "{c}"')
         else:
             valid_columns.append(c)
@@ -73,8 +73,11 @@ def imputation(data:pd.DataFrame) -> pd.DataFrame:
     """
     Function to fill missing values
     """
-
+    #..identify % null by col
     missing = data.isna().sum() / len(data)
+    
+    #..not consider categorical data to imputation
+    missing = missing[[col for col in missing.index if bool(re.match('^.*_label',str(col)))==False and col!='dx_age_e11_cat']]
 
     cols_to_impute = list(missing[(missing<=0.3) & (missing>0)].index)
     cols_to_zero = list(missing[missing>0.3].index)
