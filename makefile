@@ -10,7 +10,7 @@ clean:
 	rm -rf data/ml_data/fold_used-*
 	rm -rf data/ml_data/prebalanced-*
 
-test: data/ml_data/06_score-0-e112-diabetia-unbalanced-yeo_johnson-z_score-xi2-knc.csv
+test: data/ml_data/07_global_score-e112-diabetia-unbalanced-yeo_johnson-z_score-xi2-ada_boost.csv
 
 clean-test: clean test
 
@@ -86,6 +86,8 @@ data/ml_data/02b_scaled-%.csv: ph/02b_scaled-% scripts4ml/02b_data_standardizati
 
 ph/03_features-%-xi2: data/ml_data/02b_scaled-%.csv ph/02b_scaled-%
 	@echo "phony target $@"
+ph/03_features-%-dummy: data/ml_data/02b_scaled-%.csv ph/02b_scaled-%
+	@echo "phony target $@"
 data/ml_data/03_features-%.json: ph/03_features-% scripts4ml/03_feature_selection.py .venv/bin/activate
 	source .venv/bin/activate; python3 scripts4ml/03_feature_selection.py $@
 	test -f $@
@@ -136,7 +138,7 @@ data/ml_data/07_global_score-%.csv: data/ml_data/06_score-0-%.csv data/ml_data/0
 	source .venv/bin/activate; python3 scripts4ml/07_global_score.py $(subst data/global_score-,,$(subst .csv,,$@))
 
 # single fold test
-sample-scores: data/ml_data/merged_06_scores-0-e112.csv
+1-fold: data/ml_data/merged_06_scores-0-e112.csv
 	@echo "phony target $@"
 data/ml_data/merged_06_scores-0-e112.csv: ph/sample_01-0
 	source .venv/bin/activate; python3 scripts4ml/merge_06_scores.py
@@ -153,10 +155,35 @@ ph/sample_05-%: ph/sample_06-%-z_score
 	@echo "phony target $@"
 ph/sample_06-%: ph/sample_07-%-xi2
 	@echo "phony target $@"
-ph/sample_07-%: ph/sample_08-%-gaussian_nb ph/sample_08-%-bernoulli_nb ph/sample_08-%-nearest_centroid ph/sample_08-%-quadratic_discriminant ph/sample_08-%-extra_trees ph/sample_08-%-decision_tree ph/sample_08-%-mlpc ph/sample_08-%-sgdc ph/sample_08-%-passive_aggressive ph/sample_08-%-random_forest ph/sample_08-%-logistic ph/sample_08-%-xgboost ph/sample_08-%-knc ph/sample_08-%-svc
+ph/sample_07-%: ph/sample_08-%-gaussian_nb ph/sample_08-%-bernoulli_nb ph/sample_08-%-nearest_centroid ph/sample_08-%-quadratic_discriminant ph/sample_08-%-extra_trees ph/sample_08-%-decision_tree ph/sample_08-%-mlpc ph/sample_08-%-sgdc ph/sample_08-%-passive_aggressive ph/sample_08-%-random_forest ph/sample_08-%-logistic ph/sample_08-%-xgboost ph/sample_08-%-knc
 	@echo "phony target $@"
 ph/sample_08-%: data/ml_data/06_score-%.csv
 	source .venv/bin/activate; python3 scripts4ml/merge_06_scores.py
+	@echo "phony target $@"
+
+
+# complete 5-fold test
+5-folds: data/ml_data/merged_07_global_score-e112.csv data/ml_data/merged_07_global_score-e113.csv data/ml_data/merged_07_global_score-e114.csv data/ml_data/merged_07_global_score-e115.csv
+	@echo "phony target $@"
+data/ml_data/merged_07_global_score-%.csv: ph/full_01-%
+	source .venv/bin/activate; python3 scripts4ml/merge_07_global_score.py
+	@echo "phony target $@"
+ph/full_01-%: ph/full_02-0-% ph/full_02-1-% ph/full_02-2-% ph/full_02-3-% ph/full_02-4-%
+	@echo "phony target $@"
+ph/full_02-%: ph/full_03-%-diabetia
+	@echo "phony target $@"
+ph/full_03-%: ph/full_04-%-unbalanced
+	@echo "phony target $@"
+ph/full_04-%: ph/full_05-%-yeo_johnson ph/full_05-%-quantile_transform
+	@echo "phony target $@"
+ph/full_05-%: ph/full_06-%-z_score
+	@echo "phony target $@"
+ph/full_06-%: ph/full_07-%-xi2
+	@echo "phony target $@"
+ph/full_07-%: ph/full_08-%-bernoulli_nb ph/full_08-%-logistic ph/full_08-%-mlpc ph/full_08-%-random_forest ph/full_08-%-knc
+	@echo "phony target $@"
+ph/full_08-%: data/ml_data/07_global_score-%.csv
+	source .venv/bin/activate; python3 scripts4ml/merge_07_global_score.py
 	@echo "phony target $@"
 
 # statistical analysis

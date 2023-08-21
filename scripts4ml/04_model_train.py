@@ -38,6 +38,7 @@ from aux_04_model_train import models
 # Code: model training --------------------------------------------------------
 # general code for model training given the selected machine learning model
 #   taking into account the selected selection_method, diagnostic and test_fold
+logging.info(f"{'='*30} {MACHINE_LEARNING_MODEL} training started")
 
 # Load data
 df = pd.read_csv(IN_PATH)
@@ -60,3 +61,6 @@ logging.info(f"saving model to {OUT_PATH}")
 with open(OUT_PATH, "wb") as f:
     pickle.dump(m, f)
 logging.info(f"model saved to {OUT_PATH}")
+
+# final message
+logging.info(f"{'='*30} {MACHINE_LEARNING_MODEL} training finished")

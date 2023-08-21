@@ -39,6 +39,7 @@ import json
 # Code: prediction ------------------------------------------------------------
 # general code for prediction on the test fold
 #   taking into account the selected diagnostic, test_fold, selection_method and model
+logging.info(f"{'='*30} prediction started")
 
 # Load data
 df = pd.read_csv(IN_PATH)
@@ -83,3 +84,6 @@ logging.info(f"model test accuracy: {balanced_accuracy_score(real, pred)}")
 # save the prediction in a csv
 df = pd.DataFrame({"id":ids, "real":real, "pred":pred})
 df.to_csv(OUT_PATH, index=False)
+
+# final message
+logging.info(f"{'='*30} prediction finished")
