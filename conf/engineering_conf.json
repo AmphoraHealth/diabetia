@@ -58,7 +58,7 @@
                 "fn_weight_median",
                 "fn_height_median"
             ],
-            "valueCol":"bmi_index",
+            "valueCol":"bmi_value",
             "labelCol":"bmi_label",
             "ordinalCol":"bmi_ordinal"
         },
@@ -79,7 +79,7 @@
                 "fn_capillary_glucose_median",
                 "fn_glycemia_median"
             ],
-            "valueCol":"glucose_index",
+            "valueCol":"glucose_value",
             "labelCol":"glucose_label",
             "ordinalCol":"glucose_ordinal"
         },
@@ -93,7 +93,7 @@
             "targetCols":[
                 "fn_hemoglobin_median"
             ],
-            "valueCol":"hemoglobin_index",
+            "valueCol":"hemoglobin_value",
             "labelCol":"hemoglobin_label",
             "ordinalCol":"hemoglobin_ordinal"
         },
@@ -111,7 +111,7 @@
             "targetCols":[
                 "fn_triglycerides_median"
             ],
-            "valueCol":"triglycerides_index",
+            "valueCol":"triglycerides_value",
             "labelCol":"triglycerides_label",
             "ordinalCol":"triglycerides_ordinal"
         },
@@ -144,7 +144,7 @@
                 "age_at_wx",
                 "cs_sex"
             ],
-            "valueCol":"creatinine_index",
+            "valueCol":"creatinine_value",
             "labelCol":"creatinine_label",
             "ordinalCol":"creatinine_ordinal"
         },
@@ -160,7 +160,7 @@
             "targetCols":[
                 "fn_cholesterol_median"
             ],
-            "valueCol":"cholesterol_index",
+            "valueCol":"cholesterol_value",
             "labelCol":"cholesterol_label",
             "ordinalCol":"cholesterol_ordinal"
         }
