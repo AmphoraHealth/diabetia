@@ -1,5 +1,6 @@
 # This is a library to standardize the data logging messages
 import logging
+import os
 
 # custom class to format the logging messages
 class CustomFormatter(logging.Formatter):
@@ -33,5 +34,10 @@ handler = logging.StreamHandler()
 handler.setFormatter(CustomFormatter())
 logging.root.handlers = [handler]
 
-# set the logging level
-logging.getLogger().setLevel(logging.INFO)
+# check logging level from environment variable
+if os.environ.get("LOGGING_LEVEL") == "DEBUG":
+  logging.getLogger().setLevel(logging.DEBUG)
+  logging.info("logging level set to DEBUG")
+else:
+  # set logging level to INFO by default
+  logging.getLogger().setLevel(logging.INFO)

@@ -72,7 +72,7 @@ else:
   MACHINE_LEARNING_MODEL = get_arg_value("machine_learning_models")
   
 # report the values
-logging.info(f"""
+logging.debug(f"""
   arguments given:          {sys.argv}
   DIAGNOSTIC:               {DIAGNOSTIC}
   TEST_FOLD:                {TEST_FOLD}
@@ -178,7 +178,7 @@ S06_SCORE_BY_FOLD = "data/ml_data/06_score-" + "-".join(_get_args(9))
 S07_GLOBAL_SCORE = "data/ml_data/07_global_score-" + "-".join(_get_args(10,skip_fold=True))
 
 # print the values
-logging.info(f"""
+logging.debug(f"""
   AUX_ORIGIN_DATABASE:   {AUX_ORIGIN_DATABASE}
   S00_FOLD_SPLITING:     {S00_FOLD_SPLITING}
   AUX_FOLD_SELECTION:    {AUX_FOLD_SELECTION}
@@ -192,3 +192,6 @@ logging.info(f"""
   S06_SCORE_BY_FOLD:     {S06_SCORE_BY_FOLD}
   S07_GLOBAL_SCORE:      {S07_GLOBAL_SCORE}
 """)
+
+# confirm that the code is loaded
+logging.info("global constants loaded")
