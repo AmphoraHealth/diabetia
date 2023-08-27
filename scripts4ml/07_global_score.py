@@ -20,7 +20,7 @@ from libs.global_constants import *
 from libs.logging import logging
 
 # Constants -------------------------------------------------------------------
-IN_PATHS = [f"{S06_SCORE_BY_FOLD.replace('-{TEST_FOLD}-', str(i))}.csv" for i in range(len(FOLDS))]
+IN_PATHS = [f"{S06_SCORE_BY_FOLD.replace('-'+TEST_FOLD+'-', '-'+tf+'-')}.csv" for tf in FOLDS]
 OUT_PATH = f"{S07_GLOBAL_SCORE}.csv"
 CODE_NAME = "-".join(S07_GLOBAL_SCORE.split("-")[1:])
 
