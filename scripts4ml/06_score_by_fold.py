@@ -66,3 +66,6 @@ logging.info(f"""
 \tsaving score to    {OUT_PATH}""")
 df = pd.DataFrame({"fold": TEST_FOLD, "balanced_accuracy": [balanced_accuracy], "f1": [f1], "roc": [roc]})
 df.to_csv(OUT_PATH, index=False)
+
+# final message
+logging.info(f"{'='*30} scoring finished")

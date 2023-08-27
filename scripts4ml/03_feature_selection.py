@@ -80,13 +80,18 @@ def dummy_feature_selection(data:pd.DataFrame, label:pd.Series):
     return best_features
 
 def main():
+    # start message
+    logging.info(f"{'='*30} feature selection started")
+    # data preparation
     logging.info('Reading data...')
     data = pd.read_csv(f'{DB_PATH}', index_col = 0)
     data.drop('e11', axis = 1, inplace = True)
     folds = json.load(open(f'{FOLD_PATH}', 'r', encoding='UTF-8'))
+    # get the data for the selected diagnostic and test_fold
     logging.info(f"Selecting fold {TEST_FOLD} as test and rest for feature selection")
     data = get_fold_trainning(data, folds)
     X, y = data.iloc[:,:-4], data[DIAGNOSTIC]
+    # feature selection
     logging.info(f"Starting feature selection process for {definitions[DIAGNOSTIC].replace('type_2_diabetes_mellitus', 'DM2').replace('_',' ')} using {FEATURE_SELECTION_METHOD} approach")
     if FEATURE_SELECTION_METHOD == 'xi2':
         features = xi2_feature_selection(X, y)
@@ -97,6 +102,8 @@ def main():
 
     with open(f'{OUT_PATH}', "w") as json_file:
         json.dump(features, json_file)
+    # final message
+    logging.info(f"{'='*30} feature selection finished")
 
 
 if __name__ == '__main__':
