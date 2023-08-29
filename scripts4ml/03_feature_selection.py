@@ -32,41 +32,33 @@ definitions = json.load(open(f'{CONFIG_PATH}', 'r', encoding='UTF-8'))['config']
 from aux_03_feature_selection import methods
 import pandas as pd
 import json
-# from sklearn.feature_selection import chi2
-# from sklearn.naive_bayes import GaussianNB
-# from sklearn.feature_selection import SequentialFeatureSelector
 
 # Code: feature selection -----------------------------------------------------
 # general code for feature selection given the selected FEATURE_SELECTION_METHOD
 #   taking into account the selected diagnostic and test_fold
- 
-def get_fold_trainning(data:pd.DataFrame, folds_file:json, n_folds:int = 5) -> pd.DataFrame:
-    train = []
-    for n in range(n_folds):
-        if str(n) == TEST_FOLD:
-            pass
-        else:
-            # train.append(data.loc[data['id'].isin(folds_file[str(n)]['ids'])])
-            train.append(data.loc[folds_file[str(n)]['ids']])
-    train = pd.concat(train)
-    return train
 
 def feature_selection(data:pd.DataFrame, label:pd.Series, n_features:int) -> json:
     return methods[FEATURE_SELECTION_METHOD].fit(data, label, n_features)
 
 
-
 def main():
     logging.info('Reading data...')
     data = pd.read_csv(f'{DB_PATH}', index_col = 0, low_memory=False)
+
+    #Drop label columns
     data.drop('e11', axis = 1, inplace = True)
     data.drop('dx_age_e11_cat', axis = 1, inplace = True)
     columns_to_drop = [x for x in data.columns if 'label' in x]
     data.drop(columns_to_drop, axis = 1, inplace = True)
+
+    #Split data for feature selection methods
     X, y = data.iloc[:,:-4], data[DIAGNOSTIC]
+
+    #Feature Selection
     logging.info(f"Starting feature selection process for {definitions[DIAGNOSTIC].replace('type_2_diabetes_mellitus', 'DM2').replace('_',' ')} using {FEATURE_SELECTION_METHOD} approach")
     features = feature_selection(X, y, n_features=100)
 
+    #Saving output
     with open(f'{OUT_PATH}', "w") as json_file:
         json.dump(features, json_file)
 
