@@ -185,9 +185,9 @@ ph/full_04-%: ph/full_05-%-yeo_johnson
 	@echo "phony target $@"
 ph/full_05-%: ph/full_06-%-z_score
 	@echo "phony target $@"
-ph/full_06-%: ph/full_07-%-xi2
+ph/full_06-%: ph/full_07-%-xi2 ph/full_07-%-dummy
 	@echo "phony target $@"
-ph/full_07-%: ph/full_08-%-bernoulli_nb #ph/full_08-%-logistic ph/full_08-%-mlpc ph/full_08-%-random_forest ph/full_08-%-knc
+ph/full_07-%: ph/full_08-%-bernoulli_nb ph/full_08-%-logistic ph/full_08-%-mlpc ph/full_08-%-xgboost
 	@echo "phony target $@"
 ph/full_08-x-%: data/ml_data/07_global_score-x-%.csv
 	@echo "phony target $@"
