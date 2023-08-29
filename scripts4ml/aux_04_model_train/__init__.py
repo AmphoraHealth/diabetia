@@ -29,5 +29,5 @@ models:dict[str:object] = {
     'random_forest': random_forest,
     'sgdc': sgdc,
     'svc': svc,
-    'xgboost': 'xgboost'
+    'xgboost': xgboost
 }
