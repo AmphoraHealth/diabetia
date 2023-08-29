@@ -1,5 +1,6 @@
 from sklearn.naive_bayes import GaussianNB
 from sklearn.feature_selection import SequentialFeatureSelector
+import pandas as pd
 
 class ProbabilisticForwardSelection:
     def fit(data:pd.DataFrame, label:pd.Series, n_features:int):
