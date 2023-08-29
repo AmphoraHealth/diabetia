@@ -21,7 +21,8 @@ import os
 import sys
 ROOT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(ROOT_PATH)
-from libs.global_constants import ORIGIN, TEST_FOLD, BALANCING_METHOD, AUX_ORIGIN_DATABASE ,S00_FOLD_SPLITING, S01_BALANCING
+from libs.logging import logging
+from libs.global_constants import *
 import aux_01_class_balancing as aux
 
 # Constants -------------------------------------------------------------------
@@ -37,6 +38,7 @@ import json
 # Code: class balancing -------------------------------------------------------
 # general code for class balancing given the selected diagnostic, origin and test_fold
 #   taking into account the selected balancing_method
+logging.info(f"{'='*30} class balancing started")
 
 # Load data
 df = pd.read_csv(IN_PATH)
@@ -48,3 +50,6 @@ df = aux.methods[BALANCING_METHOD](df, fold_selection, TEST_FOLD)
 
 # save the data
 df.to_csv(OUT_PATH, index=False)
+
+# final message
+logging.info(f"{'='*30} class balancing finished")

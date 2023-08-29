@@ -42,6 +42,9 @@ def feature_selection(data:pd.DataFrame, label:pd.Series, n_features:int) -> jso
 
 
 def main():
+    # start message
+    logging.info(f"{'='*30} feature selection started")
+    # data preparation
     logging.info('Reading data...')
     data = pd.read_csv(f'{DB_PATH}', index_col = 0, low_memory=False)
 
@@ -61,6 +64,8 @@ def main():
     #Saving output
     with open(f'{OUT_PATH}', "w") as json_file:
         json.dump(features, json_file)
+    # final message
+    logging.info(f"{'='*30} feature selection finished")
 
 
 if __name__ == '__main__':
