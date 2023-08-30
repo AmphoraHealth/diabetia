@@ -34,6 +34,7 @@ import numpy as np
 import json
 import re
 from aux_table_one import TableOne
+from aux_table_one import CreateGlucose
 
 
 def run():
@@ -41,21 +42,13 @@ def run():
     Function to run all process requiered to create table one based on patients
     """
     try:
-      """
-      first_group = TableOne(df,filter)
-      second_group = TableOne(df,filter)
-      third_group = TableOne(df,filter)
-
-      first_group.run()
-      second_group.run()
-      third_group.run()
-
-      data = concat(first_group,second_group)
-      data = concat(data,third_group
-      """
       #..Read data and config files
       data = pd.read_csv(IN_PATH,low_memory=False, nrows=None)
       config = json.load(open(CONFIG_TABLEONE_PATH, 'r',encoding='utf-8'))
+
+      #..Adding auxiliar column of glucose composed by 4 mean glucose target cols
+      createGlucose = CreateGlucose(data = data)
+      data['glucose_value_mean'] = createGlucose.create()
 
       #..All patients
       all_records = TableOne(
@@ -75,7 +68,7 @@ def run():
       t2d_wo_complications = TableOne(
         data = data[
           (data['diabetes_mellitus_type_2']==1) &\
-          (data[config['categories']['t2d_complications'].keys()].sum(axis=1)<=0)
+          (data[config['categories']['t2d_complications']['columnsUsed']].sum(axis=1)<=0)
           ],
         name = 'Records with T2D w/o complications'
       )
@@ -85,7 +78,7 @@ def run():
       t2d_with_complications = TableOne(
         data = data[
           (data['diabetes_mellitus_type_2']==1) &\
-          (data[config['categories']['t2d_complications'].keys()].sum(axis=1)>0)
+          (data[config['categories']['t2d_complications']['columnsUsed']].sum(axis=1)>0)
           ],
         name = 'Records with T2D with complications'
       )
