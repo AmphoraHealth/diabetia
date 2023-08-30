@@ -24,8 +24,6 @@ sys.path.append(ROOT_PATH)
 from libs.logging import logging
 
 # Constants
-IN_PATH = 'data/diabetia.csv'
-OUT_PATH = 'data/table_one_records.csv'
 CONFIG_PATH = 'conf/columnGroups.json'
 CONFIG_TABLEONE_PATH = 'scripts2print/aux_table_one/config_tableone.json'
 
@@ -49,19 +47,100 @@ class TableOne:
         filterCol:str = None,
         filterValue:str = None,
         name:str=None,
-        config_path:str = CONFIG_TABLEONE_PATH,
-        in_path:str = IN_PATH,
-        out_path:str = OUT_PATH
+        config_path:str = CONFIG_TABLEONE_PATH
     ):
         self.data = data[data[filterCol]==filterValue] if filterCol != None else data
         self.filterCol = filterCol
         self.filterValue = filterValue
         self.name = name
         self.CONFIG_PATH = config_path
-        self.IN_PATH = in_path
-        self.OUT_PATH = out_path
         self.config = json.load(open(self.CONFIG_PATH, 'r', encoding='utf-8'))
     
+
+    def create(self) -> pd.DataFrame:
+        """
+        This function create a table one from diabetia.csv database. It is necessary
+        to give as input: 
+        - data (diabetia.csv database after preprocessing pipeline)
+        - filterCol (column to apply filter)
+        - filter Value (value to filter in filterCol)
+        - name (name to rename output)
+        - config_path (path to read table one configurations)
+        
+        Each category has its own function and all are applied in _create() function. 
+        Defined categories are next:
+        - Age at T2D diagnosis in categories: count(%)
+            18-44
+            45-64
+            65>
+        - Sex: count(%)
+            Female
+            Male
+        - BMI by category: count(%)
+            Underweight
+            Normal weight
+            Overweight
+            Obesity (any class)
+        - T2D complications: count(%)
+            type_2_diabetes_mellitus_with_renal_complications
+            type_2_diabetes_mellitus_with_ophthalmic_complications
+            type_2_diabetes_mellitus_with_neurological_complications
+            type_2_diabetes_mellitus_with_peripheral_circulatory_complications
+        - Comorbidities: count(%)
+            essential_(primary)_hypertension
+            disorders_of_lipoprotein_metabolism_and_other_lipidemias
+        - Laboratories: mean (std)
+            creatinine_value
+            glucose_value
+            hemoglobin_value
+            triglycerides_value
+            cholesterol_value
+        """
+        return self._create()
+    
+    
+    def _create(self) -> pd.DataFrame:
+        """Function to run all frames and concatenate a final frame"""
+        try:
+            #..Get intial frame
+            valueName:str = 'value' if self.name == None else self.name
+            global_frame:pd.DataFrame = pd.DataFrame(
+                {
+                    'name':[self.filterValue],
+                    'category':['N'],
+                    valueName:["{:,.0f}".format(self.data.shape[0])]
+                }
+            )
+
+            #..Get frames by category
+            frame_ageAtDx = self.createAgeAtDx()
+            frame_sex = self.createSex()
+            frame_bmi = self.createBMI()
+            frame_complications = self.createT2DComplications()
+            frame_comorbidities = self.createComorbidities()
+            frame_laboratories = self.createLaboratories()
+            frame_gfr = self.createGFR()
+
+            #..Concat all
+            data:pd.DataFrame = pd.concat(
+                [
+                    global_frame,
+                    frame_ageAtDx,
+                    frame_sex,
+                    frame_bmi,
+                    frame_complications,
+                    frame_comorbidities,
+                    frame_laboratories,
+                    frame_gfr
+                ],
+                axis=0
+            )
+
+            logging.info(f'All charecteristics of table one created for {self.name}')
+            return data
+        except Exception as e:
+            raise logging.error(f'{self.create.__name__} falied. {e}')
+        
 
     def createAgeAtDx(self) -> pd.DataFrame:
         """Function to add Age at T2D diagnosis frame"""
@@ -84,13 +163,22 @@ class TableOne:
             grouped_data = grouped_data.complete(
                 {
                     "name":['Age at Dx'],
-                    "category":self.config['categories']['ageAtDx'].keys()
+                    "category":self.config['categories']['ageAtDx']['order'].keys()
                 }
             )
 
             #..change col name
             if self.name != None:
                 grouped_data.rename(columns={'value':self.name}, inplace=True)
+
+            #..Add principal row for formatter
+            grouped_data = pd.concat(
+                [
+                    pd.DataFrame({'name':['Age at Dx']}),
+                    grouped_data
+                ],
+                axis = 0
+                ).reset_index(drop=True)
 
             logging.debug(f'Age at T2D Dx added')
             return grouped_data
@@ -121,13 +209,22 @@ class TableOne:
             grouped_data = grouped_data.complete(
                 {
                     "name":['Sex'],
-                    "category":self.config['categories']['sex'].keys()
+                    "category":self.config['categories']['sex']['order'].keys()
                 }
             )
             
             #..change col name
             if self.name != None:
                 grouped_data.rename(columns={'value':self.name}, inplace=True)
+
+            #..Add principal row for formatter
+            grouped_data = pd.concat(
+                [
+                    pd.DataFrame({'name':['Sex']}),
+                    grouped_data
+                ],
+                axis = 0
+                ).reset_index(drop=True)
 
             logging.debug(f'Sex added')
             return grouped_data
@@ -140,7 +237,7 @@ class TableOne:
         """Function to create BMI frame. Categories are previously defined by WHO recomendation"""
         try:
             #..default vars
-            order:dict[str:int] = self.config['categories']['bmi']
+            order:dict[str:int] = self.config['categories']['bmi']['order']
 
             #..adding aux cols
             self.data['bmi_aux'] = self.data['bmi_label'].copy()
@@ -174,13 +271,22 @@ class TableOne:
             grouped_data = grouped_data.complete(
                 {
                     "name":['BMI'],
-                    "category":self.config['categories']['bmi'].keys()
+                    "category":self.config['categories']['bmi']['order'].keys()
                 }
             )
 
             #..change col name
             if self.name != None:
                 grouped_data.rename(columns={'value':self.name}, inplace=True)
+
+            #..Add principal row for formatter
+            grouped_data = pd.concat(
+                [
+                    pd.DataFrame({'name':['BMI']}),
+                    grouped_data
+                ],
+                axis = 0
+                ).reset_index(drop=True)
 
             logging.debug(f'BMI added')
             return grouped_data
@@ -193,7 +299,7 @@ class TableOne:
         """Function to create T2D complications frame. Only are consider E11.2 to E11.5 ICD codes"""
         try:
             #..default values
-            t2d_complications:list[str] = list(self.config['categories']['t2d_complications'].keys())
+            t2d_complications:list[str] = list(self.config['categories']['t2d_complications']['columnsUsed'])
 
             #..get group by
             grouped_data = self.data[t2d_complications].sum().reset_index().rename(columns={0:'measure','index':'category'})
@@ -210,13 +316,22 @@ class TableOne:
             grouped_data = grouped_data.complete(
                 {
                     "name":['T2D Complications'],
-                    "category":self.config['categories']['t2d_complications'].keys()
+                    "category":t2d_complications
                 }
             )
 
             #..change col name
             if self.name != None:
                 grouped_data.rename(columns={'value':self.name}, inplace=True)
+
+            #..Add principal row for formatter
+            grouped_data = pd.concat(
+                [
+                    pd.DataFrame({'name':['T2D Complications']}),
+                    grouped_data
+                ],
+                axis = 0
+                ).reset_index(drop=True)
             
             logging.debug(f'T2D complications added')
             return grouped_data
@@ -229,7 +344,7 @@ class TableOne:
         """Function to create comorbidities frame"""
         try:
             #..dafult values
-            comorbidities = list(self.config['categories']['comorbidities'].keys())
+            comorbidities:list[str] = list(self.config['categories']['comorbidities']['columnsUsed'])
 
             #..get groupby
             grouped_data = \
@@ -252,13 +367,22 @@ class TableOne:
             grouped_data = grouped_data.complete(
                 {
                     "name":['Comorbidities'],
-                    "category":self.config['categories']['comorbidities'].keys()
+                    "category":comorbidities
                 }
             )
 
             #..change col name
             if self.name != None:
                 grouped_data.rename(columns={'value':self.name}, inplace=True)
+
+            #..Add principal row for formatter
+            grouped_data = pd.concat(
+                [
+                    pd.DataFrame({'name':['Comorbidities']}),
+                    grouped_data
+                ],
+                axis = 0
+                ).reset_index(drop=True)
             
             logging.debug(f'Comorbidited added')
             return grouped_data
@@ -274,35 +398,52 @@ class TableOne:
         """
         try:
             #..dafult values
-            lxCols:list[str] = list(self.config['categories']['laboratories'].keys())
+            lxCols:list[str] = list(self.config['categories']['laboratories']['columnsUsed'])
+
             #..get groupby
             grouped_data = \
                 self.data[lxCols]\
                     .replace(0,np.nan)\
-                    .agg(['median','std'])\
+                    .agg(['mean','std'])\
                     .T\
                     .reset_index()\
                     .rename(columns={'index':'category'})
             
             #..Add final format (col with % and group name)
-            grouped_data['category'] = grouped_data['category'].replace('fn_creatinine_median','creatinine_value')
+            replaces:dict = {
+                'fn_creatinine_mean':'creatinine_value',
+                'glucose_value_mean':'glucose_value',
+                'fn_hemoglobin_mean':'hemoglobin_value',
+                'fn_triglycerides_mean':'triglycerides_value',
+                'fn_cholesterol_mean':'cholesterol_value'
+            }
+            grouped_data['category'] = grouped_data['category'].replace(to_replace=replaces)
             grouped_data['value'] = \
                         grouped_data\
-                            .apply(lambda x: f'{x["median"]:,.2f} ({x["std"]:,.2f})',axis=1)
-            grouped_data.drop(columns=['median','std'],inplace=True)
+                            .apply(lambda x: f'{x["mean"]:,.2f} ({x["std"]:,.2f})',axis=1)
+            grouped_data.drop(columns=['mean','std'],inplace=True)
             grouped_data.insert(0,'name','Laboratories')  
 
             #..Complete janitor process
             grouped_data = grouped_data.complete(
                 {
                     "name":['Laboratories'],
-                    "category":self.config['categories']['laboratories'].keys()
+                    "category":self.config['categories']['laboratories']['order'].keys()
                 }
             )
 
             #..change col name
             if self.name != None:
                 grouped_data.rename(columns={'value':self.name}, inplace=True)
+
+            #..Add principal row for formatter
+            grouped_data = pd.concat(
+                [
+                    pd.DataFrame({'name':['Laboratories']}),
+                    grouped_data
+                ],
+                axis = 0
+                ).reset_index(drop=True)
             
             logging.debug(f'Laboratories added')
             return grouped_data
@@ -315,7 +456,7 @@ class TableOne:
         """Function to crate GFR frame"""
         try:
             #..default vars
-            order:dict[str:int] = self.config['categories']['gfr']
+            order:dict[str:int] = self.config['categories']['gfr']['order']
 
             #..adding aux cols
             self.data['gfr_aux'] = self.data['creatinine_label'].copy()
@@ -352,62 +493,28 @@ class TableOne:
             grouped_data = grouped_data.complete(
                 {   
                     "name":['GFR'],
-                    "category":self.config['categories']['gfr'].keys()
+                    "category":self.config['categories']['gfr']['order'].keys()
                 }
             )
 
             #..change col name
             if self.name != None:
                 grouped_data.rename(columns={'value':self.name}, inplace=True)
+
+            #..Add principal row for formatter
+            grouped_data = pd.concat(
+                [
+                    pd.DataFrame({'name':['GFR']}),
+                    grouped_data
+                ],
+                axis = 0
+                ).reset_index(drop=True)
             
             logging.debug(f'GFR added')
             return grouped_data
         
         except Exception as e:
             raise logging.error(f'{self.createGFR.__name__} falied. {e}')
-        
-
-    def create(self) -> pd.DataFrame:
-        """Function to run all frames and concatenate a final frame"""
-        try:
-            #..Get intial frame
-            valueName:str = 'value' if self.name == None else self.name
-            global_frame:pd.DataFrame = pd.DataFrame(
-                {
-                    'name':[self.filterValue],
-                    'category':['N'],
-                    valueName:[self.data.shape[0]]
-                }
-            )
-
-            #..Get frames by category
-            frame_ageAtDx = self.createAgeAtDx()
-            frame_sex = self.createSex()
-            frame_bmi = self.createBMI()
-            frame_complications = self.createT2DComplications()
-            frame_comorbidities = self.createComorbidities()
-            frame_laboratories = self.createLaboratories()
-            frame_gfr = self.createGFR()
-
-            #..Concat all
-            data:pd.DataFrame = pd.concat(
-                [
-                    global_frame,
-                    frame_ageAtDx,
-                    frame_sex,
-                    frame_bmi,
-                    frame_complications,
-                    frame_comorbidities,
-                    frame_laboratories,
-                    frame_gfr
-                ],
-                axis=0
-            )
-
-            logging.info(f'All charecteristics of table one created for {self.name}')
-            return data
-        except Exception as e:
-            raise logging.error(f'{self.create.__name__} falied. {e}')
         
 
 if __name__=='__main__':
