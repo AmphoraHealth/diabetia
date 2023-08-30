@@ -28,8 +28,8 @@ from libs.logging import logging
 from libs.global_constants import *
 
 # Constants -------------------------------------------------------------------
-DB_PATH:str = f"{S01_BALANCING}.csv"
-OUT_PATH:str = f"{S02A_NORMALIZATION}.csv"
+DB_PATH:str = f"{S01_BALANCING}.parquet"
+OUT_PATH:str = f"{S02A_NORMALIZATION}.parquet"
 _NORMALIZATION_METHOD:str = f"{NORMALIZATION_METHOD}"
 OUT_PATH_NORMALIZER:str = f"{S02A_NORMALIZATION}.pkl"
 OUT_PATH_NORMALIZER_JSON:str = f"{S02A_NORMALIZATION}.json"
@@ -42,6 +42,7 @@ import sys
 import json
 import pickle
 from aux_02a_data_normalization import normalizers
+from aux_00_common import *
 
 # Code: data normalization ----------------------------------------------------
 
@@ -88,7 +89,7 @@ class DataNormalization:
           logging.info(f'{len(categoricalCols)} categorical cols were dropped')
           
           #..Saving new file
-          self.data.to_csv(OUT_PATH, index = False)
+          save_data(self.data, OUT_PATH)
 
        except Exception as e:
           return logging.warning(f'{self.mainNormalization.__name__} failed. {e}')
@@ -137,12 +138,10 @@ class DataNormalization:
           self.data[self.columnsToTransform] = normalizer.transform(self.data[self.columnsToTransform])
 
           #..Saving pickle
-          with open(OUT_PATH_NORMALIZER, 'wb') as file:
-            pickle.dump(normalizer, file)
+          save_data(normalizer, OUT_PATH_NORMALIZER)
 
           #..Saving columns normalized
-          with open(OUT_PATH_NORMALIZER_JSON, 'w') as file:
-            json.dump({"columnsNormalized":self.columnsToTransform}, file, indent=4, ensure_ascii=False)
+          save_data({"columnsNormalized":self.columnsToTransform}, OUT_PATH_NORMALIZER_JSON)
           
           return logging.info(f'Data normalized')  
        
@@ -161,8 +160,8 @@ def runDataNormalization():
   Function to run data normaliaztion
   """
   #..Files
-  data:pd.DataFrame = pd.read_csv(DB_PATH, low_memory=False, nrows=None)
-  columnGroups:dict = json.load(open(f'{ROOT_PATH}/conf/columnGroups.json','r', encoding = 'Utf-8'))
+  data:pd.DataFrame = load_data(DB_PATH)
+  columnGroups:dict = load_data(f'{ROOT_PATH}/conf/columnGroups.json')
 
   #..Initialize normalization and standardization
   dataNorm = DataNormalization(

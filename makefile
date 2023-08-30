@@ -24,8 +24,8 @@ data/hk_database.csv:
 	@echo "Downloaded hk_database.csv"
 
 # Special targets
-.PRECIOUS: data/diabetia.csv data/hk_database.csv data/ml_data/00_folds-%.json data/ml_data/fold_used-% data/ml_data/01_balanced-%.csv data/ml_data/02a_normalized-%.csv data/ml_data/02b_scaled-%.csv data/ml_data/03_features-%.json data/ml_data/04_model-%.pkl data/ml_data/05_prediction-%.csv data/ml_data/merged_06_scores-0-e112.csv data/ml_data/merged_07_global_score-%.csv
-.INTERMEDIATE: data/hk_database_cleaned.csv
+.PRECIOUS: data/diabetia.csv data/hk_database.csv data/ml_data/00_folds-%.json data/ml_data/fold_used-% data/ml_data/01_balanced-%.parquet data/ml_data/02a_normalized-%.parquet data/ml_data/02b_scaled-%.parquet data/ml_data/03_features-%.json data/ml_data/04_model-%.pkl data/ml_data/05_prediction-%.parquet data/ml_data/merged_06_scores-0-e112.parquet data/ml_data/merged_07_global_score-%.csv
+.INTERMEDIATE: data/hk_database_cleaned.parquet
 
 # preprocess data
 data/hk_database_cleaned.csv: data/hk_database.csv preprocess/01_engineering.py .venv/bin/activate
@@ -67,33 +67,33 @@ ph/01_balanced-%-undersampling: data/ml_data/prebalanced-% scripts4ml/aux_01_cla
 	@echo "phony target $@"
 ph/01_balanced-%-mixed: data/ml_data/prebalanced-% scripts4ml/aux_01_class_balancing/mixed.py
 	@echo "phony target $@"
-data/ml_data/01_balanced-%.csv: ph/01_balanced-% scripts4ml/01_class_balancing.py .venv/bin/activate
+data/ml_data/01_balanced-%.parquet: ph/01_balanced-% scripts4ml/01_class_balancing.py .venv/bin/activate
 	source .venv/bin/activate; python3 scripts4ml/01_class_balancing.py $@
 	test -f $@
 
-ph/02a_normalized-%-yeo_johnson: data/ml_data/01_balanced-%.csv scripts4ml/aux_02a_data_normalization/yeo_johnson.py
+ph/02a_normalized-%-yeo_johnson: data/ml_data/01_balanced-%.parquet scripts4ml/aux_02a_data_normalization/yeo_johnson.py
 	@echo "phony target $@"
-ph/02a_normalized-%-box_cox: data/ml_data/01_balanced-%.csv scripts4ml/aux_02a_data_normalization/box_cox.py
+ph/02a_normalized-%-box_cox: data/ml_data/01_balanced-%.parquet scripts4ml/aux_02a_data_normalization/box_cox.py
 	@echo "phony target $@"
-ph/02a_normalized-%-quantile_transform: data/ml_data/01_balanced-%.csv scripts4ml/aux_02a_data_normalization/quantile_transform.py
+ph/02a_normalized-%-quantile_transform: data/ml_data/01_balanced-%.parquet scripts4ml/aux_02a_data_normalization/quantile_transform.py
 	@echo "phony target $@"
-data/ml_data/02a_normalized-%.csv: ph/02a_normalized-% scripts4ml/02a_data_normalization.py .venv/bin/activate
+data/ml_data/02a_normalized-%.parquet: ph/02a_normalized-% scripts4ml/02a_data_normalization.py .venv/bin/activate
 	source .venv/bin/activate; python3 scripts4ml/02a_data_normalization.py $@
-	echo $@ | sed 's/\.csv/\.pkl/' | xargs test -f
-	echo $@ | sed 's/\.csv/\.json/' | xargs test -f
+	echo $@ | sed 's/\.parquet/\.pkl/' | xargs test -f
+	echo $@ | sed 's/\.parquet/\.json/' | xargs test -f
 	test -f $@
 
-ph/02b_scaled-%-z_score: data/ml_data/02a_normalized-%.csv scripts4ml/aux_02b_data_standardization/z_score.py
+ph/02b_scaled-%-z_score: data/ml_data/02a_normalized-%.parquet scripts4ml/aux_02b_data_standardization/z_score.py
 	@echo "phony target $@"
-data/ml_data/02b_scaled-%.csv: ph/02b_scaled-% scripts4ml/02b_data_standardization.py .venv/bin/activate
+data/ml_data/02b_scaled-%.parquet: ph/02b_scaled-% scripts4ml/02b_data_standardization.py .venv/bin/activate
 	source .venv/bin/activate; python3 scripts4ml/02b_data_standardization.py $@
-	echo $@ | sed 's/\.csv/\.pkl/' | xargs test -f
-	echo $@ | sed 's/\.csv/\.json/' | xargs test -f
+	echo $@ | sed 's/\.parquet/\.pkl/' | xargs test -f
+	echo $@ | sed 's/\.parquet/\.json/' | xargs test -f
 	test -f $@
 
-ph/03_features-%-xi2: data/ml_data/02b_scaled-%.csv
+ph/03_features-%-xi2: data/ml_data/02b_scaled-%.parquet
 	@echo "phony target $@"
-ph/03_features-%-dummy: data/ml_data/02b_scaled-%.csv
+ph/03_features-%-dummy: data/ml_data/02b_scaled-%.parquet
 	@echo "phony target $@"
 data/ml_data/03_features-%.json: ph/03_features-% scripts4ml/03_feature_selection.py .venv/bin/activate
 	source .venv/bin/activate; python3 scripts4ml/03_feature_selection.py $@
@@ -133,11 +133,11 @@ data/ml_data/04_model-%.pkl: ph/04_model-% scripts4ml/04_model_train.py .venv/bi
 	source .venv/bin/activate; python3 scripts4ml/04_model_train.py $@
 	test -f $@
 
-data/ml_data/05_prediction-%.csv: data/ml_data/04_model-%.pkl scripts4ml/05_prediction.py .venv/bin/activate
+data/ml_data/05_prediction-%.parquet: data/ml_data/04_model-%.pkl scripts4ml/05_prediction.py .venv/bin/activate
 	source .venv/bin/activate; python3 scripts4ml/05_prediction.py $@
 	test -f $@
 
-data/ml_data/06_score-%.csv: data/ml_data/05_prediction-%.csv scripts4ml/06_score_by_fold.py .venv/bin/activate
+data/ml_data/06_score-%.csv: data/ml_data/05_prediction-%.parquet scripts4ml/06_score_by_fold.py .venv/bin/activate
 	source .venv/bin/activate; python3 scripts4ml/06_score_by_fold.py $@
 	test -f $@
 
