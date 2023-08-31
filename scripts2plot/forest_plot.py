@@ -59,8 +59,6 @@ def get_binary_features(data:pd.DataFrame) -> pd.DataFrame:
     binary_feats = []
     ordinal_feats = []
     for c in data.columns:
-        if 'label' in c:
-            print(c)
         if len(data[c].unique()) == 2:
             binary_feats.append(c)
         elif 'ordinal' in c:
@@ -72,6 +70,7 @@ def get_binary_features(data:pd.DataFrame) -> pd.DataFrame:
 
     one_hot_variables = pd.get_dummies(data[ordinal_feats], drop_first = False)
     complete_set = pd.concat([data[binary_feats], one_hot_variables], axis = 1)
+    complete_set.columns = [x.replace('_', ' ') for x in complete_set.columns]
 
     return complete_set
 
