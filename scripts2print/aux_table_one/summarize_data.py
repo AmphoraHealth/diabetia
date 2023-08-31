@@ -49,13 +49,14 @@ class SummarizeData:
         This function summarize data from diabetia.csv. 
         Next are the considerations for each category that will be processed
         by table_one.py script for patients.
-        1. Sex: sex of patient
+        1. Age at first visit: age calculated at the first visit registered
         2. Age at Dx: age calculated at the year of T2D diagnosis
-        3. BMI_median: median result in first window
-        4. T2D complications: in first window
-        5. Comorbidities: in first window
-        6. Laboratory values: median in first window
-        7. GFR: result in first window
+        3. Sex: sex of patient
+        4. BMI_median: median result in first window
+        5. T2D complications: in first window
+        6. Comorbidities: in first window
+        7. Laboratory values: median in first window
+        8. GFR: result in first window
         """
         return self._transform()
     
@@ -77,6 +78,7 @@ class SummarizeData:
             tbl:pd.DataFrame = self._uniquePatients()
 
             #..Do summarized  values
+            tbl = self._summarizeAgeAtFirstVisit(tbl=tbl)
             tbl = self._summarizeAgeAtDx(tbl=tbl)
             tbl = self._summarizeSex(tbl=tbl)
             tbl = self._summarizeBMI(tbl=tbl)
@@ -124,13 +126,12 @@ class SummarizeData:
         return self.data[['cx_curp']+t2d].drop_duplicates(subset='cx_curp', keep='first')
     
 
-    def _summarizeAgeAtDx(self,tbl:pd.DataFrame) -> pd.DataFrame:
+    def _summarizeAgeAtFirstVisit(self,tbl:pd.DataFrame) -> pd.DataFrame:
         try:
             #..grouped AgeAtDx
             summ = (
-                self.data[['cx_curp','dx_age_e11_cat']]
-                    .dropna(subset='dx_age_e11_cat')
-                    .drop_duplicates()
+                self.data[['window','cx_curp','age_at_wx']]
+                    .drop_duplicates(subset='cx_curp',keep='first')
                 )
             
             #..merge to tbl
@@ -140,6 +141,28 @@ class SummarizeData:
                 on = 'cx_curp',
                 how = 'left'
             )
+            tbl.drop(columns='window',inplace=True)
+            return tbl
+        except Exception as e:
+            raise logging.error(f'{self._summarizeAgeAtFirstVisit.__name__} failed. {e}')
+
+
+    def _summarizeAgeAtDx(self,tbl:pd.DataFrame) -> pd.DataFrame:
+        try:
+            #..grouped AgeAtDx
+            summ = (
+                self.data[['window','cx_curp','dx_age_e11_cat']]
+                    .drop_duplicates(subset='cx_curp', keep='first')
+                )
+                        
+            #..merge to tbl
+            tbl = pd.merge(
+                tbl,
+                summ,
+                on = 'cx_curp',
+                how = 'left'
+            )
+            tbl.drop(columns='window',inplace=True)
             return tbl
         except Exception as e:
             raise logging.error(f'{self._summarizeAgeAtDx.__name__} failed. {e}')
@@ -269,12 +292,4 @@ class SummarizeData:
         except Exception as e:
             raise logging.error(f'{self._summarizeAgeAtDx.__name__} failed. {e}')
     
-
-if __name__=='__main__':
-    data = pd.read_csv('./data/diabetia.csv',low_memory=False,nrows=None)
-    summarize = SummarizeData(
-        data = data,
-        config_path=CONFIG_TABLEONE_PATH
-        )
-    data = summarize.transform()
     

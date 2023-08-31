@@ -69,6 +69,10 @@ class TableOne:
         
         Each category has its own function and all are applied in _create() function. 
         Defined categories are next:
+        - Age at first visit: count(%)
+            18-44
+            45-64
+            65>
         - Age at T2D diagnosis in categories: count(%)
             18-44
             45-64
@@ -113,18 +117,20 @@ class TableOne:
             )
 
             #..Get frames by category
-            frame_ageAtDx = self.createAgeAtDx()
-            frame_sex = self.createSex()
-            frame_bmi = self.createBMI()
-            frame_complications = self.createT2DComplications()
-            frame_comorbidities = self.createComorbidities()
-            frame_laboratories = self.createLaboratories()
-            frame_gfr = self.createGFR()
+            frame_ageAtFirstVisit = self._createAgeAtFirstVisit()
+            frame_ageAtDx = self._createAgeAtDx()
+            frame_sex = self._createSex()
+            frame_bmi = self._createBMI()
+            frame_complications = self._createT2DComplications()
+            frame_comorbidities = self._createComorbidities()
+            frame_laboratories = self._createLaboratories()
+            frame_gfr = self._createGFR()
 
             #..Concat all
             data:pd.DataFrame = pd.concat(
                 [
                     global_frame,
+                    frame_ageAtFirstVisit,
                     frame_ageAtDx,
                     frame_sex,
                     frame_bmi,
@@ -142,7 +148,60 @@ class TableOne:
             raise logging.error(f'{self.create.__name__} falied. {e}')
         
 
-    def createAgeAtDx(self) -> pd.DataFrame:
+    def _createAgeAtFirstVisit(self) -> pd.DataFrame:
+        """Function to add Age at first visit"""
+        try:
+            #..create auxliar col for age_cat
+            self.data['age_at_wx_cat'] = pd.cut(
+                self.data['age_at_wx'],
+                bins = [18,45,65,150],
+                right = False,
+                labels = ['18-44','45-64','65>']
+            )
+
+            #..get group by
+            grouped_data = \
+                self.data.groupby('age_at_wx_cat')['id']\
+                    .agg(['count',lambda x: x.count()/self.data['id'].count()])\
+                    .reset_index()
+            grouped_data.columns = ['category','measure','measure_per']
+
+            #..Add final format (col with % and group name)
+            grouped_data['value'] = \
+                grouped_data\
+                    .apply(lambda x: f'{x["measure"]:,.0f} ({x["measure_per"]*100:,.2f}%)',axis=1)
+            grouped_data.drop(columns = ['measure','measure_per'],inplace=True)
+            grouped_data.insert(0,'name','Age at first visit')
+
+            #..Complete janitor process
+            grouped_data = grouped_data.complete(
+                {
+                    "name":['Age at first visit'],
+                    "category":self.config['categories']['ageAtFirstVisit']['order'].keys()
+                }
+            )
+
+            #..change col name
+            if self.name != None:
+                grouped_data.rename(columns={'value':self.name}, inplace=True)
+
+            #..Add principal row for formatter
+            grouped_data = pd.concat(
+                [
+                    pd.DataFrame({'name':['Age at first visit']}),
+                    grouped_data
+                ],
+                axis = 0
+                ).reset_index(drop=True)
+
+            logging.debug(f'Age at first visit added')
+            return grouped_data
+        
+        except Exception as e:
+            raise logging.error(f'{self._createAgeAtFirstVisit.__name__} falied. {e}')
+
+
+    def _createAgeAtDx(self) -> pd.DataFrame:
         """Function to add Age at T2D diagnosis frame"""
         try:
             #..get group by
@@ -184,10 +243,10 @@ class TableOne:
             return grouped_data
         
         except Exception as e:
-            raise logging.error(f'{self.createAgeAtDx.__name__} falied. {e}')
+            raise logging.error(f'{self._createAgeAtDx.__name__} falied. {e}')
         
     
-    def createSex(self) -> pd.DataFrame:
+    def _createSex(self) -> pd.DataFrame:
         """Function to add sex frame. From data engineering process 0 = Female and 1 = Male"""
         try:
             #..get group by
@@ -230,10 +289,10 @@ class TableOne:
             return grouped_data
         
         except Exception as e:
-            raise logging.error(f'{self.createSex.__name__} falied. {e}')
+            raise logging.error(f'{self._createSex.__name__} falied. {e}')
         
 
-    def createBMI(self) -> pd.DataFrame:
+    def _createBMI(self) -> pd.DataFrame:
         """Function to create BMI frame. Categories are previously defined by WHO recomendation"""
         try:
             #..default vars
@@ -292,10 +351,10 @@ class TableOne:
             return grouped_data
         
         except Exception as e:
-            raise logging.error(f'{self.createBMI.__name__} falied. {e}')
+            raise logging.error(f'{self._createBMI.__name__} falied. {e}')
         
 
-    def createT2DComplications(self) -> pd.DataFrame:
+    def _createT2DComplications(self) -> pd.DataFrame:
         """Function to create T2D complications frame. Only are consider E11.2 to E11.5 ICD codes"""
         try:
             #..default values
@@ -337,10 +396,10 @@ class TableOne:
             return grouped_data
         
         except Exception as e:
-            raise logging.error(f'{self.createT2DComplications.__name__} falied. {e}')
+            raise logging.error(f'{self._createT2DComplications.__name__} falied. {e}')
 
 
-    def createComorbidities(self) -> pd.DataFrame:
+    def _createComorbidities(self) -> pd.DataFrame:
         """Function to create comorbidities frame"""
         try:
             #..dafult values
@@ -388,10 +447,10 @@ class TableOne:
             return grouped_data
         
         except Exception as e:
-            raise logging.error(f'{self.createComorbidities.__name__} falied. {e}')
+            raise logging.error(f'{self._createComorbidities.__name__} falied. {e}')
         
 
-    def createLaboratories(self) -> pd.DataFrame:
+    def _createLaboratories(self) -> pd.DataFrame:
         """
         Function to create laboratories frame. This frame use values cleaned in data engineering: *_value
         and consider median and std to give a final result
@@ -449,10 +508,10 @@ class TableOne:
             return grouped_data
         
         except Exception as e:
-            raise logging.error(f'{self.createLaboratories.__name__} falied. {e}')
+            raise logging.error(f'{self._createLaboratories.__name__} falied. {e}')
         
 
-    def createGFR(self) -> pd.DataFrame:
+    def _createGFR(self) -> pd.DataFrame:
         """Function to crate GFR frame"""
         try:
             #..default vars
@@ -514,7 +573,7 @@ class TableOne:
             return grouped_data
         
         except Exception as e:
-            raise logging.error(f'{self.createGFR.__name__} falied. {e}')
+            raise logging.error(f'{self._createGFR.__name__} falied. {e}')
         
 
 if __name__=='__main__':
