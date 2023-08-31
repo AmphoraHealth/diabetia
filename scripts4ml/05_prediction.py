@@ -28,10 +28,11 @@ STD_PATH = f"{S02B_STANDARDIZATION}"
 FEAT_PATH = f"{S03_FEATURE_SELECTION}.json"
 MODEL_PATH = f"{S04_MODEL_TRAIN}.pkl"
 
-OUT_PATH = f"{S05_PREDICTION}.csv"
+OUT_PATH = f"{S05_PREDICTION}.parquet"
 
 # Import libraries ------------------------------------------------------------
 from sklearn.metrics import balanced_accuracy_score
+from aux_00_common import *
 import pandas as pd
 import pickle
 import json
@@ -42,36 +43,34 @@ import json
 logging.info(f"{'='*30} prediction started")
 
 # Load data
-df = pd.read_csv(IN_PATH)
-with open(FOLD_PATH) as f:
-  fold_selection = json.load(f)
+df = load_data(IN_PATH)
+fold_selection = load_data(FOLD_PATH)
 
 # get the ids of the test fold and filter the data
 ids = fold_selection[str(TEST_FOLD)]["ids"]
 df = df.loc[df["id"].isin(ids)]
 
 # prepare normalization
-cols = json.load(open(f"{NORM_PATH}.json", "r", encoding="UTF-8"))["columnsNormalized"]
-norm = pickle.load(open(f"{NORM_PATH}.pkl", "rb"))
+cols = load_data(f"{NORM_PATH}.json")["columnsNormalized"]
+norm = load_data(f"{NORM_PATH}.pkl")
 
 # normalize the data
 df[cols] = norm.transform(df[cols])
 
 # prepare standardization
-cols = json.load(open(f"{STD_PATH}.json", "r", encoding="UTF-8"))["columnsStandardized"]
-std = pickle.load(open(f"{STD_PATH}.pkl", "rb"))
+cols = load_data(f"{STD_PATH}.json")["columnsStandardized"]
+std = load_data(f"{STD_PATH}.pkl")
 
 # standardize the data
 df[cols] = std.transform(df[cols])
 
 # load features and filter the data
-features = json.load(open(FEAT_PATH, "r", encoding="UTF-8"))["columns"]
+features = load_data(FEAT_PATH)["columns"]
 df = df[["id"]+features+[DIAGNOSTIC]]
 
 # load the model
 logging.info(f"loading model from {MODEL_PATH}")
-with open(MODEL_PATH, "rb") as f:
-  m = pickle.load(f)
+m = load_data(MODEL_PATH)
 
 # predict
 ids = df["id"]
@@ -83,7 +82,7 @@ logging.info(f"model test accuracy: {balanced_accuracy_score(real, pred)}")
 
 # save the prediction in a csv
 df = pd.DataFrame({"id":ids, "real":real, "pred":pred})
-df.to_csv(OUT_PATH, index=False)
+save_data(df, OUT_PATH)
 
 # final message
 logging.info(f"{'='*30} prediction finished")

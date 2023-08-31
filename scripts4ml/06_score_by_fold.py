@@ -22,18 +22,19 @@ from libs.global_constants import *
 from libs.logging import logging
 
 # Constants -------------------------------------------------------------------
-IN_PATH = f"{S05_PREDICTION}.csv"
+IN_PATH = f"{S05_PREDICTION}.parquet"
 OUT_PATH = f"{S06_SCORE_BY_FOLD}.csv"
 
 # Import libraries ------------------------------------------------------------
 from sklearn.metrics import balanced_accuracy_score, f1_score, roc_auc_score, recall_score
+from aux_00_common import load_data
 import pandas as pd
 
 # Code: score -----------------------------------------------------------------
 # general code for scoring the model on the test fold
 
 # Load data
-df = pd.read_csv(IN_PATH)
+df = load_data(IN_PATH)
 
 # make a confusion matrix of this data
 confusion_matrix = pd.crosstab(df["real"], df["pred"], rownames=["real"], colnames=["pred"])

@@ -24,12 +24,13 @@ sys.path.append(ROOT_PATH)
 from libs.logging import logging
 from libs.global_constants import *
 import aux_01_class_balancing as aux
+from aux_00_common import *
 
 # Constants -------------------------------------------------------------------
 IN_PATH = f"{AUX_ORIGIN_DATABASE}"
 FOLD_PATH = f"{S00_FOLD_SPLITING}.json"
 
-OUT_PATH = f"{S01_BALANCING}.csv"
+OUT_PATH = f"{S01_BALANCING}.parquet"
 
 # Import libraries ------------------------------------------------------------
 import pandas as pd
@@ -41,15 +42,14 @@ import json
 logging.info(f"{'='*30} class balancing started")
 
 # Load data
-df = pd.read_csv(IN_PATH)
-with open(FOLD_PATH) as f:
-  fold_selection = json.load(f)
+df = load_data(IN_PATH)
+fold_selection = load_data(FOLD_PATH)
 
 # balance the data
 df = aux.methods[BALANCING_METHOD](df, fold_selection, TEST_FOLD)
 
 # save the data
-df.to_csv(OUT_PATH, index=False)
+save_data(df, OUT_PATH)
 
 # final message
 logging.info(f"{'='*30} class balancing finished")
