@@ -91,6 +91,7 @@ class DataEngineering(
 
           #..update functions
           self.updateDiagnosis()
+          self.updatePredictions()
 
           #..delete functions
           self.dropCols()
