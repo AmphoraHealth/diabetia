@@ -16,18 +16,15 @@ import sys
 
 ROOT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(ROOT_PATH)
-from libs.global_constants import *
 from libs.logging import logging
-
-
-# Constants from config files
-from libs.global_constants import DIAGNOSTIC
 
 
 # Constant definition
 IN_PATH = 'data/diabetia.csv'
-OUT_PATH = ''
+OUT_PATH_IMG = 'data/supplementary_material/visualizations'
+OUT_PATH_DATA = 'data/supplementary_material/data'
 CONFIG_PATH = './conf/engineering_conf.json'
+DIAGNOSTIC = sys.argv[1]
 
 
 #Libraries
@@ -37,6 +34,7 @@ import matplotlib.pyplot as plt
 from scipy.stats.contingency import relative_risk
 from scipy.stats.contingency import odds_ratio
 import json
+import sys
 import warnings
 
 #Default config
@@ -56,14 +54,26 @@ def read_data(file:str) -> pd.DataFrame:
 
 def get_binary_features(data:pd.DataFrame) -> pd.DataFrame:
     """
-    Function to return a subset of df where the features are only the binary ones
+    Function to return a subset of binary variables from the dataset
     """
     binary_feats = []
+    ordinal_feats = []
     for c in data.columns:
+        if 'label' in c:
+            print(c)
         if len(data[c].unique()) == 2:
             binary_feats.append(c)
+        elif 'ordinal' in c:
+            if c.replace('ordinal', 'label') in data.columns:
+                ordinal_feats.append(c.replace('ordinal', 'label'))
+            else: 
+                data[c] = data[c].astype(int).astype(str)
+                ordinal_feats.append(c)
 
-    return data[binary_feats]
+    one_hot_variables = pd.get_dummies(data[ordinal_feats], drop_first = False)
+    complete_set = pd.concat([data[binary_feats], one_hot_variables], axis = 1)
+
+    return complete_set
 
 def get_relative_risk(X_data:pd.DataFrame, y_data:pd.Series) -> pd.DataFrame:
     """
@@ -117,7 +127,7 @@ def get_odds_ratio(X_data:pd.DataFrame, y_data:pd.Series) -> pd.DataFrame:
     or_df = pd.DataFrame(zip(X_data.columns[:-1], effect, lower_int, upper_int), columns = ['Variable', 'OddsRatio', 'Lower', 'Upper'])
     return or_df
 
-def forest_plot(df:pd.DataFrame, variables:str, effect:str, low:str, high:str, plot_name:str, reference_value:int = 1, ascending:bool = False, logscale:bool = False, figsize:tuple = (20,55)):
+def forest_plot(df:pd.DataFrame, variables:str, effect:str, low:str, high:str, plot_name:str, reference_value:int = 1, ascending:bool = False, logscale:bool = False, figsize:tuple = (20,60)):
     """
     Function to generate a forest plot from an risk effect estimation
     """
@@ -148,7 +158,7 @@ def forest_plot(df:pd.DataFrame, variables:str, effect:str, low:str, high:str, p
     plt.tick_params(axis='y', which='major', labelsize=10)
     plt.tick_params(axis='x', which='major', labelsize=12)
     plt.tight_layout()
-    plt.savefig(f'{plot_name}.png', dpi = 300)   
+    plt.savefig(f'{OUT_PATH_IMG}/{plot_name}.png', dpi = 300)   
 
 def main():
     logging.info('Reading data...')
@@ -157,12 +167,12 @@ def main():
 
     logging.info(f"Calculating Relative Risk of {definitions[DIAGNOSTIC].replace('type_2_diabetes_mellitus', 'DM2').replace('_',' ')} for {len(X_data.columns)} variables...")
     rr_df = get_relative_risk(X_data, y_data[DIAGNOSTIC])
-    rr_df.to_csv(f'RelativeRisk_{DIAGNOSTIC}.csv', index = False)
+    rr_df.to_csv(f'{OUT_PATH_DATA}/RelativeRisk_{DIAGNOSTIC}.csv', index = False)
 
 
     logging.info(f"Calculating Odds Ratio of {definitions[DIAGNOSTIC].replace('type_2_diabetes_mellitus', 'DM2').replace('_',' ')} for {len(X_data.columns)} variables...")
     or_df = get_odds_ratio(X_data, y_data[DIAGNOSTIC])
-    or_df.to_csv(f'OddsRatio_{DIAGNOSTIC}.csv', index = False)
+    or_df.to_csv(f'{OUT_PATH_DATA}/OddsRatio_{DIAGNOSTIC}.csv', index = False)
 
     logging.info('Generating forest plots...')
     forest_plot(rr_df[rr_df['RelativeRisk'] > 0], 'Variable', 'RelativeRisk', 'Lower', 'Upper', f'RelativeRiskFp_{DIAGNOSTIC}', logscale = True, figsize = (21,27))
