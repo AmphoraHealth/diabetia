@@ -110,7 +110,7 @@ def run():
 
 
 if __name__ == '__main__':
-    logging.info(f'{"="*30}RECORDS TABLE ONE STARTS')
+    logging.info(f'{"="*30}PATIENTS TABLE ONE STARTS')
     data = run()
     data.to_csv(OUT_PATH,index=False)
-    logging.info(f'{"="*30}RECORDS TABLE ONE FINISHED')
+    logging.info(f'{"="*30}PATIENTS TABLE ONE FINISHED')

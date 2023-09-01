@@ -56,7 +56,6 @@ class SummarizeData:
         5. T2D complications: in first window
         6. Comorbidities: in first window
         7. Laboratory values: median in first window
-        8. GFR: result in first window
         """
         return self._transform()
     
@@ -85,7 +84,6 @@ class SummarizeData:
             tbl = self._summarizeT2DComplications(tbl=tbl)
             tbl = self._summarizeComorbidites(tbl=tbl)
             tbl = self._summariezeLaboratories(tbl=tbl)
-            tbl = self._summarizeGFR(tbl=tbl)
 
             tbl.rename(columns={'cx_curp':'id'},inplace=True)
             
@@ -271,25 +269,3 @@ class SummarizeData:
             return tbl
         except Exception as e:
             raise logging.error(f'{self._summariezeLaboratories.__name__} failed. {e}')
-    
-
-    def _summarizeGFR(self,tbl:pd.DataFrame) -> pd.DataFrame:
-        try:
-            #..grouped GFR
-            summ = self.data[['window','cx_curp','creatinine_label']].copy()
-            summ['creatinine_label'] = summ.groupby('cx_curp')['creatinine_label'].bfill()
-            summ =  summ.drop_duplicates(subset='cx_curp', keep='first')
-            
-            #..Merge to tbl
-            tbl = pd.merge(
-                tbl,
-                summ,
-                on = 'cx_curp',
-                how = 'left'
-            )
-            tbl.drop(columns='window',inplace=True)
-            return tbl
-        except Exception as e:
-            raise logging.error(f'{self._summarizeAgeAtDx.__name__} failed. {e}')
-    
-    

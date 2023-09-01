@@ -79,16 +79,6 @@
                 "triglycerides_value":3,
                 "cholesterol_value":4
             }
-        },
-        "gfr":{
-            "columnsUsed":[   
-                "creatinine_label"
-            ],
-            "order":{
-                "G1-G2":0,
-                "G3":1,
-                "G4-G5":2
-            }
         }
     }
 }

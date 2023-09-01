@@ -124,7 +124,6 @@ class TableOne:
             frame_complications = self._createT2DComplications()
             frame_comorbidities = self._createComorbidities()
             frame_laboratories = self._createLaboratories()
-            frame_gfr = self._createGFR()
 
             #..Concat all
             data:pd.DataFrame = pd.concat(
@@ -137,7 +136,6 @@ class TableOne:
                     frame_complications,
                     frame_comorbidities,
                     frame_laboratories,
-                    frame_gfr
                 ],
                 axis=0
             )
@@ -510,72 +508,7 @@ class TableOne:
         except Exception as e:
             raise logging.error(f'{self._createLaboratories.__name__} falied. {e}')
         
-
-    def _createGFR(self) -> pd.DataFrame:
-        """Function to crate GFR frame"""
-        try:
-            #..default vars
-            order:dict[str:int] = self.config['categories']['gfr']['order']
-
-            #..adding aux cols
-            self.data['gfr_aux'] = self.data['creatinine_label'].copy()
-            self.data.loc[:,'gfr_aux'] = \
-                self.data['creatinine_label']\
-                    .replace(
-                    {
-                        'G1':'G1-G2',
-                        'G2':'G1-G2',
-                        'G3a':'G3',
-                        'G3b':'G3',
-                        'G4':'G4-G5',
-                        'G5':'G4-G5'
-                    }
-                )
-            
-            #..get group by
-            grouped_data = \
-                self.data.groupby('gfr_aux')['id']\
-                    .agg(['count',lambda x: x.count()/self.data['id'].count()])\
-                    .reset_index()
-            grouped_data.columns = ['category','measure','measure_per']
-
-            #..Add final format (col with % and group name)
-            grouped_data['order'] = grouped_data['category'].apply(lambda x: order.get(x,None))
-            grouped_data['value'] = \
-                grouped_data\
-                    .apply(lambda x: f'{x["measure"]:,.0f} ({x["measure_per"]*100:,.2f}%)',axis=1)
-            grouped_data.sort_values(by='order',inplace=True)
-            grouped_data.drop(columns = ['measure','measure_per','order'],inplace=True)
-            grouped_data.insert(0,'name','GFR')
-
-            #..Complete janitor process
-            grouped_data = grouped_data.complete(
-                {   
-                    "name":['GFR'],
-                    "category":self.config['categories']['gfr']['order'].keys()
-                }
-            )
-
-            #..change col name
-            if self.name != None:
-                grouped_data.rename(columns={'value':self.name}, inplace=True)
-
-            #..Add principal row for formatter
-            grouped_data = pd.concat(
-                [
-                    pd.DataFrame({'name':['GFR']}),
-                    grouped_data
-                ],
-                axis = 0
-                ).reset_index(drop=True)
-            
-            logging.debug(f'GFR added')
-            return grouped_data
         
-        except Exception as e:
-            raise logging.error(f'{self._createGFR.__name__} falied. {e}')
-        
-
 if __name__=='__main__':
     logging.basicConfig(level=logging.DEBUG)
     data = pd.read_csv('./data/diabetia.csv',low_memory=False,nrows=100)
