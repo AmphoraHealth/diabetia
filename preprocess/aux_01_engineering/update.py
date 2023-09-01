@@ -84,3 +84,21 @@ class UpdateFunctions:
             logging.info(f'columnGroups.json saved in ./config. {totalCols} columns.')
         except Exception as e:
             raise logging.error(f'{self.updateJsonCols.__name__} failed. {e}')
+
+    
+    def updatePredictions(self):
+        """
+        Function to update predictions. E11 is to indicate if patient has or not T2D in window. From origin, those prediction
+        cols come from original diagnosis, then in some cases, physician do not registered E11, he registered E119. But some other cases
+        only a complication was registered as E11.2 and E11 was not mapped. 
+        """
+        try:
+            #..requeried variables
+            initial_predictions:int = self.data.columns.get_loc('e11')
+            yxCols:list[str] = list(self.data.columns[initial_predictions:])
+
+            #..clen of e11
+            self.data.loc[(self.data[self.data[yxCols].sum(axis=1)>0]).index, 'e11'] = 1
+            return logging.info(f'E11 diagnosis was cleaned')
+        except Exception as e:
+            raise logging.error(f'{self.updatePredictions.__name__} failed. {e}')
