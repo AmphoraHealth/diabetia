@@ -23,7 +23,7 @@ from libs.global_constants import DIAGNOSTIC
 
 # Constant definition
 IN_PATH = 'data/diabetia.csv'
-OUT_PATH = ''
+OUT_PATH_IMG = 'data/supplementary_material/visualizations'
 CONFIG_PATH = './conf/engineering_conf.json'
 
 
@@ -75,7 +75,7 @@ def generate_tsne_plot(data:pd.DataFrame, label:pd.Series):
     sns.scatterplot(X_embedded_df, x = 'x', y='y', hue = 'label', alpha = 0.6, palette= 'Set1').set(title=f"TSNE transformation plot of {definitions[DIAGNOSTIC].replace('type_2_diabetes_mellitus', 'DM2').replace('_',' ')}")
     sns.scatterplot(X_embedded_df[X_embedded_df['label'] == 1], x = 'x', y='y', color = '#377eb8', alpha = 0.5)
     plt.show()
-    plt.savefig(f'tsne_{DIAGNOSTIC}.png', dpi = 200)
+    plt.savefig(f'{OUT_PATH_IMG}/tsne_{DIAGNOSTIC}.png', dpi = 200)
 
 def main():
     logging.info('Reading data...')
