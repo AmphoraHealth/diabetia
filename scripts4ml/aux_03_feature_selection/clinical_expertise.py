@@ -4,7 +4,9 @@ import pandas as pd
 _features:list[str] = [
     'cs_sex',
     'age_at_wx',
+    'age_at_wx_ordinal',
     'age_at_e11',
+    'age_at_e11_ordinal',
     'years_since_dx',
     'bmi_value',
     'bmi_ordinal',
