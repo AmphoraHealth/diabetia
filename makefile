@@ -115,6 +115,10 @@ ph/04_model-%-logistic: data/ml_data/03_features-%.json scripts4ml/aux_04_model_
 	@echo "phony target $@"
 ph/04_model-%-mlpc: data/ml_data/03_features-%.json scripts4ml/aux_04_model_train/mlpc.py
 	@echo "phony target $@"
+ph/04_model-%-mlpc_256: data/ml_data/03_features-%.json scripts4ml/aux_04_model_train/mlpc_256.py
+	@echo "phony target $@"
+ph/04_model-%-mlpc_1024: data/ml_data/03_features-%.json scripts4ml/aux_04_model_train/mlpc_1024.py
+	@echo "phony target $@"
 ph/04_model-%-nearest_centroid: data/ml_data/03_features-%.json scripts4ml/aux_04_model_train/nearest_centroid.py
 	@echo "phony target $@"
 ph/04_model-%-passive_aggressive: data/ml_data/03_features-%.json scripts4ml/aux_04_model_train/passive_aggressive.py
@@ -128,6 +132,8 @@ ph/04_model-%-sgdc: data/ml_data/03_features-%.json scripts4ml/aux_04_model_trai
 ph/04_model-%-svc: data/ml_data/03_features-%.json scripts4ml/aux_04_model_train/svc.py
 	@echo "phony target $@"
 ph/04_model-%-xgboost: data/ml_data/03_features-%.json scripts4ml/aux_04_model_train/xgboost.py
+	@echo "phony target $@"
+ph/04_model-%-xgboost_1500: data/ml_data/03_features-%.json scripts4ml/aux_04_model_train/xgboost_1500.py
 	@echo "phony target $@"
 data/ml_data/04_model-%.pkl: ph/04_model-% scripts4ml/04_model_train.py .venv/bin/activate
 	source .venv/bin/activate; python3 scripts4ml/04_model_train.py $@
@@ -154,7 +160,7 @@ ph/sample_01-%: ph/sample_02-%-e112
 	@echo "phony target $@"
 ph/sample_02-%: ph/sample_03-%-diabetia
 	@echo "phony target $@"
-ph/sample_03-%: ph/sample_04-%-unbalanced
+ph/sample_03-%: ph/sample_04-%-undersampling ph/sample_04-%-unbalanced
 	@echo "phony target $@"
 ph/sample_04-%: ph/sample_05-%-yeo_johnson ph/sample_05-%-quantile_transform
 	@echo "phony target $@"
@@ -162,7 +168,7 @@ ph/sample_05-%: ph/sample_06-%-z_score
 	@echo "phony target $@"
 ph/sample_06-%: ph/sample_07-%-xi2 ph/sample_07-%-dummy
 	@echo "phony target $@"
-ph/sample_07-%: ph/sample_08-%-gaussian_nb ph/sample_08-%-bernoulli_nb ph/sample_08-%-nearest_centroid ph/sample_08-%-quadratic_discriminant ph/sample_08-%-extra_trees ph/sample_08-%-decision_tree ph/sample_08-%-mlpc ph/sample_08-%-sgdc ph/sample_08-%-passive_aggressive ph/sample_08-%-random_forest ph/sample_08-%-logistic ph/sample_08-%-xgboost ph/sample_08-%-knc
+ph/sample_07-%: ph/sample_08-%-gaussian_nb ph/sample_08-%-bernoulli_nb ph/sample_08-%-nearest_centroid ph/sample_08-%-quadratic_discriminant ph/sample_08-%-extra_trees ph/sample_08-%-decision_tree ph/sample_08-%-mlpc ph/sample_08-%-mlpc_1024 ph/sample_08-%-mlpc_256 ph/sample_08-%-sgdc ph/sample_08-%-passive_aggressive ph/sample_08-%-random_forest ph/sample_08-%-logistic ph/sample_08-%-xgboost ph/sample_08-%-xgboost_1500 ph/sample_08-%-knc
 	@echo "phony target $@"
 ph/sample_08-%: data/ml_data/06_score-%.csv
 	@echo "phony target $@"
@@ -174,24 +180,26 @@ ph/sample_08-%: data/ml_data/06_score-%.csv
 	@echo "phony target $@"
 data/ml_data/merged_07_global_score-%.csv: ph/full_01-%
 	source .venv/bin/activate; python3 scripts4ml/merge_07_global_score.py $@
+	source .venv/bin/activate; python3 scripts4ml/merge_table2.py
 	@echo "phony target $@"
 ph/full_01-%: ph/full_02-x-%
 	@echo "phony target $@"
 ph/full_02-%: ph/full_03-%-diabetia
 	@echo "phony target $@"
-ph/full_03-%: ph/full_04-%-unbalanced
+ph/full_03-%: ph/full_04-%-undersampling
 	@echo "phony target $@"
 ph/full_04-%: ph/full_05-%-yeo_johnson
 	@echo "phony target $@"
 ph/full_05-%: ph/full_06-%-z_score
 	@echo "phony target $@"
-ph/full_06-%: ph/full_07-%-xi2 ph/full_07-%-dummy
+ph/full_06-%: ph/full_07-%-dummy
 	@echo "phony target $@"
-ph/full_07-%: ph/full_08-%-bernoulli_nb ph/full_08-%-logistic ph/full_08-%-mlpc ph/full_08-%-xgboost
+ph/full_07-%: ph/full_08-%-gaussian_nb ph/full_08-%-logistic ph/full_08-%-mlpc ph/full_08-%-xgboost
 	@echo "phony target $@"
 ph/full_08-x-%: data/ml_data/07_global_score-x-%.csv
 	@echo "phony target $@"
 	source .venv/bin/activate; python3 scripts4ml/merge_07_global_score.py $@
+	source .venv/bin/activate; python3 scripts4ml/merge_table2.py
 
 # statistical analysis
 data/table_one/tbl1.csv data/table_one/tbl1.xlsx: data/diabetia.csv scripts2print/table_one/__tableOne__.py .venv/bin/activate
