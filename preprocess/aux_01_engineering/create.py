@@ -52,6 +52,46 @@ class CreateFunctions:
         except Exception as e:
             raise logging.error(f'{self.createAgeDx.__name__} failed. {e}')
 
+    def createAgeWxGroup(self):
+        """
+        Function to stablish categories for Age at window: 
+        18 - 44
+        45 - 64
+        65 >
+        """
+        try:
+            #..setting default vales
+            valueVar:str = 'age_at_wx'
+            labelVar:str = 'age_at_wx_label'
+            ordinalVar:str = 'age_at_wx_ordinal'
+            categories:dict = self.config['ageAtWxConfig']['categories']
+            dx_age_e11_index:int = self.data.columns.get_loc(valueVar)
+            self.data.insert(dx_age_e11_index+1,labelVar,np.nan)
+            self.data.insert(dx_age_e11_index+2,ordinalVar,np.nan)
+
+            #..create labels for variable
+            for cat,values in categories.items():
+                self.data.loc[
+                    (
+                        self.data[
+                                (self.data[valueVar]>=values[0]) &\
+                                (self.data[valueVar]<=values[1])
+                            ]
+                    ).index,
+                    labelVar
+                    ] = cat
+            
+            #..create ordinal var
+            categoriesMap:dict = {
+                    label:index for index,label in enumerate(categories.keys()) 
+                }
+            self.data[ordinalVar] = self.data[labelVar].map(categoriesMap)
+
+            logging.info(f'Age at window group added')
+
+        except Exception as e:
+            raise logging.error(f'{self.createAgeDxGroup.__name__} failed. {e}')
+        
 
     def createAgeDxGroup(self):
         """
@@ -62,19 +102,31 @@ class CreateFunctions:
         """
         try:
             #..setting default vales
+            valueVar:str = 'dx_age_e11'
+            labelVar:str = 'dx_age_e11_label'
+            ordinalVar:str = 'dx_age_e11_ordinal'
             categories:dict = self.config['ageAtDxConfig']['categories']
-            dx_age_e11_index:int = self.data.columns.get_loc('dx_age_e11')
-            self.data.insert(dx_age_e11_index+1,'dx_age_e11_cat',np.nan)
+            dx_age_e11_index:int = self.data.columns.get_loc(valueVar)
+            self.data.insert(dx_age_e11_index+1,labelVar,np.nan)
+            self.data.insert(dx_age_e11_index+2,ordinalVar,np.nan)
+
+            #..create labels for variable
             for cat,values in categories.items():
                 self.data.loc[
                     (
                         self.data[
-                                (self.data['dx_age_e11']>=values[0]) &\
-                                (self.data['dx_age_e11']<=values[1])
+                                (self.data[valueVar]>=values[0]) &\
+                                (self.data[valueVar]<=values[1])
                             ]
                     ).index,
-                    'dx_age_e11_cat'
+                    labelVar
                     ] = cat
+            
+            #..create ordinal var
+            categoriesMap:dict = {
+                    label:index for index, label in enumerate(categories.keys()) 
+                }
+            self.data[ordinalVar] = self.data[labelVar].map(categoriesMap)
 
             logging.info(f'Age at T2D Dx group added')
 
