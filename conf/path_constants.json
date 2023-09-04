@@ -35,7 +35,9 @@
     "relieff",
     "probabilistic",
     "mutual_info",
-    "dummy"
+    "dummy",
+    "clinical_expertise",
+    "demographics"
   ],
   "machine_learning_models": [
     "ada_boost",
