@@ -22,7 +22,7 @@ from libs.logging import logging
 # Constant definition
 IN_PATH = 'data/diabetia.csv'
 OUT_PATH_IMG = 'data/supplementary_material/visualizations'
-OUT_PATH_DATA = 'data/supplementary_material/data'
+OUT_PATH_DATA = 'data/supplementary_material/data_aux'
 CONFIG_PATH = './conf/engineering_conf.json'
 DIAGNOSTIC = sys.argv[1]
 
