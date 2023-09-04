@@ -35,7 +35,9 @@
     "relieff",
     "probabilistic",
     "mutual_info",
-    "dummy"
+    "dummy",
+    "clinical_expertise",
+    "demographics"
   ],
   "machine_learning_models": [
     "ada_boost",
@@ -47,13 +49,16 @@
     "knc",
     "logistic",
     "mlpc",
+    "mlpc_256",
+    "mlpc_1024",
     "nearest_centroid",
     "passive_aggressive",
     "quadratic_discriminant",
     "random_forest",
     "sgdc",
     "svc",
-    "xgboost"
+    "xgboost",
+    "xgboost_1500"
   ],
   "_order_in_pipeline": [
     "diagnostics",

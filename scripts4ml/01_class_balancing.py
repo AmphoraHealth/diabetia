@@ -45,6 +45,13 @@ logging.info(f"{'='*30} class balancing started")
 df = load_data(IN_PATH)
 fold_selection = load_data(FOLD_PATH)
 
+# get the list of valid ids not in the test fold
+folds = [fold_selection[str(i)]["ids"] for i in range(5) if str(i) != TEST_FOLD]
+ids = [item for sublist in folds for item in sublist]
+
+# filter the data to get only rows where the id is in the list
+df = df.loc[df["id"].isin(ids)]
+
 # balance the data
 df = aux.methods[BALANCING_METHOD](df, fold_selection, TEST_FOLD)
 
