@@ -96,7 +96,9 @@ class DataNormalization:
            'years_since_dx',
            'count_cx_w',
            'age_at_wx',
-           'dx_age_e11'
+           'age_at_wx_ordinal',
+           'dx_age_e11',
+           'dx_age_e11_ordinal'
            ]
         self.columnsToTransform = [col for col in self.columnsToTransform if col in self.data.columns]
         self.columnsToTransform = [col for col in self.columnsToTransform if bool(re.match('^.*_label$',str(col)))==False]

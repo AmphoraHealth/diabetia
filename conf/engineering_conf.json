@@ -40,6 +40,13 @@
             "65>":[65,120]
         }
     },
+    "ageAtWxConfig":{
+        "categories":{
+            "18-44":[18,44],
+            "45-64":[45,64],
+            "65>":[65,120]
+        }
+    },
     "categoricalMeasuresConfig":{
         "bmi":{
             "ranges":[

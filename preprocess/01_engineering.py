@@ -78,6 +78,7 @@ class DataEngineering(
 
           #..create functions
           self.createAgeDxGroup()
+          self.createAgeWxGroup()
           self.createYearSinceDx()
           self.createBmiCategory()
           self.createGlucoseCategory()
