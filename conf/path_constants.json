@@ -37,7 +37,10 @@
     "mutual_info",
     "dummy",
     "clinical_expertise",
-    "demographic"
+    "demographic",
+    "demographic_diagnoses",
+    "demographic_drugs",
+    "demographic_labs"
   ],
   "machine_learning_models": [
     "ada_boost",
