@@ -1,0 +1,48 @@
+{
+    "config_heatmap":{
+        "columns":{
+            "glucose_value":"Total glucose",
+            "creatinine_value":"GFR",
+            "bmi_value":"BMI",
+            "fn_ta_systolic_mean":"TAS",
+            "fn_ta_diastolic_mean":"TAD",
+            "in_heart_rate_mean":"Heart rate",
+            "in_respiratory_frequency_mean":"Respiratory frecuency",
+            "fn_temperature_mean":"Temperature",
+            "in_glucose_mean":"Glucose index",
+            "fn_fasting_glucose_mean":"Fasting glucose",
+            "fn_capillary_glucose_mean":"Capillary glucose",
+            "fn_hemoglobin_mean":"Hemoglobin Hb1aC",
+            "fn_triglycerides_mean":"Triglycerides",
+            "fn_right_foot_mean":"Diabetic right foot",
+            "fn_left_foot_mean":"Diabetic left foot",
+            "fn_ph_mean":"PH",
+            "fn_density_mean":"Density",
+            "fn_ego_mean":"General urine test",
+            "fn_urea_mean":"Urea",
+            "fn_glycemia_mean":"Glycemia",
+            "fn_aurico_mean":"Aurico",
+            "fn_creatinine_mean":"Creatinine",
+            "fn_ego_density_mean":"General urine test density",
+            "fn_cholesterol_mean":"Cholesterol"
+        }
+    },
+    "config_lineplot":{
+        "columns":{
+            "bmi_value":"BMI",
+            "glucose_value":"Glucose",
+            "hemoglobin_value":"Hemoglobin HbA1c",
+            "triglycerides_value":"Triglycerides",
+            "fn_creatinine_mean":"Creatinine",
+            "cholesterol_value":"Cholesterol"
+        },
+        "y_limits":{
+            "BMI": [15,40],
+            "Glucose": [75, 200],
+            "Hemoglobin HbA1c": [0,20],
+            "Triglycerides":[80,500],
+            "Creatinine":[0,1.5],
+            "Cholesterol": [150,300]
+        }
+    }
+}
