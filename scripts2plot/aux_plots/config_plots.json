@@ -2,7 +2,7 @@
     "config_heatmap":{
         "columns":{
             "glucose_value":"Total glucose",
-            "creatinine_value":"GFR",
+            "gfr_value":"GFR",
             "bmi_value":"BMI",
             "fn_ta_systolic_mean":"TAS",
             "fn_ta_diastolic_mean":"TAD",
@@ -12,7 +12,7 @@
             "in_glucose_mean":"Glucose index",
             "fn_fasting_glucose_mean":"Fasting glucose",
             "fn_capillary_glucose_mean":"Capillary glucose",
-            "fn_hemoglobin_mean":"Hemoglobin Hb1aC",
+            "fn_hemoglobin_mean":"Hemoglobin-A1c",
             "fn_triglycerides_mean":"Triglycerides",
             "fn_right_foot_mean":"Diabetic right foot",
             "fn_left_foot_mean":"Diabetic left foot",
@@ -31,7 +31,7 @@
         "columns":{
             "bmi_value":"BMI",
             "glucose_value":"Glucose",
-            "hemoglobin_value":"Hemoglobin HbA1c",
+            "hemoglobin_value":"Hemoglobin-A1c",
             "triglycerides_value":"Triglycerides",
             "fn_creatinine_mean":"Creatinine",
             "cholesterol_value":"Cholesterol"
@@ -39,10 +39,26 @@
         "y_limits":{
             "BMI": [15,40],
             "Glucose": [75, 200],
-            "Hemoglobin HbA1c": [0,20],
+            "Hemoglobin-A1c": [0,20],
             "Triglycerides":[80,500],
             "Creatinine":[0,1.5],
             "Cholesterol": [150,300]
         }
+    },
+    "config_tsne":{
+        "columns":[
+            "birthdate",
+            "cs_sex",
+            "diabetes_mellitus_type_2",
+            "essential_(primary)_hypertension",
+            "glucose_value",
+            "fn_left_foot_median",
+            "fn_right_foot_median",
+            "fn_hemoglobin_median",
+            "fn_cholesterol_median",
+            "fn_creatinine_median",
+            "albumin",
+            "glucose"
+        ]
     }
 }

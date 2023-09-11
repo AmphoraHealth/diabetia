@@ -47,6 +47,6 @@ def run():
         raise logging.error(f'Slope lineplot process failed. {e}')
 
 if __name__=='__main__':  
-    logging.info(f'{"="*32} SLOPE LINEPLOT IN PROCESS')
+    logging.info(f'{"="*32} SLOPE HEATMAP IN PROCESS')
     run()
-    logging.info(f'{"="*32} SLOPE LINEPLOT IN FINISHED')
+    logging.info(f'{"="*32} SLOPE HEATMAP IN FINISHED')
