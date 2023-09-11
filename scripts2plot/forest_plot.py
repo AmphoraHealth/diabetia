@@ -25,6 +25,7 @@ OUT_PATH_IMG = 'data/supplementary_material/visualizations'
 OUT_PATH_DATA = 'data/supplementary_material/data_aux'
 CONFIG_PATH = './conf/engineering_conf.json'
 DIAGNOSTIC = sys.argv[1]
+DIAGNOSTIC = DIAGNOSTIC.lower()
 
 
 #Libraries
@@ -34,22 +35,28 @@ import matplotlib.pyplot as plt
 from scipy.stats.contingency import relative_risk
 from scipy.stats.contingency import odds_ratio
 import json
-import sys
 import warnings
 
 #Default config
 warnings.filterwarnings("ignore")
+complications = {'e112':'Renal complications', 'e113':'Ophthalmic complications', 'e114':'Neurological complications', 'e115':'Circulatory complications'}
 definitions = json.load(open(f'{CONFIG_PATH}', 'r', encoding='UTF-8'))['config']['diagnosis']
 
 
 #Functions
-def read_data(file:str) -> pd.DataFrame:
+def read_data(file:str, all_ = True) -> pd.DataFrame:
     """
     Function to read data
     """
     data = pd.read_csv(file, low_memory = True, index_col = 0)
-    X_data = data.iloc[:, :-5]
-    y_data = data.iloc[:, -5:]
+    if all_:
+        X_data = data.iloc[:, :-5]
+        y_data = data.iloc[:, -5:]
+    else:
+        data = data[data['diabetes_mellitus_type_2']==1]
+        X_data = data.iloc[:, :-5]
+        y_data = data.iloc[:, -5:]
+
     return X_data, y_data
 
 def get_binary_features(data:pd.DataFrame) -> pd.DataFrame:
@@ -67,10 +74,13 @@ def get_binary_features(data:pd.DataFrame) -> pd.DataFrame:
             else: 
                 data[c] = data[c].astype(int).astype(str)
                 ordinal_feats.append(c)
+        elif 'slope' in c:
+            data[c + '_binary'] = [0 if x < 0 else 1 for x in data[c]]
+            binary_feats.append(c + '_binary')
 
     one_hot_variables = pd.get_dummies(data[ordinal_feats], drop_first = False)
     complete_set = pd.concat([data[binary_feats], one_hot_variables], axis = 1)
-    complete_set.columns = [x.replace('_', ' ') for x in complete_set.columns]
+    complete_set.columns = [x.replace('_', ' ').replace('ordinal', '').replace('label', '').replace('binary', '') for x in complete_set.columns]
 
     return complete_set
 
@@ -78,26 +88,30 @@ def get_relative_risk(X_data:pd.DataFrame, y_data:pd.Series) -> pd.DataFrame:
     """
     Function to calculate relative risk by feature
     """
-    effect, lower_int, upper_int = [], [], []
+    variable, effect, lower_int, upper_int = [], [], [], []
     X_data['label'] = list(y_data)
     for c in X_data.columns[:-1]:
-        controlled = X_data[X_data[c] == 0]
-        controlled_total = len(controlled)
-        controlled_cases = len(controlled[controlled['label'] == 1])
-        
-        experimental = X_data[X_data[c] == 1]
-        experimental_total = len(experimental)
-        experimental_cases = len(experimental[experimental['label'] == 1])
+        try:
+            controlled = X_data[X_data[c] == 0]
+            controlled_total = len(controlled)
+            controlled_cases = len(controlled[controlled['label'] == 1])
+            
+            experimental = X_data[X_data[c] == 1]
+            experimental_total = len(experimental)
+            experimental_cases = len(experimental[experimental['label'] == 1])
 
-        rr = relative_risk(experimental_cases, experimental_total,controlled_cases, controlled_total)
-        interval = rr.confidence_interval(confidence_level=0.95)
+            rr = relative_risk(experimental_cases, experimental_total,controlled_cases, controlled_total)
+            interval = rr.confidence_interval(confidence_level=0.95)
 
-        effect.append(rr.relative_risk)
-        lower_int.append(interval.low)
-        upper_int.append(interval.high)
+            effect.append(rr.relative_risk)
+            lower_int.append(interval.low)
+            upper_int.append(interval.high)
+            variable.append(c)
+        except:
+            pass
 
     X_data.drop('label', axis = 1, inplace = True)
-    rr_df = pd.DataFrame(zip(X_data.columns[:-1], effect, lower_int, upper_int), columns = ['Variable', 'RelativeRisk', 'Lower', 'Upper'])
+    rr_df = pd.DataFrame(zip(variable, effect, lower_int, upper_int), columns = ['Variable', 'RelativeRisk', 'Lower', 'Upper'])
     return rr_df
 
 def get_odds_ratio(X_data:pd.DataFrame, y_data:pd.Series) -> pd.DataFrame:
@@ -146,9 +160,9 @@ def forest_plot(df:pd.DataFrame, variables:str, effect:str, low:str, high:str, p
     plt.axvline(x=reference_value, color='red', linestyle='--', label='Reference', alpha = 0.6)
 
     plt.yticks(np.arange(len(df)), list(df[variables]))
-    plt.xlabel(f'{effect}', fontsize=18)
-    plt.ylabel('Variables', fontsize=18)
-    plt.title(f'Forest Plot of {effect}', fontsize=20)
+    plt.xlabel(f'{effect}', fontsize=20)
+    plt.ylabel('Variables', fontsize=20)
+    plt.title(f'Forest Plot of {effect} for {complications[DIAGNOSTIC]}', fontsize=25)
     plt.legend()
     plt.grid(axis='x', linestyle='--', alpha=0.8)
     plt.grid(axis='y', linestyle='--', alpha=0.8)
@@ -161,7 +175,7 @@ def forest_plot(df:pd.DataFrame, variables:str, effect:str, low:str, high:str, p
 
 def main():
     logging.info('Reading data...')
-    X_data, y_data = read_data(f'{IN_PATH}')
+    X_data, y_data = read_data(f'{IN_PATH}', all_ = False)
     X_data = get_binary_features(X_data)
 
     logging.info(f"Calculating Relative Risk of {definitions[DIAGNOSTIC].replace('type_2_diabetes_mellitus', 'DM2').replace('_',' ')} for {len(X_data.columns)} variables...")
@@ -174,8 +188,8 @@ def main():
     or_df.to_csv(f'{OUT_PATH_DATA}/OddsRatio_{DIAGNOSTIC}.csv', index = False)
 
     logging.info('Generating forest plots...')
-    forest_plot(rr_df[rr_df['RelativeRisk'] > 0], 'Variable', 'RelativeRisk', 'Lower', 'Upper', f'RelativeRiskFp_{DIAGNOSTIC}', logscale = True, figsize = (21,27))
-    forest_plot(or_df[or_df['OddsRatio'] > 0], 'Variable', 'OddsRatio', 'Lower', 'Upper', f'OddsRatioFp_{DIAGNOSTIC}', logscale = True, figsize = (21,27))
+    forest_plot(rr_df[(rr_df['RelativeRisk'] > 0) & (rr_df['RelativeRisk'] < float('inf'))], 'Variable', 'RelativeRisk', 'Lower', 'Upper', f'RelativeRiskFp_{DIAGNOSTIC}', logscale = True, figsize = (21,38))
+    forest_plot(or_df[(or_df['OddsRatio'] > 0) & (or_df['OddsRatio'] < float('inf'))], 'Variable', 'OddsRatio', 'Lower', 'Upper', f'OddsRatioFp_{DIAGNOSTIC}', logscale = True, figsize = (21,38))
 
 
 if __name__ == "__main__":
