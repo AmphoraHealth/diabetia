@@ -51,12 +51,13 @@
             "cs_sex",
             "diabetes_mellitus_type_2",
             "essential_(primary)_hypertension",
+            "bmi_value",
             "glucose_value",
-            "fn_left_foot_median",
-            "fn_right_foot_median",
-            "fn_hemoglobin_median",
-            "fn_cholesterol_median",
-            "fn_creatinine_median",
+            "fn_left_foot_mean",
+            "fn_right_foot_mean",
+            "fn_hemoglobin_mean",
+            "fn_cholesterol_mean",
+            "fn_creatinine_mean",
             "albumin",
             "glucose"
         ]
