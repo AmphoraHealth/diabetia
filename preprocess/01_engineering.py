@@ -84,7 +84,7 @@ class DataEngineering(
           self.createGlucoseCategory()
           self.createHemoglobinCategory()
           self.createTriglyceridesCategory()
-          self.createCreatinineCategory()
+          self.createGFRCategory()
           self.createCholesterolCategory()
           self.createDiabeticFoot()
           self.categoricalCols()

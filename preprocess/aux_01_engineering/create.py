@@ -292,15 +292,15 @@ class CreateFunctions:
             raise logging.error(f'{self.createDiabeticFootCategory.__name__} failed. {e}')
         
 
-    def createCreatinineCategory(self):
+    def createGFRCategory(self):
         try:
             #..default vars
-            ranges:list[int] = self.config['categoricalMeasuresConfig']['creatinine']['ranges']
-            labels:list[int] = self.config['categoricalMeasuresConfig']['creatinine']['labels']
-            targetCols:str = self.config['categoricalMeasuresConfig']['creatinine']['targetCols']
-            eGFR_Factors:dict = self.config['categoricalMeasuresConfig']['creatinine']['factors']
-            valueColName:str = self.config['categoricalMeasuresConfig']["creatinine"]['valueCol']
-            labelColName:str = self.config['categoricalMeasuresConfig']["creatinine"]['labelCol']
+            ranges:list[int] = self.config['categoricalMeasuresConfig']['GFR']['ranges']
+            labels:list[int] = self.config['categoricalMeasuresConfig']['GFR']['labels']
+            targetCols:str = self.config['categoricalMeasuresConfig']['GFR']['targetCols']
+            eGFR_Factors:dict = self.config['categoricalMeasuresConfig']['GFR']['factors']
+            valueColName:str = self.config['categoricalMeasuresConfig']["GFR"]['valueCol']
+            labelColName:str = self.config['categoricalMeasuresConfig']["GFR"]['labelCol']
 
             #..create new cols
             col_index:int = self.data.columns.get_loc(targetCols[0])
@@ -332,9 +332,9 @@ class CreateFunctions:
                 right = False
                 )
 
-            logging.info('Creatinine categorical col created')
+            logging.info('GFR categorical col created')
         except Exception as e:
-            raise logging.error(f'{self.createCreatinineCategory.__name__} failed. {e}')
+            raise logging.error(f'{self.createGFRCategory.__name__} failed. {e}')
         
 
     def createCholesterolCategory(self):
