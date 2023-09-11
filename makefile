@@ -99,6 +99,12 @@ ph/03_features-%-clinical_expertise: data/ml_data/02b_scaled-%.parquet scripts4m
 	@echo "phony target $@"
 ph/03_features-%-demographic: data/ml_data/02b_scaled-%.parquet scripts4ml/aux_03_feature_selection/demographic.py
 	@echo "phony target $@"
+ph/03_features-%-demographic_labs: data/ml_data/02b_scaled-%.parquet scripts4ml/aux_03_feature_selection/demographic_labs.py
+	@echo "phony target $@"
+ph/03_features-%-demographic_diagnoses: data/ml_data/02b_scaled-%.parquet scripts4ml/aux_03_feature_selection/demographic_diagnoses.py
+	@echo "phony target $@"
+ph/03_features-%-demographic_drugs: data/ml_data/02b_scaled-%.parquet scripts4ml/aux_03_feature_selection/demographic_drugs.py
+	@echo "phony target $@"
 data/ml_data/03_features-%.json: ph/03_features-% scripts4ml/03_feature_selection.py .venv/bin/activate
 	source .venv/bin/activate; python3 scripts4ml/03_feature_selection.py $@
 	test -f $@
@@ -196,7 +202,7 @@ ph/full_04-%: ph/full_05-%-yeo_johnson
 	@echo "phony target $@"
 ph/full_05-%: ph/full_06-%-z_score
 	@echo "phony target $@"
-ph/full_06-%: ph/full_07-%-dummy ph/full_07-%-demographic ph/full_07-%-clinical_expertise
+ph/full_06-%: ph/full_07-%-dummy ph/full_07-%-demographic_labs  ph/full_07-%-demographic_drugs ph/full_07-%-demographic_diagnoses ph/full_07-%-clinical_expertise
 	@echo "phony target $@"
 ph/full_07-%: ph/full_08-%-gaussian_nb ph/full_08-%-logistic ph/full_08-%-mlpc ph/full_08-%-xgboost
 	@echo "phony target $@"

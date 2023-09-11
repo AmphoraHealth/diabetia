@@ -7,12 +7,12 @@ IN_PATHS = glob(f"data/ml_data/merged_07_global_score-x-*.csv")
 # prepare each file
 files = [pd.read_csv(IN_PATH) for IN_PATH in IN_PATHS]
 for index, df in enumerate(files):
-  # keep only code and roc
-  df = df[["code", "roc"]]
   # determine the diagnostic from the file name
   diagnostic = IN_PATHS[index].split("-")[2].split(".")[0]
   # rename the roc column to the diagnostic
-  df.rename(columns={"roc": diagnostic}, inplace=True)
+  df[diagnostic] = df["roc"]
+  # keep only code and 'diagnostic'
+  df = df[["code", diagnostic]]
   # round the roc to 2 decimals
   df[diagnostic] = df[diagnostic].apply(lambda x: round(x, 2))
   # remove the diagnostic from the code
@@ -66,6 +66,7 @@ df.sort_values(by=["0_ord", "1_ord", "2_ord"], inplace=True)
 
 # get the columns in the correct order
 cols = ["code", "e112", "e113", "e114", "e115"]
+cols = [col for col in cols if col in df.columns]
 df = df[cols]
 
 # save the file
