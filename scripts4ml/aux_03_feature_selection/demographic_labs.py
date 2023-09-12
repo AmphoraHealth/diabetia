@@ -1,15 +1,8 @@
 import pandas as pd
 
 _features:list[str] = [
-  "birthdate",
   "years_since_dx",
   "cs_sex",
-  "hgz_con_mf_no_12",
-  "hgz_con_mf_no_2",
-  "umf_no_75",
-  "umf_no_76",
-  "umf_no_77",
-  "umf_no_80",
   "count_cx_w",
   "age_at_wx",
   "age_at_wx_ordinal",
@@ -90,8 +83,8 @@ _features:list[str] = [
   "fn_aurico_std",
   "fn_aurico_slope",
   "fn_creatinine_mean",
-  "creatinine_value",
-  "creatinine_ordinal",
+  "gfr_value",
+  "gfr_ordinal",
   "fn_creatinine_median",
   "fn_creatinine_max",
   "fn_creatinine_min",
