@@ -36,6 +36,7 @@ from scipy.stats.contingency import relative_risk
 from scipy.stats.contingency import odds_ratio
 import json
 import warnings
+import re
 
 #Default config
 warnings.filterwarnings("ignore")
@@ -59,28 +60,55 @@ def read_data(file:str, all_ = True) -> pd.DataFrame:
 
     return X_data, y_data
 
+def process_string(input_string: str) -> str:
+    processed_string = re.sub(r'^(fn_|cs_|in_)', '', input_string)
+    processed_string = processed_string.replace('_', ' ')
+    processed_string = re.sub(r'\b(label|binary|ordinal)\b', '', processed_string)
+    return processed_string
+
 def get_binary_features(data:pd.DataFrame) -> pd.DataFrame:
     """
     Function to return a subset of binary variables from the dataset
     """
     binary_feats = []
     ordinal_feats = []
-    for c in data.columns:
-        if len(data[c].unique()) == 2:
-            binary_feats.append(c)
-        elif 'ordinal' in c:
-            if c.replace('ordinal', 'label') in data.columns:
-                ordinal_feats.append(c.replace('ordinal', 'label'))
-            else: 
-                data[c] = data[c].astype(int).astype(str)
-                ordinal_feats.append(c)
-        elif 'slope' in c:
-            data[c + '_binary'] = [0 if x < 0 else 1 for x in data[c]]
-            binary_feats.append(c + '_binary')
+    not_consider_variables = [
+        'diabetes_mellitus_type_2', 
+        'type_2_diabetes_mellitus_without_mention_of_complication', 
+        'endocrine_nutritional_and_metabolic_diseases', 
+        'type_2_diabetes_mellitus_with_other_specified_complications', 
+        'type_2_diabetes_mellitus_with_multiple_complications', 
+        'type_2_diabetes_mellitus_with_ophthalmic_complications',
+        'type_2_diabetes_mellitus_with_peripheral_circulatory_complications',
+        'type_2_diabetes_mellitus_with_unspecified_complications',
+        'type_2_diabetes_mellitus_with_renal_complications',
+        'type_2_diabetes_mellitus_with_neurological_complications', 
+        'others', 
+        'diabetes_mellitus_unspecified', 
+        'other_specified_diabetes_mellitus'
+    ]
 
+    for c in data.columns:
+        if c in not_consider_variables or 'umf' in c or 'hgz' in c:
+            continue
+        else:
+            if len(data[c].unique()) == 2:
+                binary_feats.append(c)
+            elif 'ordinal' in c:
+                if c.replace('ordinal', 'label') in data.columns:
+                    ordinal_feats.append(c.replace('ordinal', 'label'))
+                else: 
+                    data[c] = data[c].astype(int).astype(str)
+                    ordinal_feats.append(c)
+            elif 'slope' in c:
+                data[c + '_positive'] = [1 if x > 0 else 0 for x in data[c]]
+                data[c + '_negative'] = [1 if x < 0 else 0 for x in data[c]]
+                # data[c + '_binary'] = [0 if x < 0 else 1 for x in data[c]]
+                binary_feats.append(c + '_positive')
+                binary_feats.append(c + '_negative')
     one_hot_variables = pd.get_dummies(data[ordinal_feats], drop_first = False)
     complete_set = pd.concat([data[binary_feats], one_hot_variables], axis = 1)
-    complete_set.columns = [x.replace('_', ' ').replace('ordinal', '').replace('label', '').replace('binary', '') for x in complete_set.columns]
+    complete_set.columns = [process_string(x) for x in complete_set.columns]
 
     return complete_set
 
@@ -175,7 +203,7 @@ def forest_plot(df:pd.DataFrame, variables:str, effect:str, low:str, high:str, p
 
 def main():
     logging.info('Reading data...')
-    X_data, y_data = read_data(f'{IN_PATH}', all_ = False)
+    X_data, y_data = read_data(f'{IN_PATH}', all_ = True)
     X_data = get_binary_features(X_data)
 
     logging.info(f"Calculating Relative Risk of {definitions[DIAGNOSTIC].replace('type_2_diabetes_mellitus', 'DM2').replace('_',' ')} for {len(X_data.columns)} variables...")
