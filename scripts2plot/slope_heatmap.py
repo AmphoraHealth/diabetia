@@ -33,6 +33,8 @@ CONFIG_PATH = './scripts2plot/aux_plots/config_plots.json'
 # Global variables
 config:dict = json.load(open(CONFIG_PATH, 'r', encoding='utf-8'))
 _lx_measures:dict[str:str] = config['config_heatmap']['columns']
+_groups:list[str] = config['config_heatmap']['groups']
+_categories:dict[float:str] = config['config_heatmap']['categories']
 
 def run():
     try:
@@ -40,7 +42,12 @@ def run():
         data = pd.read_csv(IN_PATH, low_memory=False, nrows=None)
 
         #..Do plot
-        make_heatmap = MakeHeatmap(data=data, columns=_lx_measures)
+        make_heatmap = MakeHeatmap(
+            data=data,
+            columns=_lx_measures,
+            groups=_groups,
+            categories=_categories
+        )
         make_heatmap.create_plot()
 
     except Exception as e:
