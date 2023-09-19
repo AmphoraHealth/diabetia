@@ -17,15 +17,10 @@ OUT_PATH = './data/supplementary_material/visualizations/'
 # Import libraries
 import pandas as pd
 import numpy as np
-import re
 import os
-import json
 import sys
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn import preprocessing
-from sklearn.linear_model import LinearRegression
-from alive_progress import alive_bar
 
 
 ROOT_PATH = os.path.abspath(
