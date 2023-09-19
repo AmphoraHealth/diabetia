@@ -25,24 +25,68 @@
             "fn_creatinine_mean":"Creatinine",
             "fn_ego_density_mean":"General urine test density",
             "fn_cholesterol_mean":"Cholesterol"
+        },
+        "groups":[
+            "e112",
+            "e113",
+            "e114",
+            "e115"
+        ],
+        "categories":{
+                "0.0":"No complications",
+                "1.0":"Novo complications",
+                "2.0":"Existing complications"
         }
     },
     "config_lineplot":{
         "columns":{
-            "bmi_value":"BMI",
-            "glucose_value":"Glucose",
-            "hemoglobin_value":"Hemoglobin-A1c",
-            "triglycerides_value":"Triglycerides",
-            "fn_creatinine_mean":"Creatinine",
-            "cholesterol_value":"Cholesterol"
+            "bmi_value":"BMI (kg/m2)",
+            "glucose_value":"Glucose (mg/dL)",
+            "hemoglobin_value":"Hemoglobin-A1c (g/dL)",
+            "triglycerides_value":"Triglycerides (mg/dL)",
+            "fn_creatinine_mean":"Creatinine (mg/dL)",
+            "cholesterol_value":"Cholesterol (mg/dL)"
         },
         "y_limits":{
-            "BMI": [15,40],
-            "Glucose": [75, 200],
-            "Hemoglobin-A1c": [0,20],
-            "Triglycerides":[80,500],
-            "Creatinine":[0,1.5],
-            "Cholesterol": [150,300]
+            "BMI (kg/m2)": [26,32],
+            "Glucose (mg/dL)": [100, 170],
+            "Hemoglobin-A1c (g/dL)": [5,18],
+            "Triglycerides (mg/dL)":[150,300],
+            "Creatinine (mg/dL)":[0.5,2.5],
+            "Cholesterol (mg/dL)": [150,250]
+        },
+        "groups":[
+            "e112",
+            "e113",
+            "e114",
+            "e115"
+        ],
+        "categories":{
+            "0.0":"No complications",
+            "1.0":"Novo complications",
+            "2.0":"Existing complications"
+        },
+        "palette":{
+            "e112":{
+                "No complications":"#95A5A6",
+                "Novo complications":"#E74C3C",
+                "Existing complications":"#FFA07A"
+            },
+            "e113":{
+                "No complications":"#95A5A6",
+                "Novo complications":"#3498DB",
+                "Existing complications":"#ADD8E6"
+            },
+            "e114":{
+                "No complications":"#95A5A6",
+                "Novo complications":"#2ECC71",
+                "Existing complications":"#98FB98"
+            },
+            "e115":{
+                "No complications":"#95A5A6",
+                "Novo complications":"#FF5733",
+                "Existing complications":"#8B4513"
+            }
         }
     },
     "config_tsne":{
