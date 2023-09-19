@@ -27,7 +27,6 @@ from scripts2plot.aux_plots import MakeHeatmap
 
 # Constants
 IN_PATH = './data/diabetia.csv'
-OUT_PATH = './data/visualizations/diabetia_lineplot.png'
 CONFIG_PATH = './scripts2plot/aux_plots/config_plots.json'
 
 # Global variables
@@ -51,7 +50,7 @@ def run():
         make_heatmap.create_plot()
 
     except Exception as e:
-        raise logging.error(f'Slope lineplot process failed. {e}')
+        raise logging.error(f'Slope heatmap process failed. {e}')
 
 if __name__=='__main__':  
     logging.info(f'{"="*32} SLOPE HEATMAP IN PROCESS')

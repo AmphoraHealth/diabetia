@@ -16,13 +16,9 @@ CONFIG_PATH = './conf/engineering_conf.json'
 # Import libraries
 import pandas as pd
 import numpy as np
-import re
 import os
-import json
 import sys
-from sklearn import preprocessing
 from sklearn.linear_model import LinearRegression
-from alive_progress import alive_bar
 
 ROOT_PATH = os.path.abspath(
     os.path.join(
