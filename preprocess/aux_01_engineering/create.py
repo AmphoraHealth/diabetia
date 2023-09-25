@@ -364,6 +364,42 @@ class CreateFunctions:
             raise logging.error(f'{self.createCholesterolCategory.__name__} failed. {e}')
         
 
+    def createCreatinineCategory(self):
+        try:
+            #..default vars
+            ranges_f:list[int] = self.config['categoricalMeasuresConfig']['creatinine']['ranges']['F']
+            ranges_m:list[int] = self.config['categoricalMeasuresConfig']['creatinine']['ranges']['M']
+            labels:list[int] = self.config['categoricalMeasuresConfig']['creatinine']['labels']
+            targetCols:str = self.config['categoricalMeasuresConfig']['creatinine']['targetCols']
+            valueColName:str = self.config['categoricalMeasuresConfig']["creatinine"]['valueCol']
+            labelColName:str = self.config['categoricalMeasuresConfig']["creatinine"]['labelCol']
+
+            #..create new cols
+            col_index:int = self.data.columns.get_loc(targetCols[0])
+            self.data.insert(col_index,valueColName, self.data[targetCols[0]])
+            self.data.insert(col_index+1,labelColName, np.nan)
+
+            #..Build label var for female
+            self.data.loc[self.data['cs_sex']=='F',labelColName] = pd.cut(
+                self.data.loc[self.data['cs_sex']=='F',valueColName],
+                bins = ranges_f,
+                labels = labels,
+                right = False
+                )
+            
+            #..Build label var for male
+            self.data.loc[self.data['cs_sex']=='M',labelColName] = pd.cut(
+                self.data.loc[self.data['cs_sex']=='M',valueColName],
+                bins = ranges_m,
+                labels = labels,
+                right = False
+                )
+
+            logging.info('Creatinine categorical col created')
+        except Exception as e:
+            raise logging.error(f'{self.createCreatinineCategory.__name__} failed. {e}')
+        
+
     def createDiabeticFoot(self):
         """
         Funtion to create an ordinal and rounded. This column only is rounded to up,
