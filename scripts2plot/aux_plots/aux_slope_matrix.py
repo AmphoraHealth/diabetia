@@ -16,13 +16,9 @@ CONFIG_PATH = './conf/engineering_conf.json'
 # Import libraries
 import pandas as pd
 import numpy as np
-import re
 import os
-import json
 import sys
-from sklearn import preprocessing
 from sklearn.linear_model import LinearRegression
-from alive_progress import alive_bar
 
 ROOT_PATH = os.path.abspath(
     os.path.join(
@@ -45,12 +41,13 @@ class SlopeDatabaseConstructor:
             self,
             data:pd.DataFrame,
             columns:dict[str:str],
+            groups:list[str],
             config_path:str = CONFIG_PATH
     ):
         self.data = data
         self.columns = columns
+        self.groups = groups
         self.config_path = CONFIG_PATH
-        self.config = json.load(open(self.config_path, 'r',encoding='utf-8'))
 
 
     def fit_transform(self):
@@ -58,7 +55,10 @@ class SlopeDatabaseConstructor:
         Function to transform data from diabetia.csv into a new dataframe. It is required to give a 
         columns dictionary as an input, with original name as key and a formatted name as item. The data
         is grouped by:
-            - age label
+            - T2D Complication group
+                0: 0-0
+                1: 0-1
+                2: 0-2
             - measure
         And columns are:
             - windows
@@ -98,8 +98,44 @@ class SlopeDatabaseConstructor:
 
             return np.nan,np.nan
         
-        
     def _transform(self) -> pd.DataFrame:
+        """
+        Function to transform and give 
+        """
+        try:
+            #..validate self.groups list
+            assert len(self.groups)>0, 'Categories to group by are missing'
+
+            #..initialize final df
+            data:pd.DataFrame = pd.DataFrame()
+
+            #..do category by category
+            for category in self.groups:
+                new_data = self._summarize(group = category)
+                data = pd.concat(
+                    [data, new_data],
+                    axis=0,
+                    ignore_index = True
+                )
+            data.reset_index(drop=True, inplace=True)
+        
+            #..replace categories for string values
+            data.replace(
+                to_replace={
+                    'categories':{
+                        0.0:'No complications',
+                        1.0:'Novo complications',
+                        2.0:'Existing complications'
+                    }
+                },
+                inplace = True
+            )
+            return data
+
+        except Exception as e:
+            raise logging.error(f'{self._transform.__name__} failed. {e}')
+        
+    def _summarize(self, group:str) -> pd.DataFrame:
         """
         Function to preprocess data from diabetia.csv
         """
@@ -114,30 +150,33 @@ class SlopeDatabaseConstructor:
             data['window'] = data['window'].astype('int64')
 
             #..filter columns required
-            data = data[
-                    ['window','age_at_wx_label','age_at_wx_ordinal']\
+            data = (
+                data[
+                    ['window',group]\
                     +list(self.columns.keys())
                 ]
-
+                .rename(columns={group:'categories'})
+                )
+            data.insert(1,'group_name',group)
+        
             #..Get new dataframe with data summarized by age label, measure and columns are now windows
-            data[[col for col in data.columns if col != 'age_at_wx_ordinal']] = data[[col for col in data.columns if col != 'age_at_wx_ordinal']].replace(0,np.nan)
-            data = pd.melt(data,id_vars=['age_at_wx_label','age_at_wx_ordinal','window'])
+            data[[col for col in data.columns if col != 'categories']] = data[[col for col in data.columns if col != 'categories']].replace(0,np.nan)
+            data = pd.melt(data,id_vars=['group_name','categories','window'])
             data = pd.pivot_table(
                 data,
-                index = ['age_at_wx_label','age_at_wx_ordinal','variable'],
+                index = ['group_name','categories','variable'],
                 columns = 'window',
                 aggfunc = 'mean'
                 ).reset_index()
-            data.columns = ['age_at_wx_label','age_at_wx_ordinal','concept_name']+[col[1] for col in data.columns if col[1]!='']
-            data[[col for col in data.columns if col != 'age_at_wx_ordinal']] = data[[col for col in data.columns if col != 'age_at_wx_ordinal']].replace(0,np.nan)
+            data.columns = ['group_name','categories','concept_name']+[col[1] for col in data.columns if col[1]!='']
+            data[[col for col in data.columns if col != 'categories']] = data[[col for col in data.columns if col != 'categories']].replace(0,np.nan)
 
             #..calculate slope
             if 15 in data.columns:
                 data.drop(columns = 15, inplace=True)
             data[['m','b']] = data.iloc[:,3:].apply(lambda x: self._calculateSlope(list(x)),axis=1, result_type='expand')
             
-            
-            logging.info('Data transformed')
+            logging.info(f'Data transformed for group: {group}')
             return data
         except Exception as e:
-            raise logging.error(f'{self._transform.__name__} failed. {e}')
+            raise logging.error(f'{self._summarize.__name__} failed. {e}')
