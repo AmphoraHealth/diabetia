@@ -2,19 +2,19 @@ from sklearn.feature_selection import chi2
 import pandas as pd
 
 _features:list[str] = [
+    'years_since_dx',
     'cs_sex',
     'age_at_wx',
     'age_at_wx_ordinal',
     'dx_age_e11',
     'dx_age_e11_ordinal',
-    'years_since_dx',
     'bmi_value',
     'bmi_ordinal',
     'diabetes_mellitus_type_2',
     'essential_(primary)_hypertension',
     'disorders_of_lipoprotein_metabolism_and_other_lipidemias',
-    'creatinine_value',
-    'creatinine_ordinal',
+    'gfr_value',
+    'gfr_ordinal',
     'glucose_value',
     'glucose_ordinal',
     'hemoglobin_value',
