@@ -22,11 +22,7 @@ _features:list[str] = [
     'triglycerides_value',
     'triglycerides_ordinal',
     'cholesterol_value',
-    'cholesterol_ordinal',
-    'type_2_diabetes_mellitus_with_renal_complications',
-    'type_2_diabetes_mellitus_with_ophthalmic_complications',
-    'type_2_diabetes_mellitus_with_neurological_complications',
-    'type_2_diabetes_mellitus_with_peripheral_circulatory_complications'
+    'cholesterol_ordinal'
 ]
 
 class ClinicalExpertise:
