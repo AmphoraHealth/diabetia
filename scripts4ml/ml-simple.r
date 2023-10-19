@@ -44,14 +44,14 @@ predicted_values <- data$predicted
 
 # Calculate the AUC using the roc() function from the pROC package
 roc_obj1 <- roc(actual_values, predicted_values)
-ci <- ci.auc(roc_obj1, method = "bootstrap", conf.level = 0.95)
+#ci <- ci.auc(roc_obj1, method = "bootstrap", conf.level = 0.95)
 
 # Calculate Brier skill score
 brier_skill_score <- verify(actual_values, predicted_values)$ss
 
 # Print the AUC value
 cat("AUC:", auc(roc_obj1), "\n")
-cat("95% Confidence Interval:", ci[1], "to", ci[2], "\n")
+#cat("95% Confidence Interval:", ci[1], "to", ci[2], "\n")
 cat("Brier Skill Score:", brier_skill_score, "\n")
 
 # Plot the ROC curve (optional)
@@ -78,7 +78,7 @@ predicted_values <- data$predicted
 
 # Calculate the AUC using the roc() function from the pROC package
 roc_obj2 <- roc(actual_values, predicted_values)
-ci <- ci.auc(roc_obj2, method = "bootstrap", conf.level = 0.95)
+ci <- ci.auc(roc_obj2, method = "delong", conf.level = 0.95)
 
 # Calculate Brier skill score
 brier_skill_score <- verify(actual_values, predicted_values)$ss
