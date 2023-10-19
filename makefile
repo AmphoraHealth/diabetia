@@ -10,7 +10,7 @@ clean:
 	rm -rf data/ml_data/fold_used-*
 	rm -rf data/ml_data/prebalanced-*
 
-test: data/ml_data/07_global_score-x-e112-diabetia-unbalanced-yeo_johnson-z_score-xi2-ada_boost.csv
+test: data/ml_data/07_global_score-x-e112-diabetia-unbalanced-yeo_johnson-z_score-xi2-logistic.csv
 testing: data/ml_data/01_balanced-1-e112-diabetia-unbalanced.csv
 
 clean-test: clean test
@@ -202,14 +202,15 @@ ph/full_04-%: ph/full_05-%-yeo_johnson
 	@echo "phony target $@"
 ph/full_05-%: ph/full_06-%-z_score
 	@echo "phony target $@"
-ph/full_06-%: ph/full_07-%-dummy ph/full_07-%-demographic_labs  ph/full_07-%-demographic_drugs ph/full_07-%-demographic_diagnoses ph/full_07-%-clinical_expertise
+ph/full_06-%:  ph/full_07-%-dummy ph/full_07-%-demographic_labs ph/full_07-%-demographic_diagnoses ph/full_07-%-demographic_drugs ph/full_07-%-demographic ph/full_07-%-clinical_expertise
 	@echo "phony target $@"
-ph/full_07-%: ph/full_08-%-gaussian_nb ph/full_08-%-logistic ph/full_08-%-mlpc ph/full_08-%-xgboost
+ph/full_07-%: ph/full_08-%-gaussian_nb
 	@echo "phony target $@"
 ph/full_08-x-%: data/ml_data/07_global_score-x-%.csv
 	@echo "phony target $@"
 	source .venv/bin/activate; python3 scripts4ml/merge_07_global_score.py $@
 	source .venv/bin/activate; python3 scripts4ml/merge_table2.py
+	bash scripts4ml/ml-simple.sh data/ml_data/07_global_score-x-$*_merged.csv
 
 # statistical analysis
 data/table_one/tbl1.csv data/table_one/tbl1.xlsx: data/diabetia.csv scripts2print/table_one/__tableOne__.py .venv/bin/activate
