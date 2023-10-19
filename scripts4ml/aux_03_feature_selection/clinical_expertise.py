@@ -2,12 +2,12 @@ from sklearn.feature_selection import chi2
 import pandas as pd
 
 _features:list[str] = [
+    'years_since_dx',
     'cs_sex',
     'age_at_wx',
     'age_at_wx_ordinal',
     'dx_age_e11',
     'dx_age_e11_ordinal',
-    'years_since_dx',
     'bmi_value',
     'bmi_ordinal',
     'diabetes_mellitus_type_2',
@@ -22,11 +22,7 @@ _features:list[str] = [
     'triglycerides_value',
     'triglycerides_ordinal',
     'cholesterol_value',
-    'cholesterol_ordinal',
-    'type_2_diabetes_mellitus_with_renal_complications',
-    'type_2_diabetes_mellitus_with_ophthalmic_complications',
-    'type_2_diabetes_mellitus_with_neurological_complications',
-    'type_2_diabetes_mellitus_with_peripheral_circulatory_complications'
+    'cholesterol_ordinal'
 ]
 
 class ClinicalExpertise:

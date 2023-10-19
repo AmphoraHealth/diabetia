@@ -24,7 +24,7 @@ OUT_PATH = f"data/ml_data/merged_07_global_score-x-{DIAGNOSTIC}.csv"
 logging.info(f"{'='*30} merge started")
 
 # load the data
-files = [pd.read_csv(IN_PATH) for IN_PATH in IN_PATHS]
+files = [pd.read_csv(IN_PATH) for IN_PATH in IN_PATHS if not "_merged.csv" in IN_PATH]
 
 # merge the data
 df = pd.concat(files, ignore_index=True)

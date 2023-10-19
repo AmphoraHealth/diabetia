@@ -26,7 +26,8 @@ IN_PATH = f"{S05_PREDICTION}.parquet"
 OUT_PATH = f"{S06_SCORE_BY_FOLD}.csv"
 
 # Import libraries ------------------------------------------------------------
-from sklearn.metrics import balanced_accuracy_score, f1_score, roc_auc_score, recall_score
+from scipy.stats import bootstrap, pearsonr
+from sklearn.metrics import balanced_accuracy_score, f1_score, roc_auc_score, recall_score, brier_score_loss
 from aux_00_common import load_data
 import pandas as pd
 
@@ -60,13 +61,15 @@ balanced_accuracy = balanced_accuracy_score(df["real"], df["pred"])
 f1 = f1_score(df["real"], df["pred"],pos_label=1)
 roc = roc_auc_score(df["real"], df["pred"])
 recall = recall_score(df["real"], df["pred"],pos_label=1)
+bss = brier_score_loss(df["real"], df["pred"])
 
 # save and print the metrics
 logging.info(f"""
 \tbalanced accuracy: {balanced_accuracy}
 \tf1 score:          {f1}
+\tbss:               {bss}
 \tsaving score to    {OUT_PATH}""")
-df = pd.DataFrame({"fold": TEST_FOLD, "balanced_accuracy": [balanced_accuracy], "f1": [f1], "roc": [roc], "recall": [recall]})
+df = pd.DataFrame({"fold": TEST_FOLD, "balanced_accuracy": [balanced_accuracy], "f1": [f1], "roc": [roc], "recall": [recall], "bss": [bss]})
 df.to_csv(OUT_PATH, index=False)
 
 # final message

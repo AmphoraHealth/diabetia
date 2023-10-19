@@ -10,7 +10,7 @@ for index, df in enumerate(files):
   # determine the diagnostic from the file name
   diagnostic = IN_PATHS[index].split("-")[2].split(".")[0]
   # rename the roc column to the diagnostic
-  df[diagnostic] = df["roc"]
+  df[diagnostic] = df["bss"]
   # keep only code and 'diagnostic'
   df = df[["code", diagnostic]]
   # round the roc to 2 decimals
@@ -45,7 +45,12 @@ df["0_ord"] = 0
 # add 1_ord column
 map_pos = 4
 map, idx = add_sort(df, map_pos, {
-  "dummy": 0
+  "dummy": 0,
+  "clinical_expertise": 1,
+  "demographic": 2,
+  "demographic_labs": 3,
+  "demographic_diagnoses": 4,
+  "demographic_drugs": 5,
 })
 df["1_ord"] = df["code"].apply(lambda x: map[x.split("-")[4]])
 df.loc[df["1_ord"] >= idx, "0_ord"] = 1

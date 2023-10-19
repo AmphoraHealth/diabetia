@@ -1,6 +1,7 @@
 # Local changes
 data/
 conf/columnGroups.json
+*.pdf
 
 # Created by https://www.toptal.com/developers/gitignore/api/python,macos,emacs,visualstudiocode,linux
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,macos,emacs,visualstudiocode,linux
