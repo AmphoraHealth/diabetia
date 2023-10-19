@@ -40,7 +40,7 @@ def generate_plot(relativerisks:pd.DataFrame, oddsratios:pd.DataFrame, plot_name
     """
     Function to generate a forest plot from an risk effect estimation
     """
-    complications = ['Renal complications', 'Ophthalmic complications', 'Neurological complications', 'Circulatory complications']
+    complications = ['Nephropathy', 'Retinopathy', 'Neuropathy', 'Diabetic foot']
     fig, axs = plt.subplots(4, 2, figsize=figsize, sharex = True)
     i = 0
     for df in relativerisks:
@@ -49,8 +49,11 @@ def generate_plot(relativerisks:pd.DataFrame, oddsratios:pd.DataFrame, plot_name
         else:
             df.sort_values(by = 'RelativeRisk', ascending = True, inplace = True)
         df = df[(df['RelativeRisk']>0) & (df['RelativeRisk']<float('inf'))]
+
+        df1 = df[df['Lower'] > 1.3]
+        df2 = df[df['Upper'] < 0.85]
         
-        df = pd.concat([df.head(tail), df.tail(top)])
+        df = pd.concat([df2.head(tail), df1.tail(top)])
             
         x_err_low = [list(df['RelativeRisk'])[i] - list(df['Lower'])[i] for i in range(len(df))]
         x_err_high = [list(df['Upper'])[i] - list(df['RelativeRisk'])[i] for i in range(len(df))]
@@ -74,6 +77,7 @@ def generate_plot(relativerisks:pd.DataFrame, oddsratios:pd.DataFrame, plot_name
 
                 else:
                     v_aux = ' '.join(v_aux)
+                v_aux = v_aux.replace(' as', '')
                 summary_variables.append(v_aux)
         
         axs[i,0].set_yticks(np.arange(len(df)), summary_variables)
@@ -84,7 +88,7 @@ def generate_plot(relativerisks:pd.DataFrame, oddsratios:pd.DataFrame, plot_name
         axs[i,0].tick_params(axis='y', which='major', labelsize=12)
         axs[i,0].tick_params(axis='x', which='major', labelsize=13)
         
-        axs[i,0].set_ylabel(complications[i], fontsize = 17, labelpad=5)
+        axs[i,0].set_ylabel(complications[i], fontsize = 19, labelpad=5)
         axs[i,0].get_yaxis().set_label_coords(-0.7,0.5)
         
         if i == 0:
@@ -100,7 +104,12 @@ def generate_plot(relativerisks:pd.DataFrame, oddsratios:pd.DataFrame, plot_name
             df.sort_values(by = 'OddsRatio', ascending = True, inplace = True)
         
         df = df[(df['OddsRatio']>0) & (df['OddsRatio']<float('inf'))]
-        df = pd.concat([df.head(tail), df.tail(top)])
+
+        df = df[abs(df['Upper'] - df['Lower']) <= 100]
+
+        df1 = df[df['Lower'] > 1.3]
+        df2 = df[df['Upper'] < 0.85]
+        df = pd.concat([df2.head(tail), df1.tail(top)])
             
         x_err_low = [list(df['OddsRatio'])[i] - list(df['Lower'])[i] for i in range(len(df))]
         x_err_high = [list(df['Upper'])[i] - list(df['OddsRatio'])[i] for i in range(len(df))]
@@ -124,6 +133,7 @@ def generate_plot(relativerisks:pd.DataFrame, oddsratios:pd.DataFrame, plot_name
 
                 else:
                     v_aux = ' '.join(v_aux)
+                v_aux = v_aux.replace(' as', '')
                 summary_variables.append(v_aux)
         axs[i,1].set_yticks(np.arange(len(df)), summary_variables)
         axs[i,1].grid(axis='x', linestyle='--', alpha=0.8)
@@ -162,7 +172,7 @@ def main():
     or_effects = [or_e112, or_e113, or_e114, or_e115]
     rr_effects = [rr_e112, rr_e113, rr_e114, rr_e115]
 
-    generate_plot(rr_effects, or_effects, 'Effect_ForestPlot_diabetesOnly', logscale = True, figsize = (24.5,16.5))
+    generate_plot(rr_effects, or_effects, 'Effect_ForestPlot', logscale = True, figsize = (24.5,16.5))
 
     
 

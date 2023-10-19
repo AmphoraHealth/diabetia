@@ -35,14 +35,17 @@ from scripts2plot.aux_plots import MakeLineplot
 config = json.load(open(CONFIG_PATH,'r', encoding='utf-8'))
 _lx_measures:dict[str:str] = config['config_lineplot']['columns']
 _y_limits:dict[str:list[int,int]] = config['config_lineplot']['y_limits']
+_groups:list[str] = config['config_lineplot']['groups']
+_palette_colors:dict[str:str] = config['config_lineplot']['palette']
+
 
 def run():
     try:
         #..read data
-        data = pd.read_csv(IN_PATH, low_memory=False)
+        data = pd.read_csv(IN_PATH, low_memory=False, nrows=None)
 
         #..Do plot
-        make_lineplot = MakeLineplot(data=data, columns=_lx_measures)
+        make_lineplot = MakeLineplot(data=data, columns=_lx_measures, groups = _groups, palette = _palette_colors)
         make_lineplot.create_plot(y_limits = _y_limits)
 
     except Exception as e:

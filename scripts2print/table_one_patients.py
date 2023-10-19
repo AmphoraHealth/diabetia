@@ -19,7 +19,7 @@ from libs.logging import logging
 
 # Constants
 IN_PATH = 'data/diabetia.csv'
-OUT_PATH = 'data/table_one_patients.csv'
+OUT_PATH = 'data/supplementary_material/table_one/table_one_patients.csv'
 CONFIG_PATH = 'conf/columnGroups.json'
 CONFIG_TABLEONE_PATH = 'scripts2print/aux_table_one/config_tableone.json'
 

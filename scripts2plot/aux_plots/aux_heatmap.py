@@ -11,21 +11,16 @@ Output:
 """
 
 # Constants
-OUT_PATH = './data/visualizations/diabetia_heatmap.png'
+OUT_PATH = './data/supplementary_material/visualizations/'
 
 
 # Import libraries
 import pandas as pd
 import numpy as np
-import re
 import os
-import json
 import sys
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn import preprocessing
-from sklearn.linear_model import LinearRegression
-from alive_progress import alive_bar
 
 
 ROOT_PATH = os.path.abspath(
@@ -46,46 +41,72 @@ class MakeHeatmap(SlopeDatabaseConstructor):
     def __init__(
             self,
             data:pd.DataFrame,
-            columns:dict[str:str]
+            columns:dict[str:str],
+            groups:list[str],
+            categories:dict[float:str]
         ):
-        super().__init__(data = data, columns = columns)
-
+        super().__init__(data = data, columns = columns, groups = groups)
+        self.categories = categories
 
     def create_plot(self):
+        """
+        This function will generate n plots by "group_name". If the input only consider
+        one group, loop process will run only once.
+        """
+        try:
+            #..Create global dataframe
+            tbl = self.fit_transform()
+
+            #..loop through groups
+            for group in list(tbl['group_name'].unique()):
+                self._create_plot(
+                    tbl=tbl,
+                    group_name=group
+                )
+
+        except Exception as e:
+            raise logging.error(f'{self.create_plot.__name__} failed. {e}')
+
+
+    def _create_plot(
+            self,
+            tbl:pd.DataFrame,
+            group_name:str
+        ):
         """
         Function to make a heatmap
         """
         try:
-            #..default var
-            age_labels:list[str] = {
-                key:index for index, key in enumerate(self.config['ageAtWxConfig']['categories'].keys())
-            }
-            age_order:list = list(age_labels.keys())
+            #..filter data and rename concept_names
+            tbl = tbl.loc[tbl['group_name']==group_name].copy()
+            tbl.loc[:,'concept_name'] = tbl['concept_name'].replace(to_replace=self.columns)
 
             #.. data preprocessing
-            tbl = self.fit_transform()
             tbl['concept_name'] = tbl['concept_name'].replace(to_replace=self.columns)
-            tbl = pd.pivot(tbl, index = 'concept_name', columns = 'age_at_wx_label', values = 'm')
-            tbl = tbl[age_order]
+            tbl = pd.pivot(tbl, index = 'concept_name', columns = 'categories', values = 'm')
+            tbl = tbl[list(self.categories.values())]
+
+            #..palette
+            palette = sns.diverging_palette(220, 20, as_cmap=True)
 
             #..make plot
             plt.figure(figsize=(10,5))
             sns.heatmap(
                 tbl, 
-                annot=True, 
-                cmap='vlag',
+                annot = True, 
+                cmap = palette,
                 fmt = '.2f',
                 center = 0,
                 vmin = -5,
                 vmax = 5
                 )
             plt.ylabel('')
-            plt.xlabel('Age group', fontsize = 8)
-            plt.title('Slopes by window (1-14)', fontsize = 14, y=1.01)
+            plt.xlabel('')
+            plt.title(f'{group_name.upper()} - slopes', fontsize = 14, y=1.01)
             plt.tight_layout()
-            plt.savefig(OUT_PATH, dpi = 300)
+            plt.savefig(OUT_PATH+'slope_heatmap_'+group_name+'.png', dpi = 300)
 
-            return logging.info('Heatmap saved')
+            return logging.info(f'{group_name} heatmap saved')
         
         except Exception as e:
             raise logging.error(f'{self.create_plot.__name__} failed. {e}')
