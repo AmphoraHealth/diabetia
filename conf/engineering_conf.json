@@ -170,6 +170,27 @@
             "valueCol":"cholesterol_value",
             "labelCol":"cholesterol_label",
             "ordinalCol":"cholesterol_ordinal"
+        },
+        "creatinine":{
+            "ranges":{
+                "M":[
+                    0,0.74,1.35,100
+                ],
+                "F":[
+                    0,0.59,1.04,100
+                ]
+            },
+            "labels":[
+                "Low",
+                "Normal",
+                "High"
+            ],
+            "targetCols":[
+                "fn_creatinine_median"
+            ],
+            "valueCol":"creatinine_value",
+            "labelCol":"creatinine_label",
+            "ordinalCol":"creatinine_ordinal"
         }
     }
 }

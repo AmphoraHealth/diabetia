@@ -120,10 +120,10 @@ class MakeLineplot(SlopeDatabaseConstructor):
                 }
             )
             #..figure adjust
-            figure.fig.subplots_adjust(hspace=0.5, top=1)
+            figure.fig.subplots_adjust(hspace=0.5, top=1.05)
             figure.set_titles(
                 template = '{row_name}',
-                fontdict = {'fontsize':6}
+                fontdict = {'fontsize':20, 'fontweight':'bold'}
                 )
             figure.set_xlabels('Window')
             figure.set_ylabels('')
@@ -151,10 +151,10 @@ class MakeLineplot(SlopeDatabaseConstructor):
                 group_3 = coefs_dict[coef]['Existing complications'] if 'Existing complications' in coefs_dict[coef].keys() else 0
                 
                 ax.annotate(
-                    f"Slopes:\nNo:{group_1:.2f} | Novo:{group_2:.2f} | Existing:{group_3:.2f}",
-                    xy=(0.05, 0.95),
+                    f"Slopes:\nNo:{group_1:.2f} | De novo:{group_2:.2f} | Existing:{group_3:.2f}",
+                    xy=(0.05, 0.90),
                     xycoords = 'axes fraction',
-                    fontsize = 8
+                    fontsize = 12
                 )
             
             #..declare 'y' limits for each row
