@@ -25,9 +25,7 @@ CONFIG_TABLEONE_PATH = 'scripts2print/aux_table_one/config_tableone.json'
 
 # Import libraries
 import pandas as pd
-import numpy as np
 import json
-import re
 from aux_table_one import TableOne
 from aux_table_one import SummarizeData
 from aux_table_one import CreateGlucose

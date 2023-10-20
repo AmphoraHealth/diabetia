@@ -20,8 +20,6 @@ CONFIG_TABLEONE_PATH = 'scripts2print/aux_table_one/config_tableone.json'
 import pandas as pd
 import numpy as np
 import json
-import re
-import janitor
 
 #..Default configurations
 import warnings
@@ -149,7 +147,7 @@ class SummarizeData:
         try:
             #..grouped AgeAtDx
             summ = (
-                self.data[['window','cx_curp','dx_age_e11_cat']]
+                self.data[['window','cx_curp','dx_age_e11_label']]
                     .drop_duplicates(subset='cx_curp', keep='first')
                 )
                         

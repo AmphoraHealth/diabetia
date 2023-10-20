@@ -31,7 +31,6 @@ CONFIG_TABLEONE_PATH = 'scripts2print/aux_table_one/config_tableone.json'
 import pandas as pd
 import numpy as np
 import json
-import re
 import janitor
 
 #..Default configurations
@@ -204,7 +203,7 @@ class TableOne:
         try:
             #..get group by
             grouped_data = \
-                self.data.groupby('dx_age_e11_cat')['id']\
+                self.data.groupby('dx_age_e11_label')['id']\
                     .agg(['count',lambda x: x.count()/self.data['id'].count()])\
                     .reset_index()
             grouped_data.columns = ['category','measure','measure_per']
