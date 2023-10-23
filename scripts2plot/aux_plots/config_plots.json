@@ -39,7 +39,7 @@
         "columns":{
             "bmi_value":"BMI (kg/m2)",
             "glucose_value":"Glucose (mg/dL)",
-            "hemoglobin_value":"Hemoglobin-A1c (g/dL)",
+            "hemoglobin_value":"HbA1c (%)",
             "triglycerides_value":"Triglycerides (mg/dL)",
             "fn_creatinine_mean":"Creatinine (mg/dL)",
             "cholesterol_value":"Cholesterol (mg/dL)"
@@ -47,7 +47,7 @@
         "y_limits":{
             "BMI (kg/m2)": [26,32],
             "Glucose (mg/dL)": [100, 170],
-            "Hemoglobin-A1c (g/dL)": [5,18],
+            "HbA1c (%)": [5,18],
             "Triglycerides (mg/dL)":[150,300],
             "Creatinine (mg/dL)":[0.5,2.5],
             "Cholesterol (mg/dL)": [150,250]
