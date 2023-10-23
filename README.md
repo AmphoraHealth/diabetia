@@ -41,4 +41,4 @@ Built by [@AmphoraHealth](github.com/AmphoraHealth) with collaborations from the
 Related Publication
 ==================
 
-> Tripp et al (2023). Predicting diabetic complications (In progress).
+> Tripp et al (2023). DiabetIA: Building Machine Learning Models for Type 2 Diabetes Complications. MedRXiv https://doi.org/10.1101/2023.10.22.23297277
