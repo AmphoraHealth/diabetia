@@ -71,22 +71,22 @@ def get_binary_features(data:pd.DataFrame) -> pd.DataFrame:
     Function to return a subset of binary variables from the dataset
     """
     data['years since T2D Dx = 0-4'] = [1 if x <= 4 else 0 for x in data['years_since_dx']]
-    data['years since T2D Dx = 5-14'] = [1 if x > 4 and x <= 14 else 0 for x in data['years_since_dx']]
-    data['years since T2D Dx = 15>'] = [1 if x >= 15 else 0 for x in data['years_since_dx']]
+    data['years since T2D Dx = 5-14'] = [1 if x >= 5 and x <= 14 else 0 for x in data['years_since_dx']]
+    data['years since T2D Dx >= 15'] = [1 if x >= 15 else 0 for x in data['years_since_dx']]
     data['Sex = Female'] = [1 if x == 0 else 0 for x in data['cs_sex']]
     data['Sex = Male'] = list(data['cs_sex'])
-    data['years at window = 18-44'] = [1 if x >=18 and x<=45 else 0 for x in data['age_at_wx']]
-    data['years at window = 45-64'] = [1 if x >=45 and x<=64 else 0 for x in data['age_at_wx']]
-    data['years at window = 65>'] = [1 if x >=65 else 0 for x in data['age_at_wx']]
-    data['years at T2D Dx = 0-4'] = [1 if x <= 4 else 0 for x in data['dx_age_e11']]
-    data['years at T2D Dx = 5-14'] = [1 if x > 4 and x <= 14 else 0 for x in data['dx_age_e11']]
-    data['years at T2D Dx = 15>'] = [1 if x >= 15 else 0 for x in data['dx_age_e11']]
+    data['years at window = 18-44'] = [1 if x >= 18 and x <= 44 else 0 for x in data['age_at_wx']]
+    data['years at window = 45-64'] = [1 if x >= 45 and x <= 64 else 0 for x in data['age_at_wx']]
+    data['years at window >= 65'] = [1 if x >= 65 else 0 for x in data['age_at_wx']]
+    data['years at T2D Dx = 18-44'] = [1 if x >= 18 and x <= 44 else 0 for x in data['dx_age_e11']]
+    data['years at T2D Dx = 45-64'] = [1 if x >= 45 and x <= 64 else 0 for x in data['dx_age_e11']]
+    data['years at T2D Dx >= 65'] = [1 if x >= 65 else 0 for x in data['dx_age_e11']]
     data['BMI = Overweight & Obesity'] = [1 if x >= 25 else 0 for x in data['bmi_value']]
-    data['T2D'] = list(data['diabetes_mellitus_type_2'])
-    data['HTN'] = list(data['essential_(primary)_hypertension'])
-    data['Disorders of lipoprotein metabolism and other lipidemias'] = list(data['disorders_of_lipoprotein_metabolism_and_other_lipidemias'])
-    data['eGFR = High (female)'] = [1 if x >=1.04 and y == 0 else 0 for x,y in zip(data['gfr_value'], data['cs_sex'])] 
-    data['eGFR = High (male)'] = [1 if x >=1.35 and y == 1 else 0 for x,y in zip(data['gfr_value'], data['cs_sex'])]
+    data['T2D (E11) = True'] = list(data['diabetes_mellitus_type_2'])
+    data['Hypertension (I10) = True'] = list(data['essential_(primary)_hypertension'])
+    data['Dyslipidemia (E78) = True'] = list(data['disorders_of_lipoprotein_metabolism_and_other_lipidemias'])
+    data['eGFR = Low (female)'] = [1 if x < 60 and x !=0 and y == 0 else 0 for x,y in zip(data['gfr_value'], data['cs_sex'])] 
+    data['eGFR = Low (male)'] = [1 if x < 60 and x !=0 and y == 1 else 0 for x,y in zip(data['gfr_value'], data['cs_sex'])]
     data['Glucose = High'] = [1 if x >= 126 else 0 for x in data['glucose_value']]
     data['HbA1c = High'] = [1 if x >= 6 else 0 for x in data['hemoglobin_value']]
     data['Triglycerides = High'] = [1 if x >= 150 else 0 for x in data['triglycerides_value']]
@@ -207,3 +207,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+        
