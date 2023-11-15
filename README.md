@@ -28,9 +28,9 @@ The main code was developed to run on Unix-like environments such as macOS and L
 Running
 =======
 
-The codes under scripts2print and scripts2plot can be run manually using python with commands like `python3 scripts2print/table_one_patients.py`. The codes under scripts4ml also can run manually but we strongly recommend to use make to orchestrate the pipelines.
+The scripts under scripts2print and scripts2plot can be executed manually using Python with commands like `python3 scripts2print/table_one_patients.py`. Similarly, the scripts under scripts4ml can also be run manually. However, we strongly recommend using Make to orchestrate the pipelines for optimal execution.
 
-## Pipeline verification
+## Running the pipelines
 
 To check if the pipeline can run under your installation you can run the command:
 `make test`
