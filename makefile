@@ -213,5 +213,5 @@ ph/full_08-x-%: data/ml_data/07_global_score-x-%.csv
 	bash scripts4ml/ml-simple.sh data/ml_data/07_global_score-x-$*_merged.csv
 
 # statistical analysis
-data/table_one/tbl1.csv data/table_one/tbl1.xlsx: data/diabetia.csv scripts2print/table_one/__tableOne__.py .venv/bin/activate
+data/table_one/tbl1.csv data/table_one/tbl1.xlsx &: data/diabetia.csv scripts2print/table_one/__tableOne__.py .venv/bin/activate
 	source .venv/bin/activate; python3 scripts2print/table_one/__tableOne__.py
