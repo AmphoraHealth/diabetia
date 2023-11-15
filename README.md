@@ -15,18 +15,31 @@ The DiabetIA dataset
 Install
 =======
 
-The only prerequisite is Python (tested with 3.10.6) and Docker.
+The main prerequisites are Python (tested with version 3.10.6) and R (tested with version 4.2.2). It is strongly recommended to install Make to orchestrate the complex pipelines for data transformation or training.
 
-1. Clone the repo.
-2. Run `pip install -r requirements.txt`.
-3. Run `python install.py` to build all the libraries inside Docker containers (this can take a while, like 10-30 minutes).
+Also we recommend to verify if you have the commands wget and unzip available on your operative sistem
+
+To create the virtual environment used for Python, you can run the command `make create_env`. Alternatively, you can manually install all the dependencies using the file requirements.txt.
+
+To download the diabetia database used for this repository you can run the command `make diabetia`. Alternatively you can download it from [Conahcyt](https://repositorio-salud.conacyt.mx/jspui/bitstream/1000/296/hk_database_17ago2023.zip), uncompress it as data/hk_database.csv and run secuentially the codes unde preprocess folder.
+
+The main code was developed to run on Unix-like environments such as macOS and Linux, but it can also run on Windows if you install Make (or without it if you run the Python or R codes manually).
 
 Running
 =======
 
-1. Run `python run.py` (this can take an extremely long time, potentially days)
-2. Run `python plot.py` or `python create_website.py` to plot results.
-3. Run `python data_export.py --out res.csv` to export all results into a csv file for additional post-processing.
+The codes under scripts2print and scripts2plot can be run manually using python with commands like `python3 scripts2print/table_one_patients.py`. The codes under scripts4ml also can run manually but we strongly recommend to use make to orchestrate the pipelines.
+
+## Pipeline verification
+
+To check if the pipeline can run under your installation you can run the command:
+`make test`
+
+To run the complete pipeline on the first fold you can run the command:
+`make 1-fold`
+
+To run the complete pipeline on the complete 5-folds verification you can run the command:
+`make 5-folds`
 
 Authors
 =======
