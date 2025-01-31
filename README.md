@@ -21,7 +21,7 @@ Also we recommend to verify if you have the commands wget and unzip available on
 
 To create the virtual environment used for Python, you can run the command `make create_env`. Alternatively, you can manually install all the dependencies using the file requirements.txt.
 
-To download the diabetia database used for this repository you can run the command `make diabetia`. Alternatively you can download it from [Conahcyt](https://repositorio-salud.conacyt.mx/jspui/bitstream/1000/296/hk_database_17ago2023.zip), uncompress it as data/hk_database.csv and run secuentially the codes unde preprocess folder.
+To download the diabetia database used for this repository you can run the command `make diabetia`. Alternatively you can download it from [Conahcyt](https://repositorio-salud.conacyt.mx/jspui/bitstream/1000/296/5/hk_database_17ago2023.zip), uncompress it as data/hk_database.csv and run secuentially the codes unde preprocess folder.
 
 The main code was developed to run on Unix-like environments such as macOS and Linux, but it can also run on Windows if you install Make (or without it if you run the Python or R codes manually).
 
