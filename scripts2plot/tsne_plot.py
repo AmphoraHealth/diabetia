@@ -20,7 +20,8 @@ from libs.logging import logging
 IN_PATH = 'data/diabetia.csv'
 OUT_PATH_IMG = 'data/supplementary_material/visualizations'
 CONFIG_PATH = './conf/engineering_conf.json'
-DIAGNOSTIC = sys.argv[1]
+#DIAGNOSTIC = sys.argv[1]
+DIAGNOSTIC = 'e112'
 DIAGNOSTIC = DIAGNOSTIC.lower()
 color_pallette = {
     'e112':{'No complication': '#95A5A6', 'De novo complication':'#E74C3C', 'Pre-existing complication':'#FFA07A'},
@@ -82,6 +83,7 @@ def generate_tsne_plot(data:pd.DataFrame, label:pd.Series):
     X_embedded_df['label'] = label_final
 
     plt.figure(figsize=(12, 12))
+    plt.axis('off')
     plt.tight_layout()
     sns.scatterplot(X_embedded_df, x = 'x', y='y', hue = 'label', alpha = 0.6, palette= color_pallette[DIAGNOSTIC])
     sns.scatterplot(X_embedded_df[X_embedded_df['label'] == 'De novo complication'], x = 'x', y='y', color = color_pallette[DIAGNOSTIC]['De novo complication'], alpha = 0.9)

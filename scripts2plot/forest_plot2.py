@@ -24,8 +24,8 @@ IN_PATH = 'data/diabetia.csv'
 OUT_PATH_IMG = 'data/supplementary_material/visualizations'
 OUT_PATH_DATA = 'data/supplementary_material/data_aux'
 CONFIG_PATH = './conf/engineering_conf.json'
-DIAGNOSTIC = sys.argv[1]
-DIAGNOSTIC = DIAGNOSTIC.lower()
+#DIAGNOSTIC = sys.argv[1]
+#DIAGNOSTIC = DIAGNOSTIC.lower()
 
 
 #Libraries
@@ -206,5 +206,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    for dx in complications.keys():
+        DIAGNOSTIC = dx
+        main()
         
